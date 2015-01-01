@@ -76,7 +76,7 @@ void CopyTitle::populateWebViewMenu(QMenu* menu, WebView* view, const QWebHitTes
 {
     m_view = view;
 
-    if (!r.linkUrl().isEmpty() || r.isContentEditable()) {
+    if (r.isContentEditable()) {
         return;
     }
 
@@ -92,12 +92,18 @@ void CopyTitle::populateWebViewMenu(QMenu* menu, WebView* view, const QWebHitTes
             title += "image";
         }
     }
-
+    else if (!r.linkText().isEmpty()) {
+        title = r.linkText();
+    }
     else {
         title = view->title();
     }
 
-    menu->addAction(QIcon::fromTheme("edit-copy"), !r.imageUrl().isEmpty() ? tr("Copy Image Name") : tr("Copy Page Title"), this, SLOT(copyPageTitle()))->setData(title);
+    menu->addAction(QIcon::fromTheme("edit-copy"),
+                    !r.imageUrl().isEmpty() ? tr("Copy Image Name") :
+                    !r.linkText().isEmpty() ? tr("Copy Link Text") :
+                    tr("Copy Page Title"),
+                    this, SLOT(copyPageTitle()))->setData(title);
 }
 
 bool CopyTitle::mousePress(const Qz::ObjectName &type, QObject* obj, QMouseEvent* event)
