@@ -23,10 +23,6 @@ WindowHandler(QWidget* const window)
 
     captureWidgets();
 
-    m_timer.setSingleShot(true);
-    this->connect(&m_timer, SIGNAL(timeout()),
-                  this,     SLOT(showToolbar()));
-
     m_navigationContainer->installEventFilter(this);
     m_tabBar->installEventFilter(this);
 }
@@ -48,13 +44,14 @@ mouseMove(QMouseEvent * const event)
     QPoint pos = m_container->mapFromGlobal(event->globalPos());
 
     if (m_container->rect().contains(pos)) {
-        if (!m_timer.isActive()) {
-            m_timer.start(WindowHandler::showTimeout);
+        if (!m_container->isEntered()) {
+            m_container->enter();
         }
     }
     else {
-        if (m_timer.isActive()) m_timer.stop();
-        hideToolbar();
+        if (m_container->isEntered()) {
+            m_container->leave();
+        }
     }
 }
 
@@ -66,7 +63,7 @@ eventFilter(QObject* const obj, QEvent* const event)
         resizeToolBars();
     }
     else if (obj == m_tabBar && event->type() == QEvent::Enter) {
-        showToolbar();
+        m_container->show();
     }
     return false;
 }
@@ -102,6 +99,7 @@ captureWidgets()
 
     assert(m_navigationContainer);
     assert(m_webView);
+    assert(m_tabBar);
 }
 
 void WindowHandler::
@@ -119,18 +117,6 @@ resizeToolBars()
     );
     qDebug() << __FUNCTION__ << m_navigationContainer->geometry()
                              << m_container->geometry();
-}
-
-void WindowHandler::
-showToolbar()
-{
-    m_container->setVisible(true);
-}
-
-void WindowHandler::
-hideToolbar()
-{
-    m_container->setVisible(false);
 }
 
 } // namespace lesschrome

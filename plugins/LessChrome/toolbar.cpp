@@ -11,7 +11,8 @@ namespace lesschrome {
 Toolbar::
 Toolbar(QWidget* const parent)
     : QWidget(parent),
-      m_layout(new QVBoxLayout)
+      m_layout(new QVBoxLayout),
+      m_entered(false)
 {
     assert(parent);
     assert(m_layout);
@@ -20,6 +21,10 @@ Toolbar(QWidget* const parent)
     m_layout->setSpacing(0);
     this->setLayout(m_layout);
     this->setAutoFillBackground(true);
+
+    m_timer.setSingleShot(true);
+    this->connect(&m_timer, SIGNAL(timeout()),
+                  this,     SLOT(show()));
 }
 
 Toolbar::
@@ -63,6 +68,49 @@ capture(QWidget* const widget)
 }
 
 void Toolbar::
+show()
+{
+    this->setVisible(true);
+    m_entered = true;
+}
+
+void Toolbar::
+hide()
+{
+    this->setVisible(false);
+    m_entered = false;
+}
+
+void Toolbar::
+enter()
+{
+    //qDebug() << __FUNCTION__;
+
+    m_entered = true;
+    if (!m_timer.isActive()) {
+        m_timer.start(Toolbar::showTimeout);
+    }
+}
+
+void Toolbar::
+leave()
+{
+    //qDebug() << __FUNCTION__;
+
+    m_entered = false;
+    if (m_timer.isActive()) {
+        m_timer.stop();
+    }
+    hide();
+}
+
+void Toolbar::
+wheelEvent(QWheelEvent* const)
+{
+    hide();
+}
+
+void Toolbar::
 restore() // needs to be noexcept
 {
     foreach (const WidgetInfo &info, m_widgets) {
@@ -83,14 +131,6 @@ restore() // needs to be noexcept
     m_widgets.clear();
 
     assert(m_widgets.empty());
-}
-
-void Toolbar::
-wheelEvent(QWheelEvent* const ev)
-{
-    if (ev->orientation() == Qt::Vertical && ev->delta() > 0) {
-        this->setVisible(false);
-    }
 }
 
 } // namespace lesschrome
