@@ -68,20 +68,6 @@ capture(QWidget* const widget)
 }
 
 void Toolbar::
-show()
-{
-    this->setVisible(true);
-    m_entered = true;
-}
-
-void Toolbar::
-hide()
-{
-    this->setVisible(false);
-    m_entered = false;
-}
-
-void Toolbar::
 enter()
 {
     //qDebug() << __FUNCTION__;
@@ -102,6 +88,20 @@ leave()
         m_timer.stop();
     }
     hide();
+}
+
+void Toolbar::
+show()
+{
+    this->setVisible(true);
+    m_entered = true;
+}
+
+void Toolbar::
+hide()
+{
+    this->setVisible(false);
+    m_entered = false;
 }
 
 void Toolbar::
