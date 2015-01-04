@@ -4,21 +4,15 @@
 #include "tabwatcher.h"
 #include "toolbar.h"
 
-#include <cassert>
-#include <utility>
-#include <vector>
-
 #include <boost/unordered_set.hpp>
 
-#include <QtCore/QTimer>
+#include <QtCore/QPoint>
 
 class QWidget;
 class QMouseEvent;
 
 namespace lesschrome {
 
-//TODO save initial visibility of target widgets
-//TODO detect visibility change of menubar, toolbar
 //TODO status bar support
 class WindowHandler : public QObject
 {
@@ -34,7 +28,6 @@ private:
     virtual bool eventFilter(QObject* const, QEvent* const event);
 
     void captureWidgets();
-    void resizeToolBars();
 
 private slots:
     void slotTabAdded(WebTab*);
@@ -42,12 +35,10 @@ private slots:
 
 private:
     QWidget *m_window;
-    QWidget *m_navigationContainer;
-    QWidget *m_webView;
     QWidget *m_tabBar;
-    TabWatcher m_tabWatcher;
     boost::unordered_set<QWidget*> m_locationBars;
 
+    TabWatcher m_tabWatcher;
     Toolbar m_container;
     QPoint m_mousePos;
 };

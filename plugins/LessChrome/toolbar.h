@@ -7,6 +7,7 @@
 #include <QtCore/QTimer>
 #include <QtGui/QWidget>
 
+class BrowserWindow;
 class QWheelEvent;
 class QBoxLayout;
 class QVBoxLayout;
@@ -17,7 +18,7 @@ class Toolbar : public QWidget
 {
     Q_OBJECT
 public:
-    Toolbar(QWidget* const parent);
+    Toolbar(BrowserWindow* const parent);
     ~Toolbar();
 
     void capture(QWidget* const);
@@ -35,6 +36,7 @@ private:
     virtual void wheelEvent(QWheelEvent* const);
 
     void restore();
+    void updatePositionAndSize();
 
 private:
     enum { showTimeout = 1000 };
@@ -48,6 +50,7 @@ private:
 
     typedef std::pair<QWidget*, LayoutInfo> WidgetInfo;
 
+    BrowserWindow* m_window;
     QVBoxLayout *m_layout;
     std::vector<WidgetInfo> m_widgets;
     QTimer m_timer;

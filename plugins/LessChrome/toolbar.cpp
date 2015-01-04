@@ -1,20 +1,25 @@
 #include "toolbar.h"
 
+#include "browserwindow.h"
+#include "tabbedwebview.h"
+
 #include <cassert>
 
 #include <QtCore/QDebug>
+#include <QtCore/QPoint>
 #include <QtGui/QWheelEvent>
 #include <QtGui/QVBoxLayout>
 
 namespace lesschrome {
 
 Toolbar::
-Toolbar(QWidget* const parent)
-    : QWidget(parent),
+Toolbar(BrowserWindow* const window)
+    : QWidget(window),
+      m_window(window),
       m_layout(new QVBoxLayout), //TODO remove new
       m_entered(false)
 {
-    assert(parent);
+    assert(m_window);
     assert(m_layout);
 
     m_layout->setContentsMargins(0, 0, 0, 0);
@@ -95,16 +100,31 @@ void Toolbar::
 show()
 {
     //qDebug() << __FUNCTION__;
+    assert(m_window);
 
     this->setVisible(true);
+
+    updatePositionAndSize();
 }
 
 void Toolbar::
 hide()
 {
     //qDebug() << __FUNCTION__;
-
     this->setVisible(false);
+}
+
+void Toolbar::
+updatePositionAndSize()
+{
+    QWidget* const webView = m_window->weView();
+    assert(webView);
+
+    const QPoint &topLeft =
+        webView->mapTo(this->parentWidget(), QPoint(0, 0));
+    this->setGeometry(
+        topLeft.x(), topLeft.y(),
+        webView->width(), this->childrenRect().height());
 }
 
 void Toolbar::
