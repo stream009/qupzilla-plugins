@@ -1,9 +1,8 @@
 #include "windowhandler.h"
 
-#include "toolbar.h"
-
 #include "bookmarkstoolbar.h"
 #include "browserwindow.h"
+#include "locationbar.h"
 #include "navigationbar.h"
 #include "navigationcontainer.h"
 #include "tabbar.h"
@@ -15,14 +14,24 @@
 namespace lesschrome {
 
 WindowHandler::
-WindowHandler(QWidget* const window)
+WindowHandler(BrowserWindow* const window)
     : m_window(window),
-      m_container(new Toolbar(window))
+      m_navigationContainer(NULL),
+      m_webView(NULL),
+      m_tabBar(NULL),
+      m_tabWatcher(window),
+      m_container(window)
 {
     assert(m_window);
 
     captureWidgets();
+    assert(m_navigationContainer);
+    assert(m_tabBar);
 
+    this->connect(&m_tabWatcher, SIGNAL(tabAdded(WebTab*)),
+                  this,          SLOT(slotTabAdded(WebTab*)));
+    this->connect(&m_tabWatcher, SIGNAL(tabDeleted(WebTab*)),
+                  this,          SLOT(slotTabDeleted(WebTab*)));
     m_navigationContainer->installEventFilter(this);
     m_tabBar->installEventFilter(this);
 }
@@ -30,40 +39,62 @@ WindowHandler(QWidget* const window)
 WindowHandler::
 ~WindowHandler()
 {
-    qDebug() << __FUNCTION__;
+    //qDebug() << __FUNCTION__;
     m_navigationContainer->removeEventFilter(this);
     m_tabBar->removeEventFilter(this);
+
+    foreach (QWidget* const locationBar, m_locationBars) {
+        locationBar->removeEventFilter(this);
+    }
 }
 
 void WindowHandler::
 mouseMove(QMouseEvent * const event)
 {
     assert(event);
+
+    // Ignore unchanged mouse move event. Sometimes it happens.
+    if (event->pos() == m_mousePos) return;
+    m_mousePos = event->pos();
+
     //TODO If only mouse events from webview come here,
     //there is no need to translate them.
-    QPoint pos = m_container->mapFromGlobal(event->globalPos());
+    QPoint pos = m_container.mapFromGlobal(event->globalPos());
 
-    if (m_container->rect().contains(pos)) {
-        if (!m_container->isEntered()) {
-            m_container->enter();
+    if (m_container.rect().contains(pos)) {
+        if (!m_container.isEntered()) {
+            m_container.enter();
         }
     }
     else {
-        if (m_container->isEntered()) {
-            m_container->leave();
+        if (m_container.isEntered()) {
+            m_container.leave();
+        }
+        else if (m_container.isVisible()){
+            m_container.hide();
         }
     }
+
 }
 
 bool WindowHandler::
 eventFilter(QObject* const obj, QEvent* const event)
 {
     assert(event);
-    if (event->type() == QEvent::Resize) {
+    if (obj == m_navigationContainer &&
+                               event->type() == QEvent::Resize)
+    {
         resizeToolBars();
     }
     else if (obj == m_tabBar && event->type() == QEvent::Enter) {
-        m_container->show();
+        //qDebug() << "tabBar enter";
+        m_container.show();
+    }
+    else if (qobject_cast<LocationBar*>(obj) != NULL) {
+        if (event->type() == QEvent::FocusIn) {
+            //qDebug() << "locationbar focus";
+            m_container.show();
+        }
     }
     return false;
 }
@@ -94,8 +125,8 @@ captureWidgets()
     m_tabBar = m_window->findChild<TabBar*>();
     assert(m_tabBar); //TODO handle more properly
 
-    m_container->capture(navigationBar);
-    m_container->capture(bookmarksToolbar);
+    m_container.capture(navigationBar);
+    m_container.capture(bookmarksToolbar);
 
     assert(m_navigationContainer);
     assert(m_webView);
@@ -111,12 +142,41 @@ resizeToolBars()
         m_webView->mapTo(m_window, webViewRect.topLeft())
     );
 
-    m_container->setGeometry(
+    m_container.setGeometry(
         webViewRect.x(), webViewRect.y(),
-        m_navigationContainer->width(), m_container->height()
+        m_navigationContainer->width(), m_container.height()
     );
-    qDebug() << __FUNCTION__ << m_navigationContainer->geometry()
-                             << m_container->geometry();
+    //qDebug() << __FUNCTION__ << m_navigationContainer->geometry();
+}
+
+void WindowHandler::
+slotTabAdded(WebTab* const tab)
+{
+    assert(tab);
+    //qDebug() << __FUNCTION__ << tab;
+
+    LocationBar* const locationBar = tab->locationBar();
+    assert(locationBar);
+
+    if (m_locationBars.count(locationBar) == 0) {
+        locationBar->installEventFilter(this);
+        m_locationBars.insert(locationBar);
+    }
+}
+
+void WindowHandler::
+slotTabDeleted(WebTab* const tab)
+{
+    assert(tab);
+    //qDebug() << __FUNCTION__ << tab;
+
+    LocationBar* const locationBar = tab->locationBar();
+    assert(locationBar);
+
+    if (m_locationBars.count(locationBar) == 1) {
+        locationBar->removeEventFilter(this);
+        m_locationBars.erase(locationBar);
+    }
 }
 
 } // namespace lesschrome

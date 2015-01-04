@@ -4,10 +4,12 @@ os2: TARGET = LessChrome
 
 SOURCES += plugin.cpp \
            windowhandler.cpp \
-	   toolbar.cpp
+	   toolbar.cpp \
+	   tabwatcher.cpp
 HEADERS += plugin.h \
            windowhandler.h \
-	   toolbar.h
+	   toolbar.h \
+	   tabwatcher.h
 #RESOURCES += lesschrome.qrc
 
 #TRANSLATIONS += \

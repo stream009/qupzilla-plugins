@@ -66,7 +66,7 @@ init(InitState state, const QString &settingsPath)
 void LessChromePlugin::
 unload()
 {
-    qDebug() << __FUNCTION__ << "called";
+    qDebug() << __FUNCTION__;
 }
 
 bool LessChromePlugin::
@@ -130,10 +130,11 @@ mouseMove(const Qz::ObjectName &type, QObject * const obj,
     //qDebug() << obj << event->pos();
 
     if (type != Qz::ON_WebView) return false;
-    BrowserWindow * const window =
+    BrowserWindow * const window = //TODO check obj for null
                     qobject_cast<TabbedWebView*>(obj)->browserWindow();
     if (window == NULL) return false;
 
+    //TODO check
     boost::shared_ptr<WindowHandler> handler = m_windows.at(window);
     handler->mouseMove(event);
 

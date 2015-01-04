@@ -11,7 +11,7 @@ namespace lesschrome {
 Toolbar::
 Toolbar(QWidget* const parent)
     : QWidget(parent),
-      m_layout(new QVBoxLayout),
+      m_layout(new QVBoxLayout), //TODO remove new
       m_entered(false)
 {
     assert(parent);
@@ -71,8 +71,8 @@ void Toolbar::
 enter()
 {
     //qDebug() << __FUNCTION__;
-
     m_entered = true;
+
     if (!m_timer.isActive()) {
         m_timer.start(Toolbar::showTimeout);
     }
@@ -84,6 +84,7 @@ leave()
     //qDebug() << __FUNCTION__;
 
     m_entered = false;
+
     if (m_timer.isActive()) {
         m_timer.stop();
     }
@@ -93,15 +94,17 @@ leave()
 void Toolbar::
 show()
 {
+    //qDebug() << __FUNCTION__;
+
     this->setVisible(true);
-    m_entered = true;
 }
 
 void Toolbar::
 hide()
 {
+    //qDebug() << __FUNCTION__;
+
     this->setVisible(false);
-    m_entered = false;
 }
 
 void Toolbar::
