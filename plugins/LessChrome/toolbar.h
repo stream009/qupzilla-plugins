@@ -15,17 +15,11 @@ class QStatusBar;
 
 namespace lesschrome {
 
-//TODO extract FloatingToolbar from Toolbar
-class Toolbar : public QWidget
+class FloatingBar : public QWidget
 {
     Q_OBJECT
 public:
     enum Position { Top, Bottom };
-
-    Toolbar(BrowserWindow* const parent, const Position = Top);
-    ~Toolbar();
-
-    void capture(QWidget* const);
 
     void enter();
     void leave();
@@ -35,6 +29,8 @@ public slots:
     void show();
 
 protected:
+    FloatingBar(BrowserWindow* const parent, const Position = Top);
+
     void updatePositionAndSize();
     BrowserWindow* window() { return m_window; }
 
@@ -42,11 +38,24 @@ private:
     // @override QWidget
     virtual void wheelEvent(QWheelEvent* const);
 
-    void restore();
-
 private:
     enum { showTimeout = 1000 };
 
+    BrowserWindow* m_window;
+    QTimer m_timer;
+    bool m_entered;
+    Position m_position;
+};
+
+class Toolbar : public FloatingBar
+{
+public:
+    explicit Toolbar(BrowserWindow* const parent);
+    virtual ~Toolbar();
+
+    void capture(QWidget* const);
+
+private:
     struct LayoutInfo {
         QBoxLayout *layout;
         int index;
@@ -56,18 +65,14 @@ private:
 
     typedef std::pair<QWidget*, LayoutInfo> WidgetInfo;
 
-    BrowserWindow* m_window;
     std::vector<WidgetInfo> m_widgets;
-    QTimer m_timer;
-    bool m_entered;
-    Position m_position;
 };
 
-class StatusBar : public Toolbar
+class StatusBar : public FloatingBar
 {
 public:
-    StatusBar(BrowserWindow* const window);
-    ~StatusBar();
+    explicit StatusBar(BrowserWindow* const window);
+    virtual ~StatusBar();
 
 private:
     QStatusBar* m_statusBar;

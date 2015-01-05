@@ -49,7 +49,7 @@ WindowHandler::
 
 //TODO move to Toolbar?
 static void
-dispatchMouseMove(Toolbar &toolbar, const QPoint &pos)
+dispatchMouseMove(FloatingBar &toolbar, const QPoint &pos)
 {
     if (toolbar.geometry().contains(pos)) {
         if (!toolbar.isEntered()) {

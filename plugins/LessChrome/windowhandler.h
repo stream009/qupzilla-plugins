@@ -14,7 +14,7 @@ class QMouseEvent;
 
 namespace lesschrome {
 
-//TODO status bar support
+//TODO save tab on top setting
 class WindowHandler : public QObject
 {
     Q_OBJECT

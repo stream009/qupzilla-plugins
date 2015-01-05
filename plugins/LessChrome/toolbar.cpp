@@ -13,8 +13,8 @@
 
 namespace lesschrome {
 
-Toolbar::
-Toolbar(BrowserWindow* const window, const Position position)
+FloatingBar::
+FloatingBar(BrowserWindow* const window, const Position position)
     : QWidget(window),
       m_window(window),
       m_entered(false),
@@ -32,10 +32,96 @@ Toolbar(BrowserWindow* const window, const Position position)
                   this,     SLOT(show()));
 }
 
+void FloatingBar::
+enter()
+{
+    //qDebug() << __FUNCTION__;
+    m_entered = true;
+
+    if (!m_timer.isActive()) {
+        m_timer.start(Toolbar::showTimeout);
+    }
+}
+
+void FloatingBar::
+leave()
+{
+    //qDebug() << __FUNCTION__;
+    m_entered = false;
+
+    if (m_timer.isActive()) {
+        m_timer.stop();
+    }
+    hide();
+}
+
+void FloatingBar::
+show()
+{
+    //qDebug() << __FUNCTION__;
+    QWidget::show();
+    updatePositionAndSize();
+}
+
+void FloatingBar::
+updatePositionAndSize()
+{
+    assert(m_window);
+    QWidget* const webView = m_window->weView();
+    assert(webView);
+
+    const QRect &childrenRect = this->childrenRect();
+    QPoint topLeft;
+    switch (m_position) {
+    case Top:
+        topLeft = webView->mapTo(this->parentWidget(), QPoint(0, 0));
+        break;
+    case Bottom:
+        topLeft = webView->mapTo(this->parentWidget(),
+            QPoint(0, webView->height() - childrenRect.height()));
+        break;
+    default:
+        //TODO error handling
+        break;
+    }
+
+    this->setGeometry(
+        topLeft.x(), topLeft.y(),
+        webView->width(), childrenRect.height());
+}
+
+void FloatingBar::
+wheelEvent(QWheelEvent* const)
+{
+    hide();
+}
+
+Toolbar::
+Toolbar(BrowserWindow* const parent)
+    : FloatingBar(parent)
+{}
+
 Toolbar::
 ~Toolbar()
 {
-    restore();
+    foreach (const WidgetInfo &info, m_widgets) {
+        QWidget* const widget = info.first;
+        const LayoutInfo &layoutInfo = info.second;
+
+        QBoxLayout* layout = layoutInfo.layout;
+        if (layout->parentWidget() == NULL ||
+            !layout->isEnabled())
+        {
+            //TODO do better
+            qDebug() << "layout is invalid:" << widget << layout;
+        }
+
+        layout->insertWidget(layoutInfo.index,
+                    widget, layoutInfo.stretch, layoutInfo.alignment);
+    }
+    m_widgets.clear();
+
+    assert(m_widgets.empty());
 }
 
 void Toolbar::
@@ -72,96 +158,9 @@ capture(QWidget* const widget)
     updatePositionAndSize();
 }
 
-void Toolbar::
-enter()
-{
-    //qDebug() << __FUNCTION__;
-    m_entered = true;
-
-    if (!m_timer.isActive()) {
-        m_timer.start(Toolbar::showTimeout);
-    }
-}
-
-void Toolbar::
-leave()
-{
-    //qDebug() << __FUNCTION__;
-    m_entered = false;
-
-    if (m_timer.isActive()) {
-        m_timer.stop();
-    }
-    hide();
-}
-
-void Toolbar::
-show()
-{
-    //qDebug() << __FUNCTION__;
-    QWidget::show();
-    updatePositionAndSize();
-}
-
-void Toolbar::
-updatePositionAndSize()
-{
-    assert(m_window);
-    QWidget* const webView = m_window->weView();
-    assert(webView);
-
-    const QRect &childrenRect = this->childrenRect();
-    QPoint topLeft;
-    switch (m_position) {
-    case Top:
-        topLeft = webView->mapTo(this->parentWidget(), QPoint(0, 0));
-        break;
-    case Bottom:
-        topLeft = webView->mapTo(this->parentWidget(),
-            QPoint(0, webView->height() - childrenRect.height()));
-        break;
-    default:
-        //TODO error handling
-        break;
-    }
-
-    this->setGeometry(
-        topLeft.x(), topLeft.y(),
-        webView->width(), childrenRect.height());
-}
-
-void Toolbar::
-wheelEvent(QWheelEvent* const)
-{
-    hide();
-}
-
-void Toolbar::
-restore() // needs to be noexcept
-{
-    foreach (const WidgetInfo &info, m_widgets) {
-        QWidget* const widget = info.first;
-        const LayoutInfo &layoutInfo = info.second;
-
-        QBoxLayout* layout = layoutInfo.layout;
-        if (layout->parentWidget() == NULL ||
-            !layout->isEnabled())
-        {
-            //TODO do better
-            qDebug() << "layout is invalid:" << widget << layout;
-        }
-
-        layout->insertWidget(layoutInfo.index,
-                    widget, layoutInfo.stretch, layoutInfo.alignment);
-    }
-    m_widgets.clear();
-
-    assert(m_widgets.empty());
-}
-
 StatusBar::
 StatusBar(BrowserWindow* const window)
-    : Toolbar(window, Toolbar::Bottom),
+    : FloatingBar(window, Toolbar::Bottom),
       m_statusBar(NULL),
       m_wasVisible(true)
 {
