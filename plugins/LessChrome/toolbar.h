@@ -5,12 +5,12 @@
 #include <vector>
 
 #include <QtCore/QTimer>
+#include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
 
 class BrowserWindow;
 class QWheelEvent;
 class QBoxLayout;
-class QVBoxLayout;
 
 namespace lesschrome {
 
@@ -51,7 +51,6 @@ private:
     typedef std::pair<QWidget*, LayoutInfo> WidgetInfo;
 
     BrowserWindow* m_window;
-    QVBoxLayout *m_layout;
     std::vector<WidgetInfo> m_widgets;
     QTimer m_timer;
     bool m_entered;

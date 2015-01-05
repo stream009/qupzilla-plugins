@@ -7,8 +7,8 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QPoint>
-#include <QtGui/QWheelEvent>
 #include <QtGui/QVBoxLayout>
+#include <QtGui/QWheelEvent>
 
 namespace lesschrome {
 
@@ -16,15 +16,13 @@ Toolbar::
 Toolbar(BrowserWindow* const window)
     : QWidget(window),
       m_window(window),
-      m_layout(new QVBoxLayout), //TODO remove new
       m_entered(false)
 {
     assert(m_window);
-    assert(m_layout);
 
-    m_layout->setContentsMargins(0, 0, 0, 0);
-    m_layout->setSpacing(0);
-    this->setLayout(m_layout);
+    QVBoxLayout *layout = new QVBoxLayout(this); // this take ownership
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
     this->setAutoFillBackground(true);
 
     m_timer.setSingleShot(true);
@@ -68,8 +66,8 @@ capture(QWidget* const widget)
 
     m_widgets.push_back(std::make_pair(widget, info));
 
-    m_layout->addWidget(widget);
-    this->adjustSize();
+    this->layout()->addWidget(widget);
+    updatePositionAndSize();
 }
 
 void Toolbar::
@@ -87,7 +85,6 @@ void Toolbar::
 leave()
 {
     //qDebug() << __FUNCTION__;
-
     m_entered = false;
 
     if (m_timer.isActive()) {
@@ -100,8 +97,6 @@ void Toolbar::
 show()
 {
     //qDebug() << __FUNCTION__;
-    assert(m_window);
-
     this->setVisible(true);
 
     updatePositionAndSize();
@@ -117,6 +112,7 @@ hide()
 void Toolbar::
 updatePositionAndSize()
 {
+    assert(m_window);
     QWidget* const webView = m_window->weView();
     assert(webView);
 

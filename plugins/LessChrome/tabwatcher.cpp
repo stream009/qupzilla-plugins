@@ -10,23 +10,21 @@
 
 namespace lesschrome {
 
+template<void (TabWatcher::*Func)(WebTab* const) const>
 struct Notifier {
-    typedef void (TabWatcher::*Func)(WebTab* const) const;
 
-    Notifier(TabWatcher* const watcher, Func func)
-        : m_watcher(watcher), m_func(func)
+    Notifier(TabWatcher* const watcher)
+        : m_watcher(watcher)
     {
         assert(m_watcher);
-        assert(m_func);
     }
 
     void operator()(WebTab* const tab) {
         assert(tab);
-        (m_watcher->*m_func)(tab);
+        (m_watcher->*Func)(tab);
     }
 
     TabWatcher *m_watcher;
-    Func m_func;
 };
 
 TabWatcher::
@@ -70,14 +68,14 @@ slotTabChanged()
         tabs.begin(), tabs.end(),
         m_tabs.begin(), m_tabs.end(),
         boost::make_function_output_iterator(
-            Notifier(this, &TabWatcher::notifyAdded))
+            Notifier<&TabWatcher::notifyAdded>(this))
     );
 
     std::set_difference(
         m_tabs.begin(), m_tabs.end(),
         tabs.begin(), tabs.end(),
         boost::make_function_output_iterator(
-            Notifier(this, &TabWatcher::notifyDeleted))
+            Notifier<&TabWatcher::notifyDeleted>(this))
     );
 
     m_tabs = tabs;
