@@ -21,9 +21,7 @@ class FloatingBar : public QWidget
 public:
     enum Position { Top, Bottom };
 
-    void enter();
-    void leave();
-    bool isEntered() { return m_entered; }
+    void mouseMove(const QPoint &);
 
 public slots:
     void show();
@@ -31,6 +29,8 @@ public slots:
 protected:
     FloatingBar(BrowserWindow* const parent, const Position = Top);
 
+    void enter();
+    void leave();
     void updatePositionAndSize();
     BrowserWindow* window() { return m_window; }
 

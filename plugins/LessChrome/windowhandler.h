@@ -14,13 +14,13 @@ class QMouseEvent;
 
 namespace lesschrome {
 
+//TODO setting
 //TODO save tab on top setting
 class WindowHandler : public QObject
 {
     Q_OBJECT
 public:
     WindowHandler(BrowserWindow* const window);
-    ~WindowHandler();
 
     void mouseMove(QMouseEvent* const event);
 
@@ -40,7 +40,7 @@ private:
     boost::unordered_set<QWidget*> m_locationBars;
 
     TabWatcher m_tabWatcher;
-    Toolbar m_container; //TODO better name
+    Toolbar m_toolbar;
     StatusBar m_statusBar;
     QPoint m_mousePos;
 };

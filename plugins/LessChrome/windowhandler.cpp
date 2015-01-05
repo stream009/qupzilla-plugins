@@ -18,7 +18,7 @@ WindowHandler(BrowserWindow* const window)
     : m_window(window),
       m_tabBar(NULL),
       m_tabWatcher(window),
-      m_container(window),
+      m_toolbar(window),
       m_statusBar(window),
       m_mousePos()
 {
@@ -34,38 +34,6 @@ WindowHandler(BrowserWindow* const window)
     m_tabBar->installEventFilter(this);
 }
 
-WindowHandler::
-~WindowHandler()
-{
-    //qDebug() << __FUNCTION__;
-    //TODO could be removed. Qt remove event filter automatically
-    //when a filter object got deleted
-    m_tabBar->removeEventFilter(this);
-
-    foreach (QWidget* const locationBar, m_locationBars) {
-        locationBar->removeEventFilter(this);
-    }
-}
-
-//TODO move to Toolbar?
-static void
-dispatchMouseMove(FloatingBar &toolbar, const QPoint &pos)
-{
-    if (toolbar.geometry().contains(pos)) {
-        if (!toolbar.isEntered()) {
-            toolbar.enter();
-        }
-    }
-    else {
-        if (toolbar.isEntered()) {
-            toolbar.leave();
-        }
-        else if (toolbar.isVisible()){
-            toolbar.hide();
-        }
-    }
-}
-
 void WindowHandler::
 mouseMove(QMouseEvent * const event)
 {
@@ -76,8 +44,8 @@ mouseMove(QMouseEvent * const event)
     if (event->pos() == m_mousePos) return;
     m_mousePos = event->pos();
 
-    dispatchMouseMove(m_container, m_mousePos);
-    dispatchMouseMove(m_statusBar, m_mousePos);
+    m_toolbar.mouseMove(m_mousePos);
+    m_statusBar.mouseMove(m_mousePos);
 }
 
 bool WindowHandler::
@@ -88,12 +56,12 @@ eventFilter(QObject* const obj, QEvent* const event)
 
     if (obj == m_tabBar && event->type() == QEvent::Enter) {
         //qDebug() << "tabBar enter";
-        m_container.show();
+        m_toolbar.show();
     }
     else if (qobject_cast<LocationBar*>(obj) != NULL) {
         if (event->type() == QEvent::FocusIn) {
             //qDebug() << "locationbar focus";
-            m_container.show();
+            m_toolbar.show();
         }
     }
     return false;
@@ -122,8 +90,8 @@ captureWidgets()
     m_tabBar = m_window->findChild<TabBar*>();
     assert(m_tabBar); //TODO handle more properly
 
-    m_container.capture(navigationBar);
-    m_container.capture(bookmarksToolbar);
+    m_toolbar.capture(navigationBar);
+    m_toolbar.capture(bookmarksToolbar);
 
     assert(m_tabBar);
 }

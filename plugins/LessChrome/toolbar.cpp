@@ -56,6 +56,24 @@ leave()
 }
 
 void FloatingBar::
+mouseMove(const QPoint &pos)
+{
+    if (this->geometry().contains(pos)) {
+        if (!m_entered) {
+            enter();
+        }
+    }
+    else {
+        if (m_entered) {
+            leave();
+        }
+        else if (this->isVisible()){
+            this->hide();
+        }
+    }
+}
+
+void FloatingBar::
 show()
 {
     //qDebug() << __FUNCTION__;
