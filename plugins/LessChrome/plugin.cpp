@@ -3,6 +3,7 @@
 #include "browserwindow.h"
 #include "pluginproxy.h"
 #include "qzcommon.h"
+#include "qzsettings.h"
 #include "tabbedwebview.h"
 
 #include <cassert>
@@ -21,8 +22,15 @@ namespace lesschrome {
 
 LessChromePlugin::
 LessChromePlugin()
-    : QObject()
+    : QObject(),
+      m_tabsOnTop(qzSettings->tabsOnTop)
 {}
+
+LessChromePlugin::
+~LessChromePlugin()
+{
+    qzSettings->tabsOnTop = m_tabsOnTop;
+}
 
 PluginSpec LessChromePlugin::
 pluginSpec()

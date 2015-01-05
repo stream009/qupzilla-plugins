@@ -29,6 +29,7 @@ class LessChromePlugin
 
 public:
     LessChromePlugin();
+    virtual ~LessChromePlugin();
 
     // @override PluginInterface
     virtual PluginSpec pluginSpec();
@@ -53,6 +54,7 @@ private:
 
     QString m_settingsPath;
     HandlerMap m_windows;
+    bool m_tabsOnTop;
 };
 
 } // namespace lesschrome
