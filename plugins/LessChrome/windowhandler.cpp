@@ -18,7 +18,9 @@ WindowHandler(BrowserWindow* const window)
     : m_window(window),
       m_tabBar(NULL),
       m_tabWatcher(window),
-      m_container(window)
+      m_container(window),
+      m_statusBar(window),
+      m_mousePos()
 {
     assert(m_window);
 
@@ -45,29 +47,37 @@ WindowHandler::
     }
 }
 
+//TODO move to Toolbar?
+static void
+dispatchMouseMove(Toolbar &toolbar, const QPoint &pos)
+{
+    if (toolbar.geometry().contains(pos)) {
+        if (!toolbar.isEntered()) {
+            toolbar.enter();
+        }
+    }
+    else {
+        if (toolbar.isEntered()) {
+            toolbar.leave();
+        }
+        else if (toolbar.isVisible()){
+            toolbar.hide();
+        }
+    }
+}
+
 void WindowHandler::
 mouseMove(QMouseEvent * const event)
 {
+    // event is in BrowserWindow's coordinate system.
     assert(event);
 
     // Ignore unchanged mouse move event. Sometimes it happens.
     if (event->pos() == m_mousePos) return;
     m_mousePos = event->pos();
 
-    if (m_container.rect().contains(m_mousePos)) {
-        if (!m_container.isEntered()) {
-            m_container.enter();
-        }
-    }
-    else {
-        if (m_container.isEntered()) {
-            m_container.leave();
-        }
-        else if (m_container.isVisible()){
-            m_container.hide();
-        }
-    }
-
+    dispatchMouseMove(m_container, m_mousePos);
+    dispatchMouseMove(m_statusBar, m_mousePos);
 }
 
 bool WindowHandler::
@@ -94,12 +104,14 @@ captureWidgets()
 {
     assert(m_window);
 
+    //TODO BrowserWindow::navigationBar()
     QWidget* const navigationBar = m_window->findChild<NavigationBar*>();
     if (navigationBar == NULL) {
         qDebug() << "widget";
         throw "widget"; //TODO
     }
 
+    //TODO BrowserWindow::bookmarksToolbar()
     QWidget* const bookmarksToolbar =
                             m_window->findChild<BookmarksToolbar*>();
     if (bookmarksToolbar == NULL) {

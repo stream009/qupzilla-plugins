@@ -127,16 +127,27 @@ bool LessChromePlugin::
 mouseMove(const Qz::ObjectName &type, QObject * const obj,
                                       QMouseEvent * const event)
 {
+    assert(obj);
+    assert(event);
     //qDebug() << obj << event->pos();
 
     if (type != Qz::ON_WebView) return false;
-    BrowserWindow * const window = //TODO check obj for null
-                    qobject_cast<TabbedWebView*>(obj)->browserWindow();
+
+    TabbedWebView* const webView = qobject_cast<TabbedWebView*>(obj);
+    assert(webView); //TODO better handling
+
+    BrowserWindow * const window = webView->browserWindow();
     if (window == NULL) return false;
 
     //TODO check
     boost::shared_ptr<WindowHandler> handler = m_windows.at(window);
-    handler->mouseMove(event);
+
+    // Translate event in BrowserWindow's coordinate system.
+    const QPoint pos = webView->mapTo(window, event->pos());
+    QMouseEvent ev(event->type(), pos, event->button(),
+                                 event->buttons(), event->modifiers());
+    // could be passing only pos if that is enough.
+    handler->mouseMove(&ev);
 
     return false;
 }

@@ -7,16 +7,18 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QPoint>
+#include <QtGui/QStatusBar>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QWheelEvent>
 
 namespace lesschrome {
 
 Toolbar::
-Toolbar(BrowserWindow* const window)
+Toolbar(BrowserWindow* const window, const Position position)
     : QWidget(window),
       m_window(window),
-      m_entered(false)
+      m_entered(false),
+      m_position(position)
 {
     assert(m_window);
 
@@ -97,16 +99,8 @@ void Toolbar::
 show()
 {
     //qDebug() << __FUNCTION__;
-    this->setVisible(true);
-
+    QWidget::show();
     updatePositionAndSize();
-}
-
-void Toolbar::
-hide()
-{
-    //qDebug() << __FUNCTION__;
-    this->setVisible(false);
 }
 
 void Toolbar::
@@ -116,11 +110,24 @@ updatePositionAndSize()
     QWidget* const webView = m_window->weView();
     assert(webView);
 
-    const QPoint &topLeft =
-        webView->mapTo(this->parentWidget(), QPoint(0, 0));
+    const QRect &childrenRect = this->childrenRect();
+    QPoint topLeft;
+    switch (m_position) {
+    case Top:
+        topLeft = webView->mapTo(this->parentWidget(), QPoint(0, 0));
+        break;
+    case Bottom:
+        topLeft = webView->mapTo(this->parentWidget(),
+            QPoint(0, webView->height() - childrenRect.height()));
+        break;
+    default:
+        //TODO error handling
+        break;
+    }
+
     this->setGeometry(
         topLeft.x(), topLeft.y(),
-        webView->width(), this->childrenRect().height());
+        webView->width(), childrenRect.height());
 }
 
 void Toolbar::
@@ -150,6 +157,38 @@ restore() // needs to be noexcept
     m_widgets.clear();
 
     assert(m_widgets.empty());
+}
+
+StatusBar::
+StatusBar(BrowserWindow* const window)
+    : Toolbar(window, Toolbar::Bottom),
+      m_statusBar(NULL),
+      m_wasVisible(true)
+{
+    assert(window);
+
+    m_statusBar = window->statusBar();
+    assert(m_statusBar);
+    m_wasVisible = m_statusBar->isVisible();
+
+    this->layout()->addWidget(m_statusBar);
+
+    window->setStatusBar(NULL);
+    window->statusBar()->hide();
+
+    m_statusBar->adjustSize();
+    m_statusBar->show();
+
+    updatePositionAndSize();
+
+    assert(m_statusBar);
+}
+
+StatusBar::
+~StatusBar()
+{
+    this->window()->setStatusBar(m_statusBar);
+    m_statusBar->setVisible(m_wasVisible);
 }
 
 } // namespace lesschrome

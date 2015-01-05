@@ -8,6 +8,7 @@
 
 #include <QtCore/QPoint>
 
+class BrowserWindow;
 class QWidget;
 class QMouseEvent;
 
@@ -34,12 +35,13 @@ private slots:
     void slotTabDeleted(WebTab*);
 
 private:
-    QWidget *m_window;
+    BrowserWindow *m_window;
     QWidget *m_tabBar;
     boost::unordered_set<QWidget*> m_locationBars;
 
     TabWatcher m_tabWatcher;
-    Toolbar m_container;
+    Toolbar m_container; //TODO better name
+    StatusBar m_statusBar;
     QPoint m_mousePos;
 };
 

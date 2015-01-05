@@ -11,14 +11,18 @@
 class BrowserWindow;
 class QWheelEvent;
 class QBoxLayout;
+class QStatusBar;
 
 namespace lesschrome {
 
+//TODO extract FloatingToolbar from Toolbar
 class Toolbar : public QWidget
 {
     Q_OBJECT
 public:
-    Toolbar(BrowserWindow* const parent);
+    enum Position { Top, Bottom };
+
+    Toolbar(BrowserWindow* const parent, const Position = Top);
     ~Toolbar();
 
     void capture(QWidget* const);
@@ -29,14 +33,16 @@ public:
 
 public slots:
     void show();
-    void hide();
+
+protected:
+    void updatePositionAndSize();
+    BrowserWindow* window() { return m_window; }
 
 private:
     // @override QWidget
     virtual void wheelEvent(QWheelEvent* const);
 
     void restore();
-    void updatePositionAndSize();
 
 private:
     enum { showTimeout = 1000 };
@@ -54,6 +60,18 @@ private:
     std::vector<WidgetInfo> m_widgets;
     QTimer m_timer;
     bool m_entered;
+    Position m_position;
+};
+
+class StatusBar : public Toolbar
+{
+public:
+    StatusBar(BrowserWindow* const window);
+    ~StatusBar();
+
+private:
+    QStatusBar* m_statusBar;
+    bool m_wasVisible;
 };
 
 } // namespace lesschrome
