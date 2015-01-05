@@ -5,6 +5,7 @@
 #include "locationbar.h"
 #include "navigationbar.h"
 #include "tabbar.h"
+#include "tabwidget.h"
 #include "webview.h"
 
 #include <cassert>
@@ -72,22 +73,21 @@ captureWidgets()
 {
     assert(m_window);
 
-    //TODO BrowserWindow::navigationBar()
-    QWidget* const navigationBar = m_window->findChild<NavigationBar*>();
+    QWidget* const navigationBar = m_window->navigationBar();
     if (navigationBar == NULL) {
         qDebug() << "widget";
         throw "widget"; //TODO
     }
 
-    //TODO BrowserWindow::bookmarksToolbar()
-    QWidget* const bookmarksToolbar =
-                            m_window->findChild<BookmarksToolbar*>();
+    QWidget* const bookmarksToolbar = m_window->bookmarksToolbar();
     if (bookmarksToolbar == NULL) {
         qDebug() << "widget";
         throw "widget"; //TODO
     }
 
-    m_tabBar = m_window->findChild<TabBar*>();
+    TabWidget* const tabWidget = m_window->tabWidget();
+    assert(tabWidget);
+    m_tabBar = tabWidget->tabBar();
     assert(m_tabBar); //TODO handle more properly
 
     m_toolbar.capture(navigationBar);
