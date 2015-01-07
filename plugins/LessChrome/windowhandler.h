@@ -20,7 +20,7 @@ class WindowHandler : public QObject
 {
     Q_OBJECT
 public:
-    WindowHandler(BrowserWindow* const window);
+    WindowHandler(BrowserWindow &window);
 
     void mouseMove(QMouseEvent* const event);
 
@@ -41,7 +41,7 @@ private slots:
     void slotTabDeleted(WebTab*);
 
 private:
-    BrowserWindow *m_window;
+    BrowserWindow &m_window;
     QWidget *m_navigationContainer;
     boost::unordered_set<QWidget*> m_locationBars;
 

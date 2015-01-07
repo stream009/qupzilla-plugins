@@ -18,7 +18,7 @@ class TabWatcher : public QObject, boost::noncopyable
 {
     Q_OBJECT
 public:
-    explicit TabWatcher(BrowserWindow* const window);
+    explicit TabWatcher(BrowserWindow &window);
 
 signals:
     void tabAdded(WebTab*) const;

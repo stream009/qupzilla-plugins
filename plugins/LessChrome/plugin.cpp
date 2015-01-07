@@ -121,7 +121,7 @@ mainWindowCreated(BrowserWindow *window)
     assert(m_settings);
 
     boost::shared_ptr<WindowHandler> ptr
-                            = boost::make_shared<WindowHandler>(window);
+            = boost::make_shared<WindowHandler, BrowserWindow&>(*window);
     this->connect(m_settings.get(), SIGNAL(change(QString)),
                   ptr.get(),        SLOT(slotSettingChanged(const QString&)));
 
@@ -132,6 +132,8 @@ void Plugin::
 mainWindowDeleted(BrowserWindow * const window)
 {
     qDebug() << __FUNCTION__;
+    assert(window);
+
     m_windows.erase(window);
 }
 

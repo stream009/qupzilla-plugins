@@ -27,19 +27,19 @@ public slots:
     void slotSettingChanged(const QString &key);
 
 protected:
-    FloatingBar(BrowserWindow* const parent, const Position = Top);
+    explicit FloatingBar(BrowserWindow &parent, const Position = Top);
 
     void enter();
     void leave();
     void updatePositionAndSize();
-    BrowserWindow* window() const { return m_window; }
+    BrowserWindow &window() const { return m_window; }
 
 private:
     // @override QWidget
     virtual void wheelEvent(QWheelEvent* const);
 
 private:
-    BrowserWindow* m_window;
+    BrowserWindow &m_window;
     QTimer m_timer;
     bool m_entered;
     Position m_position;
@@ -61,7 +61,7 @@ private:
     typedef WidgetMap::value_type WidgetInfo;
 
 public:
-    explicit Toolbar(BrowserWindow* const parent);
+    explicit Toolbar(BrowserWindow &parent);
     virtual ~Toolbar();
 
     bool empty() const { return m_widgets.empty(); }
@@ -80,7 +80,7 @@ private:
 class StatusBar : public FloatingBar
 {
 public:
-    explicit StatusBar(BrowserWindow* const window);
+    explicit StatusBar(BrowserWindow &window);
     virtual ~StatusBar();
 
 private:

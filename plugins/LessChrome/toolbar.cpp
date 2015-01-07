@@ -16,14 +16,12 @@
 namespace lesschrome {
 
 FloatingBar::
-FloatingBar(BrowserWindow* const window, const Position position)
-    : QWidget(window),
+FloatingBar(BrowserWindow &window, const Position position)
+    : QWidget(&window),
       m_window(window),
       m_entered(false),
       m_position(position)
 {
-    assert(m_window);
-
     QVBoxLayout *layout = new QVBoxLayout(this); // this take ownership
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -99,8 +97,7 @@ leave()
 void FloatingBar::
 updatePositionAndSize()
 {
-    assert(m_window);
-    QWidget* const webView = m_window->weView();
+    QWidget* const webView = m_window.weView();
     assert(webView);
 
     const QRect &childrenRect = this->childrenRect();
@@ -131,7 +128,7 @@ wheelEvent(QWheelEvent* const)
 
 
 Toolbar::
-Toolbar(BrowserWindow* const parent)
+Toolbar(BrowserWindow &parent)
     : FloatingBar(parent)
 {
     //qDebug() << __FUNCTION__;
@@ -215,21 +212,19 @@ restore(const WidgetInfo &info)
 
 
 StatusBar::
-StatusBar(BrowserWindow* const window)
+StatusBar(BrowserWindow &window)
     : FloatingBar(window, Toolbar::Bottom),
       m_statusBar(NULL),
       m_wasVisible(true)
 {
-    assert(window);
-
-    m_statusBar = window->statusBar();
+    m_statusBar = window.statusBar();
     assert(m_statusBar);
     m_wasVisible = m_statusBar->isVisible();
 
     this->layout()->addWidget(m_statusBar);
 
-    window->setStatusBar(NULL);
-    window->statusBar()->hide();
+    window.setStatusBar(NULL);
+    window.statusBar()->hide();
 
     m_statusBar->adjustSize();
     m_statusBar->show();
@@ -242,7 +237,7 @@ StatusBar(BrowserWindow* const window)
 StatusBar::
 ~StatusBar()
 {
-    this->window()->setStatusBar(m_statusBar);
+    this->window().setStatusBar(m_statusBar);
     m_statusBar->setVisible(m_wasVisible);
 }
 

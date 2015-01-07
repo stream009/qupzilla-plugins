@@ -28,12 +28,10 @@ struct Notifier {
 };
 
 TabWatcher::
-TabWatcher(BrowserWindow* const window)
+TabWatcher(BrowserWindow &window)
     : m_tabWidget(NULL)
 {
-    assert(window);
-
-    m_tabWidget = window->tabWidget();
+    m_tabWidget = window.tabWidget();
     assert(m_tabWidget); //TODO do better
 
     this->connect(m_tabWidget, SIGNAL(changed()),

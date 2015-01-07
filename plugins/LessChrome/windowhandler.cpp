@@ -16,14 +16,12 @@
 namespace lesschrome {
 
 WindowHandler::
-WindowHandler(BrowserWindow* const window)
+WindowHandler(BrowserWindow &window)
     : m_window(window),
       m_navigationContainer(NULL),
       m_tabWatcher(window),
       m_mousePos()
 {
-    assert(m_window);
-
     m_navigationContainer = navigationBar().parentWidget();
     assert(m_navigationContainer); //TODO better
 
@@ -80,8 +78,6 @@ eventFilter(QObject* const obj, QEvent* const event)
 void WindowHandler::
 captureWidgets()
 {
-    assert(m_window);
-
     const Settings &settings = Plugin::settings();
 
     if (settings.navigationBar || settings.bookmarksBar) {
@@ -104,7 +100,7 @@ captureWidgets()
 QWidget &WindowHandler::
 bookmarksBar() const
 {
-    QWidget* const widget = m_window->bookmarksToolbar();
+    QWidget* const widget = m_window.bookmarksToolbar();
     if (widget == NULL) {
         qDebug() << "widget";
         throw "widget"; //TODO
@@ -117,8 +113,7 @@ bookmarksBar() const
 QWidget &WindowHandler::
 navigationBar() const
 {
-    assert(m_window);
-    QWidget* const widget = m_window->navigationBar();
+    QWidget* const widget = m_window.navigationBar();
     if (widget == NULL) {
         qDebug() << "widget";
         throw "widget"; //TODO
