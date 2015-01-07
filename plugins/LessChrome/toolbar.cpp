@@ -1,6 +1,8 @@
 #include "toolbar.h"
 
 #include "browserwindow.h"
+#include "plugin.h"
+#include "settings.h"
 #include "tabbedwebview.h"
 
 #include <cassert>
@@ -27,32 +29,14 @@ FloatingBar(BrowserWindow* const window, const Position position)
     layout->setSpacing(0);
     this->setAutoFillBackground(true);
 
+    const Settings &settings = Plugin::settings();
     m_timer.setSingleShot(true);
+    m_timer.setInterval(settings.waitTimer);
+
     this->connect(&m_timer, SIGNAL(timeout()),
                   this,     SLOT(show()));
-}
-
-void FloatingBar::
-enter()
-{
-    //qDebug() << __FUNCTION__;
-    m_entered = true;
-
-    if (!m_timer.isActive()) {
-        m_timer.start(Toolbar::showTimeout);
-    }
-}
-
-void FloatingBar::
-leave()
-{
-    //qDebug() << __FUNCTION__;
-    m_entered = false;
-
-    if (m_timer.isActive()) {
-        m_timer.stop();
-    }
-    hide();
+    this->connect(&settings, SIGNAL(change(QString)),
+                  this,      SLOT(slotSettingChanged(const QString&)));
 }
 
 void FloatingBar::
@@ -79,6 +63,37 @@ show()
     //qDebug() << __FUNCTION__;
     QWidget::show();
     updatePositionAndSize();
+}
+
+void FloatingBar::
+slotSettingChanged(const QString &key)
+{
+    if (key == Settings::keyWaitTimer) {
+        m_timer.setInterval(Plugin::settings().waitTimer);
+    }
+}
+
+void FloatingBar::
+enter()
+{
+    //qDebug() << __FUNCTION__;
+    m_entered = true;
+
+    if (!m_timer.isActive()) {
+        m_timer.start();
+    }
+}
+
+void FloatingBar::
+leave()
+{
+    //qDebug() << __FUNCTION__;
+    m_entered = false;
+
+    if (m_timer.isActive()) {
+        m_timer.stop();
+    }
+    hide();
 }
 
 void FloatingBar::
@@ -114,47 +129,38 @@ wheelEvent(QWheelEvent* const)
     hide();
 }
 
+
 Toolbar::
 Toolbar(BrowserWindow* const parent)
     : FloatingBar(parent)
-{}
+{
+    //qDebug() << __FUNCTION__;
+}
 
 Toolbar::
 ~Toolbar()
 {
-    foreach (const WidgetInfo &info, m_widgets) {
-        QWidget* const widget = info.first;
-        const LayoutInfo &layoutInfo = info.second;
-
-        QBoxLayout* layout = layoutInfo.layout;
-        if (layout->parentWidget() == NULL ||
-            !layout->isEnabled())
-        {
-            //TODO do better
-            qDebug() << "layout is invalid:" << widget << layout;
-        }
-
-        layout->insertWidget(layoutInfo.index,
-                    widget, layoutInfo.stretch, layoutInfo.alignment);
+    //qDebug() << __FUNCTION__;
+    foreach (const WidgetInfo &item, m_widgets) {
+        restore(item);
     }
-    m_widgets.clear();
 
     assert(m_widgets.empty());
 }
 
 void Toolbar::
-capture(QWidget* const widget)
+capture(QWidget& widget)
 {
-    assert(widget);
+    assert(!m_widgets.count(&widget)); //TODO better
 
     QBoxLayout* const layout =
-        qobject_cast<QBoxLayout*>(widget->parentWidget()->layout());
+        qobject_cast<QBoxLayout*>(widget.parentWidget()->layout());
     if (layout == NULL) {
         qDebug() << "layout";
         throw "layout"; //TODO
     }
 
-    const int index = layout->indexOf(widget);
+    const int index = layout->indexOf(&widget);
     if (index == -1) {
         qDebug() << "index";
         throw "index"; //TODO
@@ -170,11 +176,43 @@ capture(QWidget* const widget)
 
     LayoutInfo info = { layout, index, alignment, stretch };
 
-    m_widgets.push_back(std::make_pair(widget, info));
+    m_widgets.emplace(&widget, info);
 
-    this->layout()->addWidget(widget);
+    this->layout()->addWidget(&widget);
     updatePositionAndSize();
 }
+
+void Toolbar::
+restore(QWidget &widget)
+{
+    const WidgetMap::const_iterator it = m_widgets.find(&widget);
+    assert(it != m_widgets.end()); //TODO better
+
+    restore(*it);
+}
+
+void Toolbar::
+restore(const WidgetInfo &info)
+{
+    QWidget* const widget = info.first;
+    const LayoutInfo &layoutInfo = info.second;
+
+    QBoxLayout* layout = layoutInfo.layout;
+    if (layout->parentWidget() == NULL ||
+        !layout->isEnabled())
+    {
+        //TODO better
+        qDebug() << "layout is invalid:" << widget << layout;
+    }
+
+    //qDebug() << __FUNCTION__ << widget << layoutInfo.index;
+    layout->insertWidget(layoutInfo.index,
+                widget, layoutInfo.stretch, layoutInfo.alignment);
+
+    m_widgets.erase(widget);
+    updatePositionAndSize();
+}
+
 
 StatusBar::
 StatusBar(BrowserWindow* const window)

@@ -1,5 +1,8 @@
 #include "windowhandler.h"
 
+#include "lc_settings.h"
+#include "plugin.h"
+
 #include "bookmarkstoolbar.h"
 #include "browserwindow.h"
 #include "locationbar.h"
@@ -19,8 +22,6 @@ WindowHandler(BrowserWindow* const window)
     : m_window(window),
       m_tabBar(NULL),
       m_tabWatcher(window),
-      m_toolbar(window),
-      m_statusBar(window),
       m_mousePos()
 {
     assert(m_window);
@@ -45,8 +46,12 @@ mouseMove(QMouseEvent * const event)
     if (event->pos() == m_mousePos) return;
     m_mousePos = event->pos();
 
-    m_toolbar.mouseMove(m_mousePos);
-    m_statusBar.mouseMove(m_mousePos);
+    if (m_toolbar) {
+        m_toolbar->mouseMove(m_mousePos);
+    }
+    if (m_statusBar) {
+        m_statusBar->mouseMove(m_mousePos);
+    }
 }
 
 bool WindowHandler::
@@ -57,12 +62,16 @@ eventFilter(QObject* const obj, QEvent* const event)
 
     if (obj == m_tabBar && event->type() == QEvent::Enter) {
         //qDebug() << "tabBar enter";
-        m_toolbar.show();
+        if (m_toolbar) {
+            m_toolbar->show();
+        }
     }
     else if (qobject_cast<LocationBar*>(obj) != NULL) {
         if (event->type() == QEvent::FocusIn) {
             //qDebug() << "locationbar focus";
-            m_toolbar.show();
+            if (m_toolbar) {
+                m_toolbar->show();
+            }
         }
     }
     return false;
@@ -73,27 +82,96 @@ captureWidgets()
 {
     assert(m_window);
 
-    QWidget* const navigationBar = m_window->navigationBar();
-    if (navigationBar == NULL) {
-        qDebug() << "widget";
-        throw "widget"; //TODO
-    }
-
-    QWidget* const bookmarksToolbar = m_window->bookmarksToolbar();
-    if (bookmarksToolbar == NULL) {
-        qDebug() << "widget";
-        throw "widget"; //TODO
-    }
-
     TabWidget* const tabWidget = m_window->tabWidget();
     assert(tabWidget);
     m_tabBar = tabWidget->tabBar();
     assert(m_tabBar); //TODO handle more properly
 
-    m_toolbar.capture(navigationBar);
-    m_toolbar.capture(bookmarksToolbar);
+    const Settings &settings = Plugin::settings();
+
+    if (settings.navigationBar || settings.bookmarksBar) {
+        m_toolbar.reset(new Toolbar(m_window));
+
+        if (settings.navigationBar) {
+            m_toolbar->capture(navigationBar());
+        }
+
+        if (settings.bookmarksBar) {
+            m_toolbar->capture(bookmarksBar());
+        }
+    }
+
+    if (settings.statusBar) {
+        m_statusBar.reset(new StatusBar(m_window));
+    }
 
     assert(m_tabBar);
+}
+
+QWidget &WindowHandler::
+bookmarksBar() const
+{
+    QWidget* const widget = m_window->bookmarksToolbar();
+    if (widget == NULL) {
+        qDebug() << "widget";
+        throw "widget"; //TODO
+    }
+
+    assert(widget);
+    return *widget;
+}
+
+QWidget &WindowHandler::
+navigationBar() const
+{
+    assert(m_window);
+    QWidget* const widget = m_window->navigationBar();
+    if (widget == NULL) {
+        qDebug() << "widget";
+        throw "widget"; //TODO
+    }
+
+    assert(widget);
+    return *widget;
+}
+
+void WindowHandler::
+toolbarSettingChanged(QWidget& widget, bool enabled)
+{
+    if (!m_toolbar) {
+        m_toolbar.reset(new Toolbar(m_window));
+    }
+
+    if (enabled) {
+        m_toolbar->capture(widget);
+    }
+    else {
+        m_toolbar->restore(widget);
+        if (m_toolbar->empty()) {
+            m_toolbar.reset();
+        }
+    }
+}
+
+void WindowHandler::
+slotSettingChanged(const QString &key)
+{
+    const Settings &settings = Plugin::settings();
+
+    if (key == Settings::keyNavigationBar) {
+        toolbarSettingChanged(navigationBar(), settings.navigationBar);
+    }
+    else if (key == Settings::keyBookmarksBar) {
+        toolbarSettingChanged(bookmarksBar(), settings.bookmarksBar);
+    }
+    else if (key == Settings::keyStatusBar) {
+        if (settings.statusBar) {
+            m_statusBar.reset(new StatusBar(m_window));
+        }
+        else {
+            m_statusBar.reset();
+        }
+    }
 }
 
 void WindowHandler::

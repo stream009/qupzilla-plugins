@@ -1,5 +1,7 @@
 #include "plugin.h"
 
+#include "settingdialog.h"
+
 #include "browserwindow.h"
 #include "pluginproxy.h"
 #include "qzcommon.h"
@@ -12,27 +14,33 @@
 
 #include <QtCore/QTranslator>
 #include <QtGui/QDialog>
-#include <QtGui/QLabel>
 #include <QtGui/QMouseEvent>
-#include <QtGui/QPushButton>
-#include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
 
 namespace lesschrome {
 
-LessChromePlugin::
-LessChromePlugin()
+boost::scoped_ptr<Settings> Plugin::m_settings;
+
+Plugin::
+Plugin()
     : QObject(),
-      m_tabsOnTop(qzSettings->tabsOnTop)
+      m_tabsOnTop(::qzSettings->tabsOnTop)
 {}
 
-LessChromePlugin::
-~LessChromePlugin()
+Plugin::
+~Plugin()
 {
-    qzSettings->tabsOnTop = m_tabsOnTop;
+    ::qzSettings->tabsOnTop = m_tabsOnTop;
 }
 
-PluginSpec LessChromePlugin::
+Settings &Plugin::
+settings()
+{
+    assert(m_settings);
+    return *m_settings;
+}
+
+PluginSpec Plugin::
 pluginSpec()
 {
     PluginSpec spec;
@@ -48,12 +56,15 @@ pluginSpec()
     return spec;
 }
 
-void LessChromePlugin::
+void Plugin::
 init(InitState state, const QString &settingsPath)
 {
-    qDebug() << __FUNCTION__ << "called";
+    qDebug() << __FUNCTION__;
 
-    m_settingsPath = settingsPath;
+    if (!m_settings) {
+        m_settings.reset(
+            new Settings(settingsPath + QL1S("/extensions.ini")));
+    }
 
     QZ_REGISTER_EVENT_HANDLER(PluginProxy::MouseMoveHandler);
 
@@ -69,69 +80,62 @@ init(InitState state, const QString &settingsPath)
             mainWindowCreated(window);
         }
     }
+
+    assert(m_settings);
 }
 
-void LessChromePlugin::
+void Plugin::
 unload()
 {
     qDebug() << __FUNCTION__;
 }
 
-bool LessChromePlugin::
+bool Plugin::
 testPlugin()
 {
-    return (Qz::VERSION == QLatin1String(QUPZILLA_VERSION));
+    return (Qz::VERSION == QL1S(QUPZILLA_VERSION));
 }
 
-QTranslator* LessChromePlugin::
+QTranslator* Plugin::
 getTranslator(const QString &locale)
 {
-    // Loads translation according to locale file
-    // QString locale will contains "fr_FR.qm" for French locale
-
     QTranslator* translator = new QTranslator(this);
     translator->load(locale, ":/lesschrome/locale/");
     return translator;
 }
 
-void LessChromePlugin::
+void Plugin::
 showSettings(QWidget* parent)
 {
-    QDialog settings(parent);
-    QPushButton* b = new QPushButton("LessChrome v0.0.1");
-    QPushButton* closeButton = new QPushButton(tr("Close"));
-    QLabel* label = new QLabel();
-    label->setPixmap(QPixmap(":icons/other/about.png"));
+    assert(m_settings);
 
-    QVBoxLayout* l = new QVBoxLayout(&settings);
-    l->addWidget(label);
-    l->addWidget(b);
-    l->addWidget(closeButton);
-    settings.setLayout(l);
-
-    settings.setWindowTitle(tr("LessChrome Plugin Settings"));
-    settings.setWindowIcon(QIcon(":qupzilla.png"));
-    connect(closeButton, SIGNAL(clicked()), &settings, SLOT(close()));
-
-    settings.exec();
+    SettingDialog dialog(parent);
+    dialog.exec();
 }
 
-void LessChromePlugin::
+void Plugin::
 mainWindowCreated(BrowserWindow *window)
 {
     qDebug() << __FUNCTION__ << window;
-    m_windows.emplace(window,
-                      boost::make_shared<WindowHandler>(window));
+    assert(window);
+    assert(m_settings);
+
+    boost::shared_ptr<WindowHandler> ptr
+                            = boost::make_shared<WindowHandler>(window);
+    this->connect(m_settings.get(), SIGNAL(change(QString)),
+                  ptr.get(),        SLOT(slotSettingChanged(const QString&)));
+
+    m_windows.emplace(window, ptr);
 }
 
-void LessChromePlugin::
+void Plugin::
 mainWindowDeleted(BrowserWindow * const window)
 {
     qDebug() << __FUNCTION__;
     m_windows.erase(window);
 }
 
-bool LessChromePlugin::
+bool Plugin::
 mouseMove(const Qz::ObjectName &type, QObject * const obj,
                                       QMouseEvent * const event)
 {
@@ -147,10 +151,10 @@ mouseMove(const Qz::ObjectName &type, QObject * const obj,
     BrowserWindow * const window = webView->browserWindow();
     if (window == NULL) return false;
 
-    //TODO check
+    //TODO std::out_of_range
     boost::shared_ptr<WindowHandler> handler = m_windows.at(window);
 
-    // Translate event in BrowserWindow's coordinate system.
+    // Translate event into BrowserWindow's coordinate system.
     const QPoint pos = webView->mapTo(window, event->pos());
     QMouseEvent ev(event->type(), pos, event->button(),
                                  event->buttons(), event->modifiers());
@@ -161,7 +165,7 @@ mouseMove(const Qz::ObjectName &type, QObject * const obj,
 }
 
 #if QT_VERSION < 0x050000
-Q_EXPORT_PLUGIN2(LessChrome, LessChromePlugin)
+Q_EXPORT_PLUGIN2(LessChrome, Plugin)
 #endif
 
 } // namespace lesschrome

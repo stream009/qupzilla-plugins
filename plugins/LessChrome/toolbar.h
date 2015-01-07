@@ -1,8 +1,7 @@
 #ifndef TOOLBAR_H
 #define TOOLBAR_H
 
-#include <utility>
-#include <vector>
+#include <boost/container/flat_map.hpp>
 
 #include <QtCore/QTimer>
 #include <QtGui/QVBoxLayout>
@@ -25,6 +24,7 @@ public:
 
 public slots:
     void show();
+    void slotSettingChanged(const QString &key);
 
 protected:
     FloatingBar(BrowserWindow* const parent, const Position = Top);
@@ -32,29 +32,22 @@ protected:
     void enter();
     void leave();
     void updatePositionAndSize();
-    BrowserWindow* window() { return m_window; }
+    BrowserWindow* window() const { return m_window; }
 
 private:
     // @override QWidget
     virtual void wheelEvent(QWheelEvent* const);
 
 private:
-    enum { showTimeout = 1000 };
-
     BrowserWindow* m_window;
     QTimer m_timer;
     bool m_entered;
     Position m_position;
 };
 
+
 class Toolbar : public FloatingBar
 {
-public:
-    explicit Toolbar(BrowserWindow* const parent);
-    virtual ~Toolbar();
-
-    void capture(QWidget* const);
-
 private:
     struct LayoutInfo {
         QBoxLayout *layout;
@@ -63,10 +56,25 @@ private:
         int stretch;
     };
 
-    typedef std::pair<QWidget*, LayoutInfo> WidgetInfo;
+    typedef boost::container::flat_map<QWidget*, LayoutInfo> WidgetMap;
+    typedef WidgetMap::value_type WidgetInfo;
 
-    std::vector<WidgetInfo> m_widgets;
+public:
+    explicit Toolbar(BrowserWindow* const parent);
+    virtual ~Toolbar();
+
+    bool empty() const { return m_widgets.empty(); }
+
+    void capture(QWidget&);
+    void restore(QWidget&);
+
+private:
+    void restore(const WidgetInfo&);
+
+private:
+    WidgetMap m_widgets;
 };
+
 
 class StatusBar : public FloatingBar
 {

@@ -3,8 +3,10 @@
 
 #include "plugininterface.h"
 
+#include "lc_settings.h"
 #include "windowhandler.h"
 
+#include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered_map.hpp>
 
@@ -17,7 +19,7 @@ class QWidget;
 
 namespace lesschrome {
 
-class LessChromePlugin
+class Plugin
     : public QObject, public PluginInterface
 {
     Q_OBJECT
@@ -28,19 +30,19 @@ class LessChromePlugin
 #endif
 
 public:
-    LessChromePlugin();
-    virtual ~LessChromePlugin();
+    Plugin();
+    virtual ~Plugin();
 
+    static Settings &settings();
+
+private:
     // @override PluginInterface
     virtual PluginSpec pluginSpec();
-
     virtual void init(InitState state, const QString &settingsPath);
     virtual void unload();
     virtual bool testPlugin();
-
     virtual QTranslator* getTranslator(const QString &locale);
     virtual void showSettings(QWidget* parent = 0);
-
     virtual bool mouseMove(const Qz::ObjectName &type,
                            QObject* obj, QMouseEvent* event);
 
@@ -52,7 +54,8 @@ private:
     typedef boost::unordered_map<
         BrowserWindow*, boost::shared_ptr<WindowHandler> > HandlerMap;
 
-    QString m_settingsPath;
+    static boost::scoped_ptr<Settings> m_settings;
+
     HandlerMap m_windows;
     bool m_tabsOnTop;
 };
