@@ -15,7 +15,7 @@ class QMouseEvent;
 
 namespace lesschrome {
 
-//TODO setting
+//TODO menubar
 class WindowHandler : public QObject
 {
     Q_OBJECT
@@ -42,12 +42,14 @@ private slots:
 
 private:
     BrowserWindow *m_window;
-    QWidget *m_tabBar;
+    QWidget *m_navigationContainer;
     boost::unordered_set<QWidget*> m_locationBars;
 
     TabWatcher m_tabWatcher;
+
     boost::scoped_ptr<Toolbar> m_toolbar;
     boost::scoped_ptr<StatusBar> m_statusBar;
+
     QPoint m_mousePos;
 };
 

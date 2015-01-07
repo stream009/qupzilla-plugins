@@ -46,6 +46,7 @@ private:
 };
 
 
+//TODO fail to restore toolbars in proper order
 class Toolbar : public FloatingBar
 {
 private:

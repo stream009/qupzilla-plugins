@@ -7,8 +7,6 @@
 #include "browserwindow.h"
 #include "locationbar.h"
 #include "navigationbar.h"
-#include "tabbar.h"
-#include "tabwidget.h"
 #include "webview.h"
 
 #include <cassert>
@@ -20,20 +18,22 @@ namespace lesschrome {
 WindowHandler::
 WindowHandler(BrowserWindow* const window)
     : m_window(window),
-      m_tabBar(NULL),
+      m_navigationContainer(NULL),
       m_tabWatcher(window),
       m_mousePos()
 {
     assert(m_window);
 
+    m_navigationContainer = navigationBar().parentWidget();
+    assert(m_navigationContainer); //TODO better
+
     captureWidgets();
-    assert(m_tabBar);
 
     this->connect(&m_tabWatcher, SIGNAL(tabAdded(WebTab*)),
                   this,          SLOT(slotTabAdded(WebTab*)));
     this->connect(&m_tabWatcher, SIGNAL(tabDeleted(WebTab*)),
                   this,          SLOT(slotTabDeleted(WebTab*)));
-    m_tabBar->installEventFilter(this);
+    m_navigationContainer->installEventFilter(this);
 }
 
 void WindowHandler::
@@ -60,8 +60,8 @@ eventFilter(QObject* const obj, QEvent* const event)
     assert(obj);
     assert(event);
 
-    if (obj == m_tabBar && event->type() == QEvent::Enter) {
-        //qDebug() << "tabBar enter";
+    if (obj == m_navigationContainer && event->type() == QEvent::Enter) {
+        //qDebug() << "navigationContainer enter";
         if (m_toolbar) {
             m_toolbar->show();
         }
@@ -82,11 +82,6 @@ captureWidgets()
 {
     assert(m_window);
 
-    TabWidget* const tabWidget = m_window->tabWidget();
-    assert(tabWidget);
-    m_tabBar = tabWidget->tabBar();
-    assert(m_tabBar); //TODO handle more properly
-
     const Settings &settings = Plugin::settings();
 
     if (settings.navigationBar || settings.bookmarksBar) {
@@ -104,8 +99,6 @@ captureWidgets()
     if (settings.statusBar) {
         m_statusBar.reset(new StatusBar(m_window));
     }
-
-    assert(m_tabBar);
 }
 
 QWidget &WindowHandler::
@@ -178,7 +171,7 @@ void WindowHandler::
 slotTabAdded(WebTab* const tab)
 {
     assert(tab);
-    qDebug() << __FUNCTION__ << tab;
+    //qDebug() << __FUNCTION__ << tab;
 
     LocationBar* const locationBar = tab->locationBar();
     assert(locationBar);
