@@ -46,6 +46,7 @@ private:
 };
 
 
+//TODO stop using timer
 class Toolbar : public FloatingBar
 {
 private:

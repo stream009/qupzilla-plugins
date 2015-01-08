@@ -59,7 +59,7 @@ pluginSpec()
 void Plugin::
 init(InitState state, const QString &settingsPath)
 {
-    qDebug() << __FUNCTION__;
+    //qDebug() << __FUNCTION__;
 
     if (!m_settings) {
         m_settings.reset(
@@ -87,7 +87,7 @@ init(InitState state, const QString &settingsPath)
 void Plugin::
 unload()
 {
-    qDebug() << __FUNCTION__;
+    //qDebug() << __FUNCTION__;
 }
 
 bool Plugin::
@@ -117,7 +117,7 @@ showSettings(QWidget* parent)
 void Plugin::
 mainWindowCreated(BrowserWindow *window)
 {
-    qDebug() << __FUNCTION__ << window;
+    //qDebug() << __FUNCTION__ << window;
     assert(window);
     assert(m_settings);
 
@@ -132,7 +132,7 @@ mainWindowCreated(BrowserWindow *window)
 void Plugin::
 mainWindowDeleted(BrowserWindow * const window)
 {
-    qDebug() << __FUNCTION__;
+    //qDebug() << __FUNCTION__;
     assert(window);
 
     m_windows.erase(window);
