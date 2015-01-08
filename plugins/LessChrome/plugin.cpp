@@ -107,9 +107,10 @@ getTranslator(const QString &locale)
 void Plugin::
 showSettings(QWidget* parent)
 {
+    assert(parent);
     assert(m_settings);
 
-    SettingDialog dialog(parent);
+    SettingDialog dialog(*parent);
     dialog.exec();
 }
 
@@ -161,7 +162,7 @@ mouseMove(const Qz::ObjectName &type, QObject * const obj,
     QMouseEvent ev(event->type(), pos, event->button(),
                                  event->buttons(), event->modifiers());
     // could be passing only pos if that is enough.
-    handler->mouseMove(&ev);
+    handler->mouseMove(ev);
 
     return false;
 }

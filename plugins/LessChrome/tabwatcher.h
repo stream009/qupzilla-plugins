@@ -31,7 +31,7 @@ private:
     void notifyAdded(WebTab* const tab) const;
     void notifyDeleted(WebTab* const tab) const;
 
-private slots:
+private slots: //TODO boost::signal2
     void slotTabChanged();
 
 private:

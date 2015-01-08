@@ -59,6 +59,8 @@ notifyDeleted(WebTab* const tab) const
 void TabWatcher::
 slotTabChanged()
 {
+    assert(m_tabWidget);
+
     QList<WebTab*> tabs = m_tabWidget->allTabs();
     std::sort(tabs.begin(), tabs.end());
 

@@ -40,14 +40,13 @@ WindowHandler::
 ~WindowHandler() {}
 
 void WindowHandler::
-mouseMove(QMouseEvent * const event)
+mouseMove(const QMouseEvent &event)
 {
     // event is in BrowserWindow's coordinate system.
-    assert(event);
 
     // Ignore unchanged mouse move event. Sometimes it happens.
-    if (event->pos() == m_mousePos) return;
-    m_mousePos = event->pos();
+    if (event.pos() == m_mousePos) return;
+    m_mousePos = event.pos();
 
     if (m_toolbar) {
         m_toolbar->mouseMove(m_mousePos);

@@ -26,7 +26,7 @@ public:
     WindowHandler(BrowserWindow &window);
     virtual ~WindowHandler();
 
-    void mouseMove(QMouseEvent* const event);
+    void mouseMove(const QMouseEvent &event);
 
 private:
     // @override QObject

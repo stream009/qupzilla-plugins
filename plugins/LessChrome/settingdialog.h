@@ -12,7 +12,7 @@ class Settings;
 class SettingDialog : public QDialog
 {
 public:
-    SettingDialog(QWidget* const parent);
+    SettingDialog(QWidget &parent);
 
 private:
     // @override QDialog
