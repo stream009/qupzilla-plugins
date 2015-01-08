@@ -2,19 +2,23 @@ TARGET = $$qtLibraryTarget(LessChrome)
 # OS/2 allows only 8 chars in TARGET
 os2: TARGET = LessChrm
 
-SOURCES += plugin.cpp \
-           windowhandler.cpp \
-	   toolbar.cpp \
-	   tabwatcher.cpp \
+SOURCES += \
+           lc_menubar.cpp \
 	   lc_settings.cpp \
-	   settingdialog.cpp
+           plugin.cpp \
+	   settingdialog.cpp \
+	   tabwatcher.cpp \
+	   toolbar.cpp \
+           windowhandler.cpp
 
-HEADERS += plugin.h \
-           windowhandler.h \
-	   toolbar.h \
-	   tabwatcher.h \
+HEADERS += \
+	   lc_menubar.h \
 	   lc_settings.h \
-	   settingdialog.h
+	   plugin.h \
+	   settingdialog.h \
+	   tabwatcher.h \
+	   toolbar.h \
+           windowhandler.h
 
 FORMS += settingdialog.ui
 

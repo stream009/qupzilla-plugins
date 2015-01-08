@@ -195,9 +195,7 @@ restore(const WidgetInfo &info)
     const LayoutInfo &layoutInfo = info.second;
 
     QBoxLayout* layout = layoutInfo.layout;
-    if (layout->parentWidget() == NULL ||
-        !layout->isEnabled())
-    {
+    if (layout->parentWidget() == NULL || !layout->isEnabled()) {
         //TODO better
         qDebug() << "layout is invalid:" << widget << layout;
     }

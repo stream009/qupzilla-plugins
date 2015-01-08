@@ -1,13 +1,14 @@
 #include "windowhandler.h"
 
+#include "lc_menubar.h"
 #include "lc_settings.h"
 #include "plugin.h"
+#include "toolbar.h"
 
 #include "bookmarkstoolbar.h"
 #include "browserwindow.h"
 #include "locationbar.h"
 #include "navigationbar.h"
-#include "webview.h"
 
 #include <cassert>
 
@@ -31,8 +32,12 @@ WindowHandler(BrowserWindow &window)
                   this,          SLOT(slotTabAdded(WebTab*)));
     this->connect(&m_tabWatcher, SIGNAL(tabDeleted(WebTab*)),
                   this,          SLOT(slotTabDeleted(WebTab*)));
+
     m_navigationContainer->installEventFilter(this);
 }
+
+WindowHandler::
+~WindowHandler() {}
 
 void WindowHandler::
 mouseMove(QMouseEvent * const event)
@@ -94,6 +99,10 @@ captureWidgets()
 
     if (settings.statusBar) {
         m_statusBar.reset(new StatusBar(m_window));
+    }
+
+    if (settings.menuBar) {
+        m_menuBar.reset(new MenuBar(m_window));
     }
 }
 
@@ -158,6 +167,14 @@ slotSettingChanged(const QString &key)
         }
         else {
             m_statusBar.reset();
+        }
+    }
+    else if (key == Settings::keyMenuBar) {
+        if (settings.menuBar) {
+            m_menuBar.reset(new MenuBar(m_window));
+        }
+        else {
+            m_menuBar.reset();
         }
     }
 }

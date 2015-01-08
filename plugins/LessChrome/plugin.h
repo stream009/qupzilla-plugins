@@ -11,10 +11,10 @@
 #include <boost/unordered_map.hpp>
 
 #include <QtCore/QObject>
-#include <QtCore/QString>
 
 class BrowserWindow;
 class QMouseEvent;
+class QString;
 class QWidget;
 
 namespace lesschrome {
