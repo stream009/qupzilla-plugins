@@ -1,6 +1,7 @@
 #include "toolbar.h"
 
 #include "browserwindow.h"
+#include "navigationbar.h"
 #include "plugin.h"
 #include "settings.h"
 #include "tabbedwebview.h"
@@ -132,48 +133,20 @@ Toolbar(BrowserWindow &parent)
     : FloatingBar(parent)
 {
     //qDebug() << __FUNCTION__;
+    saveOriginalState();
 }
 
 Toolbar::
 ~Toolbar()
 {
     //qDebug() << __FUNCTION__;
-    foreach (const WidgetInfo &item, m_widgets) {
-        restore(item);
-    }
-
-    assert(m_widgets.empty());
+    restoreAll();
 }
 
 void Toolbar::
 capture(QWidget& widget)
 {
-    assert(!m_widgets.count(&widget)); //TODO better
-
-    QBoxLayout* const layout =
-        qobject_cast<QBoxLayout*>(widget.parentWidget()->layout());
-    if (layout == NULL) {
-        qDebug() << "layout";
-        throw "layout"; //TODO
-    }
-
-    const int index = layout->indexOf(&widget);
-    if (index == -1) {
-        qDebug() << "index";
-        throw "index"; //TODO
-    }
-
-    const Qt::Alignment alignment = layout->itemAt(index)->alignment();
-    const int stretch = layout->stretch(index);
-
-    assert(layout);
-    assert(index >= 0);
-    assert(alignment >= 0);
-    assert(stretch >= 0);
-
-    LayoutInfo info = { layout, index, alignment, stretch };
-
-    m_widgets.emplace(&widget, info);
+    assert(this->layout()->indexOf(&widget) == -1); //TODO better
 
     this->layout()->addWidget(&widget);
     updatePositionAndSize();
@@ -182,30 +155,63 @@ capture(QWidget& widget)
 void Toolbar::
 restore(QWidget &widget)
 {
-    const WidgetMap::const_iterator it = m_widgets.find(&widget);
-    assert(it != m_widgets.end()); //TODO better
-
-    restore(*it);
-}
-
-void Toolbar::
-restore(const WidgetInfo &info)
-{
-    QWidget* const widget = info.first;
-    const LayoutInfo &layoutInfo = info.second;
+    const LayoutInfo &layoutInfo = m_originalStates.at(&widget); //TODO out_of_range
 
     QBoxLayout* layout = layoutInfo.layout;
     if (layout->parentWidget() == NULL || !layout->isEnabled()) {
         //TODO better
-        qDebug() << "layout is invalid:" << widget << layout;
+        qDebug() << "layout is invalid:" << &widget << layout;
     }
 
-    //qDebug() << __FUNCTION__ << widget << layoutInfo.index;
+    //qDebug() << __FUNCTION__ << &widget << layoutInfo.index;
     layout->insertWidget(layoutInfo.index,
-                widget, layoutInfo.stretch, layoutInfo.alignment);
+                &widget, layoutInfo.stretch, layoutInfo.alignment);
 
-    m_widgets.erase(widget);
     updatePositionAndSize();
+}
+
+void Toolbar::
+restoreAll()
+{
+    QLayout* const layout = this->layout();
+    while (layout->count()) {
+        QLayoutItem* const item = layout->itemAt(0);
+        assert(item);
+
+        QWidget* const widget = item->widget();
+        assert(widget);
+
+        restore(*widget);
+    }
+}
+
+void Toolbar::
+saveOriginalState()
+{
+    QWidget* const navigationBar = this->window().navigationBar();
+    assert(navigationBar); //TODO better
+
+    QWidget* const container = navigationBar->parentWidget();
+    assert(container); //TODO better
+
+    QBoxLayout* const layout = qobject_cast<QBoxLayout*>(container->layout());
+    assert(layout);
+    assert(layout->count());
+    for (size_t index = 0u, len = layout->count(); index < len; ++index) {
+        QLayoutItem* const item = layout->itemAt(index);
+        assert(item);
+
+        QWidget* const widget = item->widget();
+        const Qt::Alignment alignment = item->alignment();
+        const int stretch = layout->stretch(index);
+
+        assert(widget);
+        assert(alignment >= 0);
+        assert(stretch >= 0);
+
+        LayoutInfo info = { layout, index, alignment, stretch };
+        m_originalStates.emplace(widget, info);
+    }
 }
 
 

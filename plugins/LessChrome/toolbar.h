@@ -46,7 +46,6 @@ private:
 };
 
 
-//TODO fail to restore toolbars in proper order
 class Toolbar : public FloatingBar
 {
 private:
@@ -64,16 +63,17 @@ public:
     explicit Toolbar(BrowserWindow &parent);
     virtual ~Toolbar();
 
-    bool empty() const { return m_widgets.empty(); }
+    bool empty() const { return this->layout()->count() == 0; }
 
     void capture(QWidget&);
     void restore(QWidget&);
 
 private:
-    void restore(const WidgetInfo&);
+    void restoreAll();
+    void saveOriginalState();
 
 private:
-    WidgetMap m_widgets;
+    WidgetMap m_originalStates;
 };
 
 
