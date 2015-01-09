@@ -20,17 +20,12 @@ class FloatingBar : public QWidget
 public:
     enum Position { Top, Bottom };
 
-    void mouseMove(const QPoint &);
-
 public slots:
     void show();
-    void slotSettingChanged(const QString &key);
 
 protected:
     explicit FloatingBar(BrowserWindow &parent, const Position = Top);
 
-    void enter();
-    void leave();
     void updatePositionAndSize();
     BrowserWindow &window() const { return m_window; }
 
@@ -40,13 +35,10 @@ private:
 
 private:
     BrowserWindow &m_window;
-    QTimer m_timer;
-    bool m_entered;
     Position m_position;
 };
 
 
-//TODO stop using timer
 class Toolbar : public FloatingBar
 {
 private:
@@ -80,13 +72,22 @@ private:
 
 class StatusBar : public FloatingBar
 {
+    Q_OBJECT
 public:
     explicit StatusBar(BrowserWindow &window);
     virtual ~StatusBar();
 
+    void enter();
+    void leave();
+
+public slots:
+    void slotSettingChanged(const QString &key);
+
 private:
     QStatusBar* m_statusBar;
     bool m_wasVisible;
+    QTimer m_timer;
+    bool m_entered;
 };
 
 } // namespace lesschrome

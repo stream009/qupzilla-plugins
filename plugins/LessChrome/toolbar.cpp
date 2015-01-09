@@ -20,40 +20,12 @@ FloatingBar::
 FloatingBar(BrowserWindow &window, const Position position)
     : QWidget(&window),
       m_window(window),
-      m_entered(false),
       m_position(position)
 {
     QVBoxLayout *layout = new QVBoxLayout(this); // this take ownership
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
     this->setAutoFillBackground(true);
-
-    const Settings &settings = Plugin::settings();
-    m_timer.setSingleShot(true);
-    m_timer.setInterval(settings.waitTimer);
-
-    this->connect(&m_timer, SIGNAL(timeout()),
-                  this,     SLOT(show()));
-    this->connect(&settings, SIGNAL(change(QString)),
-                  this,      SLOT(slotSettingChanged(const QString&)));
-}
-
-void FloatingBar::
-mouseMove(const QPoint &pos)
-{
-    if (this->geometry().contains(pos)) {
-        if (!m_entered) {
-            enter();
-        }
-    }
-    else {
-        if (m_entered) {
-            leave();
-        }
-        else if (this->isVisible()){
-            this->hide();
-        }
-    }
 }
 
 void FloatingBar::
@@ -62,37 +34,6 @@ show()
     //qDebug() << __FUNCTION__;
     QWidget::show();
     updatePositionAndSize();
-}
-
-void FloatingBar::
-slotSettingChanged(const QString &key)
-{
-    if (key == Settings::keyWaitTimer) {
-        m_timer.setInterval(Plugin::settings().waitTimer);
-    }
-}
-
-void FloatingBar::
-enter()
-{
-    //qDebug() << __FUNCTION__;
-    m_entered = true;
-
-    if (!m_timer.isActive()) {
-        m_timer.start();
-    }
-}
-
-void FloatingBar::
-leave()
-{
-    //qDebug() << __FUNCTION__;
-    m_entered = false;
-
-    if (m_timer.isActive()) {
-        m_timer.stop();
-    }
-    hide();
 }
 
 void FloatingBar::
@@ -219,7 +160,8 @@ StatusBar::
 StatusBar(BrowserWindow &window)
     : FloatingBar(window, Toolbar::Bottom),
       m_statusBar(NULL),
-      m_wasVisible(true)
+      m_wasVisible(true),
+      m_entered(false)
 {
     m_statusBar = window.statusBar();
     assert(m_statusBar);
@@ -235,6 +177,15 @@ StatusBar(BrowserWindow &window)
 
     updatePositionAndSize();
 
+    const Settings &settings = Plugin::settings();
+    m_timer.setSingleShot(true);
+    m_timer.setInterval(settings.waitTimer);
+
+    this->connect(&m_timer, SIGNAL(timeout()),
+                  this,     SLOT(show()));
+    this->connect(&settings, SIGNAL(change(QString)),
+                  this,      SLOT(slotSettingChanged(const QString&)));
+
     assert(m_statusBar);
 }
 
@@ -243,6 +194,38 @@ StatusBar::
 {
     this->window().setStatusBar(m_statusBar);
     m_statusBar->setVisible(m_wasVisible);
+}
+
+void StatusBar::
+enter()
+{
+    //qDebug() << __FUNCTION__;
+    if (m_entered) return;
+    m_entered = true;
+
+    if (!m_timer.isActive()) {
+        m_timer.start();
+    }
+}
+
+void StatusBar::
+leave()
+{
+    //qDebug() << __FUNCTION__;
+    m_entered = false;
+
+    if (m_timer.isActive()) {
+        m_timer.stop();
+    }
+    hide();
+}
+
+void StatusBar::
+slotSettingChanged(const QString &key)
+{
+    if (key == Settings::keyWaitTimer) {
+        m_timer.setInterval(Plugin::settings().waitTimer);
+    }
 }
 
 } // namespace lesschrome

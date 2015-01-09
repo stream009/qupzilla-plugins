@@ -9,6 +9,7 @@
 #include "browserwindow.h"
 #include "locationbar.h"
 #include "navigationbar.h"
+#include "tabbedwebview.h"
 
 #include <cassert>
 
@@ -20,6 +21,7 @@ WindowHandler::
 WindowHandler(BrowserWindow &window)
     : m_window(window),
       m_navigationContainer(NULL),
+      m_webView(NULL),
       m_tabWatcher(window),
       m_mousePos()
 {
@@ -34,6 +36,10 @@ WindowHandler(BrowserWindow &window)
                   this,          SLOT(slotTabDeleted(WebTab*)));
 
     m_navigationContainer->installEventFilter(this);
+
+    m_webView = window.weView();
+    assert(m_webView);
+    m_webView->installEventFilter(this);
 }
 
 WindowHandler::
@@ -48,11 +54,13 @@ mouseMove(const QMouseEvent &event)
     if (event.pos() == m_mousePos) return;
     m_mousePos = event.pos();
 
-    if (m_toolbar) {
-        m_toolbar->mouseMove(m_mousePos);
-    }
     if (m_statusBar) {
-        m_statusBar->mouseMove(m_mousePos);
+        if (m_statusBar->geometry().contains(m_mousePos)) {
+            m_statusBar->enter();
+        }
+        else {
+            m_statusBar->leave();
+        }
     }
 }
 
@@ -61,8 +69,15 @@ eventFilter(QObject* const obj, QEvent* const event)
 {
     assert(obj);
     assert(event);
+    assert(m_webView);
+    assert(m_navigationContainer);
 
-    if (obj == m_navigationContainer && event->type() == QEvent::Enter) {
+    if (obj == m_webView && event->type() == QEvent::Enter) {
+        if (m_toolbar) {
+            m_toolbar->hide();
+        }
+    }
+    else if (obj == m_navigationContainer && event->type() == QEvent::Enter) {
         //qDebug() << "navigationContainer enter";
         if (m_toolbar) {
             m_toolbar->show();
@@ -76,7 +91,7 @@ eventFilter(QObject* const obj, QEvent* const event)
             }
         }
     }
-    return false;
+    return QObject::eventFilter(obj, event);
 }
 
 void WindowHandler::

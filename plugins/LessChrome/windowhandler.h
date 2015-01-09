@@ -47,6 +47,7 @@ private slots:
 private:
     BrowserWindow &m_window;
     QWidget *m_navigationContainer;
+    QWidget *m_webView;
     boost::unordered_set<QWidget*> m_locationBars;
 
     TabWatcher m_tabWatcher;
