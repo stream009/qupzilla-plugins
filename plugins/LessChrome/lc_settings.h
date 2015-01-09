@@ -1,6 +1,8 @@
 #ifndef LC_SETTINGS_H
 #define LC_SETTINGS_H
 
+#include <cassert>
+
 #include <boost/type_traits.hpp>
 
 #include <QSettings>
@@ -26,7 +28,9 @@ private:
         Property(Settings* const parent) : m_p(parent) {}
 
         operator T() const {
-            return m_p->m_settings.value(Key, Default).template value<T>();
+            const QVariant &value = m_p->m_settings.value(Key, Default);
+            assert(value.canConvert<T>());
+            return value.value<T>();
         }
 
         void operator=(const TRef newValue) {

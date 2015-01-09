@@ -19,9 +19,13 @@ class QWidget;
 
 namespace lesschrome {
 
+//TODO Disable plugin by itself when unrecoverable error occur.
+//TODO Stop exception leak from eventFilters.
 class Plugin
     : public QObject, public PluginInterface
 {
+    // This class is the DLL/Shared Library boundary.
+    // Exceptions must not leak from this class.
     Q_OBJECT
     Q_INTERFACES(PluginInterface)
 

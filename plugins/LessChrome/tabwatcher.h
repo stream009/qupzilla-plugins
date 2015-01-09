@@ -21,15 +21,15 @@ public:
     explicit TabWatcher(BrowserWindow &window);
 
 signals:
-    void tabAdded(WebTab*) const;
-    void tabDeleted(WebTab*) const;
+    void tabAdded(WebTab&) const;
+    void tabDeleted(WebTab&) const;
 
 private:
     // @override QObject
     virtual void connectNotify(const char* const signal);
 
-    void notifyAdded(WebTab* const tab) const;
-    void notifyDeleted(WebTab* const tab) const;
+    void notifyAdded(WebTab &tab) const;
+    void notifyDeleted(WebTab &tab) const;
 
 private slots:
     void slotTabChanged();

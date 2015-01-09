@@ -1,5 +1,7 @@
 #include "toolbar.h"
 
+#include "error.h"
+
 #include "browserwindow.h"
 #include "navigationbar.h"
 #include "plugin.h"
@@ -22,7 +24,7 @@ FloatingBar(BrowserWindow &window, const Position position)
       m_window(window),
       m_position(position)
 {
-    QVBoxLayout *layout = new QVBoxLayout(this); // this take ownership
+    QVBoxLayout *layout = new QVBoxLayout(this); // this takes ownership
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
     this->setAutoFillBackground(true);
@@ -40,7 +42,9 @@ void FloatingBar::
 updatePositionAndSize()
 {
     QWidget* const webView = m_window.weView();
-    assert(webView);
+    if (!webView) {
+        throw RuntimeError("Fail to obtain WebView.");
+    }
 
     const QRect &childrenRect = this->childrenRect();
     QPoint topLeft;
@@ -53,7 +57,7 @@ updatePositionAndSize()
             QPoint(0, webView->height() - childrenRect.height()));
         break;
     default:
-        //TODO error handling
+        assert(false && "Unknown Position value.");
         break;
     }
 
@@ -87,21 +91,24 @@ Toolbar::
 void Toolbar::
 capture(QWidget& widget)
 {
-    assert(this->layout()->indexOf(&widget) == -1); //TODO better
+    QLayout* const layout = this->layout();
+    assert(layout);
+    if (layout->indexOf(&widget) != -1) {
+        throw InternalError("Tried to capture widget twice.");
+    }
 
-    this->layout()->addWidget(&widget);
+    layout->addWidget(&widget);
     updatePositionAndSize();
 }
 
 void Toolbar::
 restore(QWidget &widget)
-{
-    const LayoutInfo &layoutInfo = m_originalStates.at(&widget); //TODO out_of_range
+try {
+    const LayoutInfo &layoutInfo = m_originalStates.at(&widget);
 
     QBoxLayout* layout = layoutInfo.layout;
     if (layout->parentWidget() == NULL || !layout->isEnabled()) {
-        //TODO better
-        qDebug() << "layout is invalid:" << &widget << layout;
+        throw InternalError("Invalid layout object");
     }
 
     //qDebug() << __FUNCTION__ << &widget << layoutInfo.index;
@@ -110,17 +117,25 @@ restore(QWidget &widget)
 
     updatePositionAndSize();
 }
+catch (const std::out_of_range &e) {
+    throw InternalError("Try to restore widget that hadn't captured.");
+}
 
 void Toolbar::
 restoreAll()
 {
     QLayout* const layout = this->layout();
+    assert(layout);
     while (layout->count()) {
         QLayoutItem* const item = layout->itemAt(0);
-        assert(item);
+        if (!item) {
+            throw RuntimeError("Invalid layout item");
+        }
 
         QWidget* const widget = item->widget();
-        assert(widget);
+        if (!widget) {
+            throw RuntimeError("Got invalid widget from layout.");
+        }
 
         restore(*widget);
     }
@@ -130,19 +145,32 @@ void Toolbar::
 saveOriginalState()
 {
     QWidget* const navigationBar = this->window().navigationBar();
-    assert(navigationBar); //TODO better
+    if (!navigationBar) {
+        throw RuntimeError("Fail to obtain navigation bar.");
+    }
 
     QWidget* const container = navigationBar->parentWidget();
-    assert(container); //TODO better
+    if (!container) {
+        throw RuntimeError("Fail to obtain navigation container");
+    }
 
     QBoxLayout* const layout = qobject_cast<QBoxLayout*>(container->layout());
-    assert(layout);
-    assert(layout->count());
+    if (!layout) {
+        throw RuntimeError(
+            "Fail to obtain QBoxLayout from navigation container.");
+    }
+
     for (size_t index = 0u, len = layout->count(); index < len; ++index) {
         QLayoutItem* const item = layout->itemAt(index);
-        assert(item);
+        if (!item) {
+            throw RuntimeError(
+                "Got invalid layout item from navigation container.");
+        }
 
         QWidget* const widget = item->widget();
+        if (!widget) {
+            throw RuntimeError("Layout item doesn't have widget to layout.");
+        }
         const Qt::Alignment alignment = item->alignment();
         const int stretch = layout->stretch(index);
 
@@ -164,7 +192,7 @@ StatusBar(BrowserWindow &window)
       m_entered(false)
 {
     m_statusBar = window.statusBar();
-    assert(m_statusBar);
+    // Empty status bar will be returned if status bar hasn't set.
     m_wasVisible = m_statusBar->isVisible();
 
     this->layout()->addWidget(m_statusBar);

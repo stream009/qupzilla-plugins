@@ -1,5 +1,6 @@
 #include "windowhandler.h"
 
+#include "error.h"
 #include "lc_menubar.h"
 #include "lc_settings.h"
 #include "plugin.h"
@@ -21,25 +22,28 @@ WindowHandler::
 WindowHandler(BrowserWindow &window)
     : m_window(window),
       m_navigationContainer(NULL),
-      m_webView(NULL),
       m_tabWatcher(window),
       m_mousePos()
 {
+    const Settings &settings = Plugin::settings();
+    this->connect(&settings, SIGNAL(change(QString)),
+                  this,      SLOT(slotSettingChanged(const QString&)));
+
     m_navigationContainer = navigationBar().parentWidget();
-    assert(m_navigationContainer); //TODO better
+    if (!m_navigationContainer) {
+        throw RuntimeError("Fail to access navigation container.");
+    }
 
     captureWidgets();
 
-    this->connect(&m_tabWatcher, SIGNAL(tabAdded(WebTab*)),
-                  this,          SLOT(slotTabAdded(WebTab*)));
-    this->connect(&m_tabWatcher, SIGNAL(tabDeleted(WebTab*)),
-                  this,          SLOT(slotTabDeleted(WebTab*)));
+    this->connect(&m_tabWatcher, SIGNAL(tabAdded(WebTab&)),
+                  this,          SLOT(slotTabAdded(WebTab&)));
+    this->connect(&m_tabWatcher, SIGNAL(tabDeleted(WebTab&)),
+                  this,          SLOT(slotTabDeleted(WebTab&)));
 
     m_navigationContainer->installEventFilter(this);
 
-    m_webView = window.weView();
-    assert(m_webView);
-    m_webView->installEventFilter(this);
+    assert(m_navigationContainer);
 }
 
 WindowHandler::
@@ -64,17 +68,26 @@ mouseMove(const QMouseEvent &event)
     }
 }
 
+//TODO consolidate event filter to here
 bool WindowHandler::
 eventFilter(QObject* const obj, QEvent* const event)
 {
     assert(obj);
     assert(event);
-    assert(m_webView);
     assert(m_navigationContainer);
 
-    if (obj == m_webView && event->type() == QEvent::Enter) {
-        if (m_toolbar) {
+    // If obj is invalid it just pass through, no need to check it out.
+    if (!event) {
+        throw RuntimeError("Receive invalid event.");
+    }
+
+    if (qobject_cast<WebView*>(obj)) {
+        if (event->type() == QEvent::Enter && m_toolbar) {
             m_toolbar->hide();
+        }
+
+        if (m_menuBar) {
+            m_menuBar->handleWebViewEvent(*event);
         }
     }
     else if (obj == m_navigationContainer && event->type() == QEvent::Enter) {
@@ -124,9 +137,8 @@ QWidget &WindowHandler::
 bookmarksBar() const
 {
     QWidget* const widget = m_window.bookmarksToolbar();
-    if (widget == NULL) {
-        qDebug() << "widget";
-        throw "widget"; //TODO
+    if (!widget) {
+        throw RuntimeError("Fail to access bookmarks toolbar.");
     }
 
     assert(widget);
@@ -137,9 +149,8 @@ QWidget &WindowHandler::
 navigationBar() const
 {
     QWidget* const widget = m_window.navigationBar();
-    if (widget == NULL) {
-        qDebug() << "widget";
-        throw "widget"; //TODO
+    if (!widget) {
+        throw RuntimeError("Fail to access navigation bar.");
     }
 
     assert(widget);
@@ -194,32 +205,48 @@ slotSettingChanged(const QString &key)
 }
 
 void WindowHandler::
-slotTabAdded(WebTab* const tab)
+slotTabAdded(WebTab &tab)
 {
-    assert(tab);
-    //qDebug() << __FUNCTION__ << tab;
+    qDebug() << __FUNCTION__ << &tab;
+    QWidget* const locationBar = tab.locationBar();
+    if (!locationBar) {
+        throw RuntimeError("Fail to obtain location bar.");
+    }
+    QWidget* const webView = m_window.weView();
+    if (!webView) {
+        throw RuntimeError("Fail to obtain Web view.");
+    }
 
-    LocationBar* const locationBar = tab->locationBar();
-    assert(locationBar);
-
-    typedef boost::unordered_set<QWidget*>::iterator It;
-    const std::pair<It, bool> &result = m_locationBars.insert(locationBar);
+    typedef boost::unordered_map<QWidget*, QWidget*>::iterator It;
+    const std::pair<It, bool> &result
+                        = m_tabInfos.emplace(locationBar, webView);
     if (result.second) {
         locationBar->installEventFilter(this);
+        webView->installEventFilter(this);
     }
 }
 
 void WindowHandler::
-slotTabDeleted(WebTab* const tab)
+slotTabDeleted(WebTab &tab)
 {
-    assert(tab);
-    //qDebug() << __FUNCTION__ << tab;
+    qDebug() << __FUNCTION__ << &tab;
+    QWidget* const locationBar = tab.locationBar();
+    if (!locationBar) {
+        throw RuntimeError("Fail to obtain location bar.");
+    }
 
-    LocationBar* const locationBar = tab->locationBar();
-    assert(locationBar);
+    try {
+        QWidget* const webView = m_tabInfos.at(locationBar);
+        assert(webView);
 
-    if (m_locationBars.erase(locationBar)) {
+        const size_t deleted = m_tabInfos.erase(locationBar);
+        assert(deleted);
+
         locationBar->removeEventFilter(this);
+        webView->removeEventFilter(this);
+    }
+    catch (const std::out_of_range &) {
+        throw InternalError("Unregistered tab got deleted.");
     }
 }
 

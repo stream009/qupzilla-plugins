@@ -3,7 +3,7 @@
 
 #include "tabwatcher.h"
 
-#include <boost/unordered_set.hpp>
+#include <boost/unordered_map.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include <QtCore/QPoint>
@@ -41,14 +41,15 @@ private:
 
 private slots:
     void slotSettingChanged(const QString &key);
-    void slotTabAdded(WebTab*);
-    void slotTabDeleted(WebTab*);
+    void slotTabAdded(WebTab&);
+    void slotTabDeleted(WebTab&);
 
 private:
     BrowserWindow &m_window;
     QWidget *m_navigationContainer;
-    QWidget *m_webView;
-    boost::unordered_set<QWidget*> m_locationBars;
+
+    // map<LocationBar*, WebView*>
+    boost::unordered_map<QWidget*, QWidget*> m_tabInfos;
 
     TabWatcher m_tabWatcher;
 

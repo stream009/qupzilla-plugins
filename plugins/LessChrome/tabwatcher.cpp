@@ -1,5 +1,7 @@
 #include "tabwatcher.h"
 
+#include "error.h"
+
 #include "browserwindow.h"
 #include "tabwidget.h"
 
@@ -10,7 +12,7 @@
 
 namespace lesschrome {
 
-template<void (TabWatcher::*Func)(WebTab* const) const>
+template<void (TabWatcher::*Func)(WebTab&) const>
 struct Notifier {
 
     Notifier(TabWatcher* const watcher)
@@ -21,7 +23,7 @@ struct Notifier {
 
     void operator()(WebTab* const tab) {
         assert(tab);
-        (m_watcher->*Func)(tab);
+        (m_watcher->*Func)(*tab);
     }
 
     TabWatcher *m_watcher;
@@ -32,10 +34,13 @@ TabWatcher(BrowserWindow &window)
     : m_tabWidget(NULL)
 {
     m_tabWidget = window.tabWidget();
-    assert(m_tabWidget); //TODO do better
+    if (!m_tabWidget) {
+        throw RuntimeError("Fail to obtain tab widget.");
+    }
 
     this->connect(m_tabWidget, SIGNAL(changed()),
                   this,        SLOT(slotTabChanged()));
+    assert(m_tabWidget);
 }
 
 void TabWatcher::
@@ -45,15 +50,24 @@ connectNotify(const char* const)
 }
 
 void TabWatcher::
-notifyAdded(WebTab* const tab) const
+notifyAdded(WebTab &tab) const
 {
     emit tabAdded(tab);
 }
 
 void TabWatcher::
-notifyDeleted(WebTab* const tab) const
+notifyDeleted(WebTab &tab) const
 {
     emit tabDeleted(tab);
+}
+
+static void
+validateWebTabs(const QList<WebTab*> &tabs) {
+    foreach (WebTab* const tab, tabs) {
+        if (!tab) {
+            throw RuntimeError("Receive invalid WebTab pointer.");
+        }
+    }
 }
 
 void TabWatcher::
@@ -62,6 +76,8 @@ slotTabChanged()
     assert(m_tabWidget);
 
     QList<WebTab*> tabs = m_tabWidget->allTabs();
+    validateWebTabs(tabs);
+
     std::sort(tabs.begin(), tabs.end());
 
     std::set_difference(

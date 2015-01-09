@@ -1,5 +1,6 @@
 #include "lc_menubar.h"
 
+#include "error.h"
 #include "plugin.h"
 
 #include "browserwindow.h"
@@ -20,17 +21,28 @@ MenuBar(BrowserWindow &window)
       m_keyCode(Plugin::settings().menuBarKey)
 {
     m_window.installEventFilter(this);
-    webView().installEventFilter(this);
 
     this->connect(
         &Plugin::settings(), SIGNAL(change(QString)),
         this,                SLOT(slotSettingChanged(const QString&)));
 }
 
+void MenuBar::
+handleWebViewEvent(QEvent& event)
+{
+    if (event.type() == QEvent::FocusIn) {
+        menuBar().hide();
+    }
+}
+
 bool MenuBar::
 eventFilter(QObject* const obj, QEvent* const event)
 {
-    assert(event);
+    //qDebug() << __FUNCTION__ << obj << event;
+    // If obj is invalid it just pass through, no need to check it out.
+    if (!event) {
+        throw RuntimeError("Receive invalid event.");
+    }
 
     if (obj == &m_window) {
         if (event->type() == QEvent::KeyPress) {
@@ -55,28 +67,17 @@ eventFilter(QObject* const obj, QEvent* const event)
             }
         }
     }
-    else if (obj == &webView()) {
-        if (event->type() == QEvent::FocusIn) {
-            menuBar().hide();
-        }
-    }
 
     return QObject::eventFilter(obj, event);
 }
 
 QWidget& MenuBar::
-menuBar()
+menuBar() const
 {
     QWidget* const widget = m_window.menuBar();
-    assert(widget); //TODO better
-    return *widget;
-}
-
-QWidget& MenuBar::
-webView()
-{
-    QWidget* const widget = m_window.weView();
-    assert(widget); //TODO better
+    if (!widget) {
+        throw RuntimeError("Fail to obtain menu bar");
+    }
     return *widget;
 }
 

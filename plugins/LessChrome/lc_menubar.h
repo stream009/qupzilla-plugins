@@ -15,12 +15,13 @@ class MenuBar : public QObject
 public:
     MenuBar(BrowserWindow &);
 
+    void handleWebViewEvent(QEvent &);
+
 private:
     // @override QObject
     virtual bool eventFilter(QObject* const, QEvent* const);
 
-    QWidget& menuBar();
-    QWidget& webView();
+    QWidget& menuBar() const;
 
 private slots:
     void slotSettingChanged(const QString &key);
