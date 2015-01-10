@@ -22,8 +22,7 @@ WindowHandler::
 WindowHandler(BrowserWindow &window)
     : m_window(window),
       m_navigationContainer(NULL),
-      m_tabWatcher(window),
-      m_mousePos()
+      m_tabWatcher(window)
 {
     const Settings &settings = Plugin::settings();
     this->connect(&settings, SIGNAL(change(QString)),
@@ -41,6 +40,7 @@ WindowHandler(BrowserWindow &window)
     this->connect(&m_tabWatcher, SIGNAL(tabDeleted(WebTab&)),
                   this,          SLOT(slotTabDeleted(WebTab&)));
 
+    m_window.installEventFilter(this);
     m_navigationContainer->installEventFilter(this);
 
     assert(m_navigationContainer);
@@ -49,29 +49,9 @@ WindowHandler(BrowserWindow &window)
 WindowHandler::
 ~WindowHandler() {}
 
-void WindowHandler::
-mouseMove(const QMouseEvent &event)
-{
-    // event is in BrowserWindow's coordinate system.
-
-    // Ignore unchanged mouse move event. Sometimes it happens.
-    if (event.pos() == m_mousePos) return;
-    m_mousePos = event.pos();
-
-    if (m_statusBar) {
-        if (m_statusBar->geometry().contains(m_mousePos)) {
-            m_statusBar->enter();
-        }
-        else {
-            m_statusBar->leave();
-        }
-    }
-}
-
-//TODO consolidate event filter to here
 bool WindowHandler::
-eventFilter(QObject* const obj, QEvent* const event)
-{
+eventFilter(QObject* const obj, QEvent* const event) // throw()
+try {
     assert(obj);
     assert(event);
     assert(m_navigationContainer);
@@ -81,30 +61,39 @@ eventFilter(QObject* const obj, QEvent* const event)
         throw RuntimeError("Receive invalid event.");
     }
 
-    if (qobject_cast<WebView*>(obj)) {
-        if (event->type() == QEvent::Enter && m_toolbar) {
-            m_toolbar->hide();
+    if (obj == &m_window) {
+        if (m_menuBar) {
+            m_menuBar->handleWindowEvent(*event);
         }
 
+        if (m_statusBar) {
+            m_statusBar->handleWindowEvent(*event);
+        }
+    }
+    else if (qobject_cast<WebView*>(obj)) {
         if (m_menuBar) {
             m_menuBar->handleWebViewEvent(*event);
         }
-    }
-    else if (obj == m_navigationContainer && event->type() == QEvent::Enter) {
-        //qDebug() << "navigationContainer enter";
+
         if (m_toolbar) {
-            m_toolbar->show();
+            m_toolbar->handleWebViewEvent(*event);
         }
     }
-    else if (qobject_cast<LocationBar*>(obj) != NULL) {
-        if (event->type() == QEvent::FocusIn) {
-            //qDebug() << "locationbar focus";
-            if (m_toolbar) {
-                m_toolbar->show();
-            }
+    else if (obj == m_navigationContainer) {
+        if (m_toolbar) {
+            m_toolbar->handleNavigationContainerEvent(*event);
         }
     }
+    else if (qobject_cast<LocationBar*>(obj)) {
+        if (m_toolbar) {
+            m_toolbar->handleLocationBarEvent(*event);
+        }
+    }
+
     return QObject::eventFilter(obj, event);
+}
+catch (const std::exception &e) {
+    defaultExceptionHandler(__FUNCTION__, e);
 }
 
 void WindowHandler::
@@ -127,10 +116,11 @@ captureWidgets()
     if (settings.statusBar) {
         m_statusBar.reset(new StatusBar(m_window));
     }
-
+#ifndef Q_OS_MAC
     if (settings.menuBar) {
         m_menuBar.reset(new MenuBar(m_window));
     }
+#endif
 }
 
 QWidget &WindowHandler::
@@ -194,6 +184,7 @@ slotSettingChanged(const QString &key)
             m_statusBar.reset();
         }
     }
+#ifndef Q_OS_MAC
     else if (key == Settings::keyMenuBar) {
         if (settings.menuBar) {
             m_menuBar.reset(new MenuBar(m_window));
@@ -202,12 +193,13 @@ slotSettingChanged(const QString &key)
             m_menuBar.reset();
         }
     }
+#endif
 }
 
 void WindowHandler::
 slotTabAdded(WebTab &tab)
 {
-    qDebug() << __FUNCTION__ << &tab;
+    //qDebug() << __FUNCTION__ << &tab;
     QWidget* const locationBar = tab.locationBar();
     if (!locationBar) {
         throw RuntimeError("Fail to obtain location bar.");
@@ -229,7 +221,7 @@ slotTabAdded(WebTab &tab)
 void WindowHandler::
 slotTabDeleted(WebTab &tab)
 {
-    qDebug() << __FUNCTION__ << &tab;
+    //qDebug() << __FUNCTION__ << &tab;
     QWidget* const locationBar = tab.locationBar();
     if (!locationBar) {
         throw RuntimeError("Fail to obtain location bar.");

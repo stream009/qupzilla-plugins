@@ -31,6 +31,19 @@ FloatingBar(BrowserWindow &window, const Position position)
 }
 
 void FloatingBar::
+handleWebViewEvent(const QEvent &event)
+{
+    switch (event.type()) {
+    case QEvent::Enter:
+    case QEvent::FocusIn:
+        this->hide();
+        break;
+    default:
+        break;
+    }
+}
+
+void FloatingBar::
 show()
 {
     //qDebug() << __FUNCTION__;
@@ -67,9 +80,12 @@ updatePositionAndSize()
 }
 
 void FloatingBar::
-wheelEvent(QWheelEvent* const)
-{
+wheelEvent(QWheelEvent* const) // throw()
+try {
     hide();
+}
+catch (const std::exception &e) {
+    defaultExceptionHandler(__FUNCTION__, e);
 }
 
 
@@ -86,6 +102,22 @@ Toolbar::
 {
     //qDebug() << __FUNCTION__;
     restoreAll();
+}
+
+void Toolbar::
+handleLocationBarEvent(const QEvent &event)
+{
+    if (event.type() == QEvent::FocusIn) {
+        show();
+    }
+}
+
+void Toolbar::
+handleNavigationContainerEvent(const QEvent &event)
+{
+    if (event.type() == QEvent::Enter) {
+        show();
+    }
 }
 
 void Toolbar::
@@ -222,6 +254,22 @@ StatusBar::
 {
     this->window().setStatusBar(m_statusBar);
     m_statusBar->setVisible(m_wasVisible);
+}
+
+void StatusBar::
+handleWindowEvent(const QEvent &event)
+{
+    if (event.type() == QEvent::HoverMove) {
+        const QHoverEvent &ev = static_cast<const QHoverEvent&>(event);
+        if (ev.pos() == ev.oldPos()) return; // Somethis it happens.
+
+        if (this->geometry().contains(ev.pos())) {
+            enter();
+        }
+        else {
+            leave();
+        }
+    }
 }
 
 void StatusBar::

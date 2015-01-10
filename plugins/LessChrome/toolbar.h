@@ -20,6 +20,8 @@ class FloatingBar : public QWidget
 public:
     enum Position { Top, Bottom };
 
+    void handleWebViewEvent(const QEvent &);
+
 public slots:
     void show();
 
@@ -30,7 +32,7 @@ protected:
     BrowserWindow &window() const { return m_window; }
 
 private:
-    // @override QWidget
+    // @override QWidget. Must be throw()
     virtual void wheelEvent(QWheelEvent* const);
 
 private:
@@ -58,6 +60,9 @@ public:
 
     bool empty() const { return this->layout()->count() == 0; }
 
+    void handleLocationBarEvent(const QEvent &);
+    void handleNavigationContainerEvent(const QEvent &);
+
     void capture(QWidget&);
     void restore(QWidget&);
 
@@ -77,6 +82,10 @@ public:
     explicit StatusBar(BrowserWindow &window);
     virtual ~StatusBar();
 
+    // @overload FloatingBar
+    void handleWindowEvent(const QEvent &);
+
+private:
     void enter();
     void leave();
 
@@ -86,8 +95,8 @@ public slots:
 private:
     QStatusBar* m_statusBar;
     bool m_wasVisible;
-    QTimer m_timer;
     bool m_entered;
+    QTimer m_timer;
 };
 
 } // namespace lesschrome

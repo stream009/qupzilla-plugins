@@ -12,6 +12,12 @@ SettingDialog(QWidget &parent)
     : QDialog(&parent)
 {
     m_ui.setupUi(this);
+#ifdef Q_OS_MAC
+    m_ui.menuBar->hide();
+    m_ui.menuBarKeyLabel->hide();
+    m_ui.menuBarKey->hide();
+#endif
+    this->adjustSize();
 }
 
 void SettingDialog::

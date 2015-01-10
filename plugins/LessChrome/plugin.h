@@ -20,7 +20,7 @@ class QWidget;
 namespace lesschrome {
 
 //TODO Disable plugin by itself when unrecoverable error occur.
-//TODO Stop exception leak from eventFilters.
+//TODO stack trace
 class Plugin
     : public QObject, public PluginInterface
 {
@@ -47,8 +47,6 @@ private:
     virtual bool testPlugin();
     virtual QTranslator* getTranslator(const QString &locale);
     virtual void showSettings(QWidget* parent = 0);
-    virtual bool mouseMove(const Qz::ObjectName &type,
-                           QObject* obj, QMouseEvent* event);
 
 private slots:
     void mainWindowCreated(BrowserWindow *);

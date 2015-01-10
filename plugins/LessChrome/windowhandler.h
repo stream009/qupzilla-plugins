@@ -6,8 +6,6 @@
 #include <boost/unordered_map.hpp>
 #include <boost/scoped_ptr.hpp>
 
-#include <QtCore/QPoint>
-
 class BrowserWindow;
 class QEvent;
 class QMouseEvent;
@@ -26,10 +24,8 @@ public:
     WindowHandler(BrowserWindow &window);
     virtual ~WindowHandler();
 
-    void mouseMove(const QMouseEvent &event);
-
 private:
-    // @override QObject
+    // @override QObject. Must be throw()
     virtual bool eventFilter(QObject* const, QEvent* const event);
 
     void captureWidgets();
@@ -56,8 +52,6 @@ private:
     boost::scoped_ptr<Toolbar> m_toolbar;
     boost::scoped_ptr<StatusBar> m_statusBar;
     boost::scoped_ptr<MenuBar> m_menuBar;
-
-    QPoint m_mousePos;
 };
 
 } // namespace lesschrome

@@ -22,13 +22,6 @@ namespace lesschrome {
 
 boost::scoped_ptr<Settings> Plugin::m_settings;
 
-static void
-defaultExceptionHandler(const char* const functionName,
-                                    const std::exception &e)
-{
-    qCritical() << functionName << e.what();
-}
-
 Plugin::
 Plugin()
 try : QObject(),
@@ -89,8 +82,6 @@ try {
         m_settings.reset(
             new Settings(settingsPath + QL1S("/extensions.ini")));
     }
-
-    QZ_REGISTER_EVENT_HANDLER(PluginProxy::MouseMoveHandler);
 
     if (!mApp->plugins()) {
         throw RuntimeError("Fail to obtain plugin delegate");
@@ -186,49 +177,6 @@ try {
         throw RuntimeError("invalid window");
     }
     m_windows.erase(window);
-}
-catch (const std::exception &e) {
-    defaultExceptionHandler(__FUNCTION__, e);
-}
-
-bool Plugin::
-mouseMove(const Qz::ObjectName &type, QObject* const obj,
-                                      QMouseEvent* const event)
-try {
-    assert(obj);
-    assert(event);
-    //qDebug() << obj << event->pos();
-
-    if (type != Qz::ON_WebView) return false;
-
-    TabbedWebView* const webView = qobject_cast<TabbedWebView*>(obj);
-    if (!webView) throw RuntimeError("obj isn't a instance of TabbedWebView");
-
-    BrowserWindow* const window = webView->browserWindow();
-    if (window == NULL) {
-        // This may happen accoding to tabbedwebview.h
-        return false;
-    }
-
-    boost::shared_ptr<WindowHandler> handler;
-    try {
-        handler = m_windows.at(window);
-    }
-    catch (const std::out_of_range &e) {
-        throw RuntimeError("Receive mouse event from unregistered window.");
-    }
-
-    // Translate event into BrowserWindow's coordinate system.
-    if (!event) {
-        throw RuntimeError("Receive invalid mouse move event.");
-    }
-    const QPoint pos = webView->mapTo(window, event->pos());
-    QMouseEvent ev(event->type(), pos, event->button(),
-                                 event->buttons(), event->modifiers());
-    // could be passing only pos if that is enough.
-    handler->mouseMove(ev);
-
-    return false;
 }
 catch (const std::exception &e) {
     defaultExceptionHandler(__FUNCTION__, e);

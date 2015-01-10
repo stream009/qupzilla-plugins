@@ -20,55 +20,43 @@ MenuBar(BrowserWindow &window)
       m_altPressed(false),
       m_keyCode(Plugin::settings().menuBarKey)
 {
-    m_window.installEventFilter(this);
-
     this->connect(
         &Plugin::settings(), SIGNAL(change(QString)),
         this,                SLOT(slotSettingChanged(const QString&)));
 }
 
 void MenuBar::
-handleWebViewEvent(QEvent& event)
+handleWebViewEvent(const QEvent& event)
 {
     if (event.type() == QEvent::FocusIn) {
         menuBar().hide();
     }
 }
 
-bool MenuBar::
-eventFilter(QObject* const obj, QEvent* const event)
+void MenuBar::
+handleWindowEvent(const QEvent &event)
 {
-    //qDebug() << __FUNCTION__ << obj << event;
-    // If obj is invalid it just pass through, no need to check it out.
-    if (!event) {
-        throw RuntimeError("Receive invalid event.");
+    if (event.type() == QEvent::KeyPress) {
+        if (static_cast<const QKeyEvent&>(event).key() == m_keyCode) {
+            m_altPressed = true;
+        }
+        else {
+            m_altPressed = false;
+        }
+        //qDebug() << "KeyPressed" << m_altPressed;
     }
-
-    if (obj == &m_window) {
-        if (event->type() == QEvent::KeyPress) {
-            if (static_cast<QKeyEvent*>(event)->key() == m_keyCode) {
-                m_altPressed = true;
+    else if (event.type() == QEvent::KeyRelease) {
+        //qDebug() << "KeyRelease" << m_altPressed;
+        if (m_altPressed) {
+            if (!menuBar().isVisible()) {
+                menuBar().show();
+                menuBar().setFocus(Qt::MenuBarFocusReason);
             }
             else {
-                m_altPressed = false;
-            }
-            //qDebug() << "KeyPressed" << m_altPressed;
-        }
-        else if (event->type() == QEvent::KeyRelease) {
-            //qDebug() << "KeyRelease" << m_altPressed;
-            if (m_altPressed) {
-                if (!menuBar().isVisible()) {
-                    menuBar().show();
-                    menuBar().setFocus(Qt::MenuBarFocusReason);
-                }
-                else {
-                    menuBar().hide();
-                }
+                menuBar().hide();
             }
         }
     }
-
-    return QObject::eventFilter(obj, event);
 }
 
 QWidget& MenuBar::

@@ -4,6 +4,8 @@
 #include <exception>
 #include <string>
 
+#include <QtCore/QDebug>
+
 namespace lesschrome {
 
 class Error : public std::exception
@@ -34,6 +36,13 @@ public:
     InternalError(const char* const message)
         : Error(message) {}
 };
+
+inline void
+defaultExceptionHandler(const char* const functionName,
+                                    const std::exception &e)
+{
+    qCritical() << functionName << e.what();
+}
 
 } // namespace lesschrome
 
