@@ -1,0 +1,44 @@
+#ifndef TABWATCHER_H
+#define TABWATCHER_H
+
+#include "tabwidget.h"
+
+#include <boost/noncopyable.hpp>
+
+#include <QtCore/QObject>
+#include <QtCore/QList>
+
+class BrowserWindow;
+class TabWidget;
+class WebTab;
+
+namespace lesschrome {
+
+class TabWatcher : public QObject, boost::noncopyable
+{
+    Q_OBJECT
+public:
+    explicit TabWatcher(BrowserWindow &window);
+
+signals:
+    void tabAdded(WebTab&) const;
+    void tabDeleted(WebTab&) const;
+
+private:
+    // @override QObject
+    virtual void connectNotify(const char* const signal); // throw()
+
+    void notifyAdded(WebTab &tab) const;
+    void notifyDeleted(WebTab &tab) const;
+
+private slots:
+    void slotTabChanged(); // throw()
+
+private:
+    TabWidget* m_tabWidget;
+    QList<WebTab*> m_tabs;
+};
+
+} // namespace lesschrome
+
+#endif // TABWATCHER_H
