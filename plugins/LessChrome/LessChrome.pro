@@ -25,11 +25,6 @@ HEADERS += \
 
 FORMS += settingdialog.ui
 
-#RESOURCES += lesschrome.qrc
-
-#TRANSLATIONS += \
-#    translations/ar_SA.ts \
-
 PLUGIN_DIR = $$PWD
 srcdir = $$(QUPZILLA_SRCDIR)
 equals(srcdir, "") {
