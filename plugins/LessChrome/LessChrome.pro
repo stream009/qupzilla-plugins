@@ -3,6 +3,7 @@ TARGET = $$qtLibraryTarget(LessChrome)
 os2: TARGET = LessChrm
 
 SOURCES += \
+           error.cpp \
            lc_menubar.cpp \
 	   lc_settings.cpp \
            plugin.cpp \
@@ -12,10 +13,12 @@ SOURCES += \
            windowhandler.cpp
 
 HEADERS += \
+	   error.h \
 	   lc_menubar.h \
 	   lc_settings.h \
 	   plugin.h \
 	   settingdialog.h \
+	   stacktrace.h \
 	   tabwatcher.h \
 	   toolbar.h \
            windowhandler.h

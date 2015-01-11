@@ -51,49 +51,52 @@ WindowHandler::
 
 bool WindowHandler::
 eventFilter(QObject* const obj, QEvent* const event) // throw()
-try {
+{
     assert(obj);
     assert(event);
     assert(m_navigationContainer);
 
-    // If obj is invalid it just pass through, no need to check it out.
-    if (!event) {
-        throw RuntimeError("Receive invalid event.");
-    }
-
-    if (obj == &m_window) {
-        if (m_menuBar) {
-            m_menuBar->handleWindowEvent(*event);
+    try {
+        // If obj is invalid it just pass through, no need to check it out.
+        if (!event) {
+            throw RuntimeError("Receive invalid event.");
         }
 
-        if (m_statusBar) {
-            m_statusBar->handleWindowEvent(*event);
+        if (obj == &m_window) {
+            if (m_menuBar) {
+                m_menuBar->handleWindowEvent(*event);
+            }
+
+            if (m_statusBar) {
+                m_statusBar->handleWindowEvent(*event);
+            }
         }
-    }
-    else if (qobject_cast<WebView*>(obj)) {
-        if (m_menuBar) {
-            m_menuBar->handleWebViewEvent(*event);
+        else if (qobject_cast<WebView*>(obj)) {
+            if (m_menuBar) {
+                m_menuBar->handleWebViewEvent(*event);
+            }
+
+            if (m_toolbar) {
+                m_toolbar->handleWebViewEvent(*event);
+            }
+        }
+        else if (obj == m_navigationContainer) {
+            if (m_toolbar) {
+                m_toolbar->handleNavigationContainerEvent(*event);
+            }
+        }
+        else if (qobject_cast<LocationBar*>(obj)) {
+            if (m_toolbar) {
+                m_toolbar->handleLocationBarEvent(*event);
+            }
         }
 
-        if (m_toolbar) {
-            m_toolbar->handleWebViewEvent(*event);
-        }
+        return QObject::eventFilter(obj, event);
     }
-    else if (obj == m_navigationContainer) {
-        if (m_toolbar) {
-            m_toolbar->handleNavigationContainerEvent(*event);
-        }
+    catch (const std::exception &e) {
+        DEFAULT_EXCEPTION_HANDLER(e);
+        return false;
     }
-    else if (qobject_cast<LocationBar*>(obj)) {
-        if (m_toolbar) {
-            m_toolbar->handleLocationBarEvent(*event);
-        }
-    }
-
-    return QObject::eventFilter(obj, event);
-}
-catch (const std::exception &e) {
-    defaultExceptionHandler(__FUNCTION__, e);
 }
 
 void WindowHandler::

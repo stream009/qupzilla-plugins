@@ -81,11 +81,13 @@ updatePositionAndSize()
 
 void FloatingBar::
 wheelEvent(QWheelEvent* const) // throw()
-try {
-    hide();
-}
-catch (const std::exception &e) {
-    defaultExceptionHandler(__FUNCTION__, e);
+{
+    try {
+        hide();
+    }
+    catch (const std::exception &e) {
+        DEFAULT_EXCEPTION_HANDLER(e);
+    }
 }
 
 
