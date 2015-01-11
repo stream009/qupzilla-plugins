@@ -215,10 +215,11 @@ slotTabAdded(WebTab &tab)
     typedef boost::unordered_map<QWidget*, QWidget*>::iterator It;
     const std::pair<It, bool> &result
                         = m_tabInfos.emplace(locationBar, webView);
-    if (result.second) {
-        locationBar->installEventFilter(this);
-        webView->installEventFilter(this);
+    if (!result.second) {
+        throw InternalError("Fail to register tab.");
     }
+    locationBar->installEventFilter(this);
+    webView->installEventFilter(this);
 }
 
 void WindowHandler::
