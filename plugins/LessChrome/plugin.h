@@ -19,7 +19,6 @@ class QWidget;
 
 namespace lesschrome {
 
-//TODO Disable plugin by itself when unrecoverable error occur.
 class Plugin
     : public QObject, public PluginInterface
 {

@@ -10,6 +10,7 @@
 #include "browserwindow.h"
 #include "locationbar.h"
 #include "navigationbar.h"
+#include "qzsettings.h"
 #include "tabbedwebview.h"
 
 #include <cassert>
@@ -200,6 +201,42 @@ slotSettingChanged(const QString &key)
 }
 
 void WindowHandler::
+slotLoadStarted() // throw()
+{
+    //qDebug() << __FUNCTION__;
+    try {
+        if (!::qzSettings->showLoadingProgress) return;
+
+        if (this->sender() != m_window.weView()) return;
+
+        if (m_toolbar) {
+            m_toolbar->lock();
+        }
+    }
+    catch (const std::exception &e) {
+        DEFAULT_EXCEPTION_HANDLER(e);
+    }
+}
+
+void WindowHandler::
+slotLoadFinished() // throw()
+{
+    //qDebug() << __FUNCTION__;
+    try {
+        if (!::qzSettings->showLoadingProgress) return;
+
+        if (this->sender() != m_window.weView()) return;
+
+        if (m_toolbar) {
+            m_toolbar->unlock();
+        }
+    }
+    catch (const std::exception &e) {
+        DEFAULT_EXCEPTION_HANDLER(e);
+    }
+}
+
+void WindowHandler::
 slotTabAdded(WebTab &tab)
 {
     //qDebug() << __FUNCTION__ << &tab;
@@ -207,7 +244,7 @@ slotTabAdded(WebTab &tab)
     if (!locationBar) {
         throw RuntimeError("Fail to obtain location bar.");
     }
-    QWidget* const webView = m_window.weView();
+    QWidget* const webView = tab.webView();
     if (!webView) {
         throw RuntimeError("Fail to obtain Web view.");
     }
@@ -220,6 +257,11 @@ slotTabAdded(WebTab &tab)
     }
     locationBar->installEventFilter(this);
     webView->installEventFilter(this);
+
+    this->connect(webView, SIGNAL(loadStarted()),
+                  this,    SLOT(slotLoadStarted()));
+    this->connect(webView, SIGNAL(loadFinished(bool)),
+                  this,    SLOT(slotLoadFinished()));
 }
 
 void WindowHandler::

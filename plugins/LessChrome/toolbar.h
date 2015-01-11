@@ -22,8 +22,13 @@ public:
 
     void handleWebViewEvent(const QEvent &);
 
+    void lock();
+    void unlock();
+
 public slots:
+    // @override QWidget. throw()
     void show();
+    void hide();
 
 protected:
     explicit FloatingBar(BrowserWindow &parent, const Position = Top);
@@ -38,6 +43,8 @@ private:
 private:
     BrowserWindow &m_window;
     Position m_position;
+    bool m_locked;
+    bool m_hideRequested;
 };
 
 

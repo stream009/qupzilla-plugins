@@ -26,7 +26,7 @@ public:
 
 private:
     // @override QObject. Must be throw()
-    virtual bool eventFilter(QObject* const, QEvent* const event);
+    virtual bool eventFilter(QObject* const, QEvent* const);
 
     void captureWidgets();
 
@@ -37,6 +37,8 @@ private:
 
 private slots:
     void slotSettingChanged(const QString &key);
+    void slotLoadStarted(); // throw()
+    void slotLoadFinished(); // throw()
     void slotTabAdded(WebTab&);
     void slotTabDeleted(WebTab&);
 

@@ -22,7 +22,9 @@ FloatingBar::
 FloatingBar(BrowserWindow &window, const Position position)
     : QWidget(&window),
       m_window(window),
-      m_position(position)
+      m_position(position),
+      m_locked(false),
+      m_hideRequested(false)
 {
     QVBoxLayout *layout = new QVBoxLayout(this); // this takes ownership
     layout->setContentsMargins(0, 0, 0, 0);
@@ -36,7 +38,9 @@ handleWebViewEvent(const QEvent &event)
     switch (event.type()) {
     case QEvent::Enter:
     case QEvent::FocusIn:
-        this->hide();
+        // Delay hiding so that signals will be processed first.
+        // This is required by lock/unlock mechanism.
+        QTimer::singleShot(0, this, SLOT(hide()));
         break;
     default:
         break;
@@ -44,11 +48,57 @@ handleWebViewEvent(const QEvent &event)
 }
 
 void FloatingBar::
+lock()
+{
+    if (m_locked) return;
+
+    m_locked = true;
+    if (!this->isVisible()) {
+        m_hideRequested = true;
+        show();
+    }
+}
+
+void FloatingBar::
+unlock()
+{
+    if (!m_locked) return;
+
+    m_locked = false;
+    if (m_hideRequested) {
+        m_hideRequested = false;
+        hide();
+    }
+}
+
+void FloatingBar::
 show()
 {
     //qDebug() << __FUNCTION__;
-    QWidget::show();
-    updatePositionAndSize();
+    try {
+        QWidget::show();
+        updatePositionAndSize();
+    }
+    catch (const std::exception &e) {
+        DEFAULT_EXCEPTION_HANDLER(e);
+    }
+}
+
+void FloatingBar::
+hide()
+{
+    //qDebug() << __FUNCTION__ << this << m_locked;
+    try {
+        if (!m_locked) {
+            QWidget::hide();
+        }
+        else {
+            m_hideRequested = true;
+        }
+    }
+    catch (const std::exception &e) {
+        DEFAULT_EXCEPTION_HANDLER(e);
+    }
 }
 
 void FloatingBar::
@@ -290,6 +340,7 @@ void StatusBar::
 leave()
 {
     //qDebug() << __FUNCTION__;
+    if (!m_entered) return;
     m_entered = false;
 
     if (m_timer.isActive()) {

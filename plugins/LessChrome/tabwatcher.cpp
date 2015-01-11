@@ -40,18 +40,29 @@ TabWatcher(BrowserWindow &window)
 
     this->connect(m_tabWidget, SIGNAL(changed()),
                   this,        SLOT(slotTabChanged()));
+
     assert(m_tabWidget);
 }
 
 void TabWatcher::
-connectNotify(const char* const)
+connectNotify(const char* const) // throw()
 {
-    slotTabChanged();
+    try {
+        slotTabChanged();
+    }
+    catch (const std::exception &e) {
+        DEFAULT_EXCEPTION_HANDLER(e);
+    }
 }
 
 void TabWatcher::
 notifyAdded(WebTab &tab) const
 {
+    // These indirection are due to inability of Qt's signal system
+    // to work with template. It won't be necessary if we can use
+    // boost::signal2 but we can't. Because if we put no_keyword to
+    // project file to prevent Qt from using signal as reserved word,
+    // Qupzilla's header files included from this file will got errors.
     emit tabAdded(tab);
 }
 
@@ -71,30 +82,35 @@ validateWebTabs(const QList<WebTab*> &tabs) {
 }
 
 void TabWatcher::
-slotTabChanged()
+slotTabChanged() // throw()
 {
     assert(m_tabWidget);
 
-    QList<WebTab*> tabs = m_tabWidget->allTabs();
-    validateWebTabs(tabs);
+    try {
+        QList<WebTab*> tabs = m_tabWidget->allTabs();
+        validateWebTabs(tabs);
 
-    std::sort(tabs.begin(), tabs.end());
+        std::sort(tabs.begin(), tabs.end());
 
-    std::set_difference(
-        tabs.begin(), tabs.end(),
-        m_tabs.begin(), m_tabs.end(),
-        boost::make_function_output_iterator(
-            Notifier<&TabWatcher::notifyAdded>(this))
-    );
+        std::set_difference(
+            tabs.begin(), tabs.end(),
+            m_tabs.begin(), m_tabs.end(),
+            boost::make_function_output_iterator(
+                Notifier<&TabWatcher::notifyAdded>(this))
+        );
 
-    std::set_difference(
-        m_tabs.begin(), m_tabs.end(),
-        tabs.begin(), tabs.end(),
-        boost::make_function_output_iterator(
-            Notifier<&TabWatcher::notifyDeleted>(this))
-    );
+        std::set_difference(
+            m_tabs.begin(), m_tabs.end(),
+            tabs.begin(), tabs.end(),
+            boost::make_function_output_iterator(
+                Notifier<&TabWatcher::notifyDeleted>(this))
+        );
 
-    m_tabs = tabs;
+        m_tabs = tabs;
+    }
+    catch (const std::exception &e) {
+        DEFAULT_EXCEPTION_HANDLER(e);
+    }
 }
 
 } // namespace lesschrome

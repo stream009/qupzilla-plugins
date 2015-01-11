@@ -26,13 +26,13 @@ signals:
 
 private:
     // @override QObject
-    virtual void connectNotify(const char* const signal);
+    virtual void connectNotify(const char* const signal); // throw()
 
     void notifyAdded(WebTab &tab) const;
     void notifyDeleted(WebTab &tab) const;
 
 private slots:
-    void slotTabChanged();
+    void slotTabChanged(); // throw()
 
 private:
     TabWidget* m_tabWidget;
