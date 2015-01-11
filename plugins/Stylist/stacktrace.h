@@ -14,8 +14,11 @@ class StackTrace
 {
 public:
     StackTrace()
-        : m_numTraces(::backtrace(m_addrs, sizeof(m_addrs)))
-    {}
+        : m_numTraces {
+            static_cast<size_t>(::backtrace(m_addrs, sizeof(m_addrs))) }
+    {
+        assert(m_numTraces <= maxTraces);
+    }
 
     std::string str() const
     {
@@ -28,7 +31,8 @@ public:
     }
 
 private:
-    void *m_addrs[50];
+    static const size_t maxTraces = 50u;
+    void *m_addrs[maxTraces];
     size_t m_numTraces;
 };
 

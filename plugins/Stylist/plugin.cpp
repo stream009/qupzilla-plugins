@@ -2,23 +2,19 @@
 
 #include "error.h"
 
-#include "pluginproxy.h"
+#include <pluginproxy.h>
 
 #include <cassert>
 
-#include <boost/make_shared.hpp>
-
 #include <QtCore/QTranslator>
-#include <QtGui/QDialog>
-#include <QtGui/QMouseEvent>
 #include <QtGui/QWidget>
 
 namespace stylist {
 
-boost::scoped_ptr<Settings> Plugin::m_settings;
+//boost::scoped_ptr<Settings> Plugin::m_settings;
 
 Plugin::
-Plugin() // throw()
+Plugin() noexcept
 {
     try {
     }
@@ -28,7 +24,7 @@ Plugin() // throw()
 }
 
 Plugin::
-~Plugin() // throw()
+~Plugin() noexcept
 {
     try {
     }
@@ -38,19 +34,14 @@ Plugin::
 }
 
 Settings &Plugin::
-settings() // throw()
+settings() noexcept
 {
     assert(m_settings);
-    try {
-    }
-    catch (const std::exception &e) {
-        DEFAULT_EXCEPTION_HANDLER(e);
-    }
     return *m_settings;
 }
 
 PluginSpec Plugin::
-pluginSpec() // throw()
+pluginSpec() // noexcept
 {
     PluginSpec spec;
     try {
@@ -69,7 +60,7 @@ pluginSpec() // throw()
 }
 
 void Plugin::
-init(InitState state, const QString &settingsPath) // throw()
+init(InitState state, const QString &settingsPath) // noexcept
 {
     //qDebug() << __FUNCTION__;
     try {
@@ -94,7 +85,7 @@ init(InitState state, const QString &settingsPath) // throw()
             this,            SLOT(slotWebPageCreated(WebPage*)));
 
         if (state == LateInitState) {
-            foreach (BrowserWindow* const window, mApp->windows()) {
+            for (BrowserWindow* const window: mApp->windows()) {
                 slotMainWindowCreated(window);
             }
         }
@@ -107,7 +98,7 @@ init(InitState state, const QString &settingsPath) // throw()
 }
 
 void Plugin::
-unload() // throw()
+unload() // noexcept
 {
     //qDebug() << __FUNCTION__;
     try {
@@ -118,7 +109,7 @@ unload() // throw()
 }
 
 bool Plugin::
-testPlugin() // throw()
+testPlugin() // noexcept
 {
     try {
         return (Qz::VERSION == QL1S(QUPZILLA_VERSION));
@@ -130,7 +121,7 @@ testPlugin() // throw()
 }
 
 QTranslator* Plugin::
-getTranslator(const QString &locale) // throw()
+getTranslator(const QString &locale) // noexcept
 {
     QTranslator* const translator = new QTranslator(this);
     try {
@@ -143,7 +134,7 @@ getTranslator(const QString &locale) // throw()
 }
 
 void Plugin::
-showSettings(QWidget* const parent) // throw()
+showSettings(QWidget* const parent) // noexcept
 {
     assert(parent);
     try {
@@ -160,7 +151,7 @@ showSettings(QWidget* const parent) // throw()
 }
 
 void Plugin::
-slotMainWindowCreated(BrowserWindow* const window) // throw()
+slotMainWindowCreated(BrowserWindow* const window) noexcept
 {
     //qDebug() << __FUNCTION__ << window;
     assert(window);
@@ -175,7 +166,7 @@ slotMainWindowCreated(BrowserWindow* const window) // throw()
 }
 
 void Plugin::
-slotMainWindowDeleted(BrowserWindow* const window) // throw()
+slotMainWindowDeleted(BrowserWindow* const window) noexcept
 {
     //qDebug() << __FUNCTION__;
     assert(window);
@@ -190,7 +181,7 @@ slotMainWindowDeleted(BrowserWindow* const window) // throw()
 }
 
 void Plugin::
-slotWebPageCreated(WebPage* const webPage) // throw()
+slotWebPageCreated(WebPage* const webPage) noexcept
 {
     //qDebug() << __FUNCTION__;
     assert(webPage);

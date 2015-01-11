@@ -5,7 +5,7 @@
 
 #include "settings.h"
 
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 
 #include <QtCore/QObject>
 
@@ -29,13 +29,13 @@ class Plugin
 #endif
 
 public:
-    Plugin();
-    virtual ~Plugin();
+    Plugin() noexcept;
+    virtual ~Plugin() noexcept;
 
-    static Settings &settings();
+    static Settings &settings() noexcept;
 
 private:
-    // @override PluginInterface. throw()
+    // @override PluginInterface. noexcept
     virtual PluginSpec pluginSpec();
     virtual void init(InitState state, const QString &settingsPath);
     virtual void unload();
@@ -44,12 +44,12 @@ private:
     virtual void showSettings(QWidget* parent = 0);
 
 private slots:
-    void slotMainWindowCreated(BrowserWindow* const); // throw()
-    void slotMainWindowDeleted(BrowserWindow* const); // throw()
-    void slotWebPageCreated(WebPage* const); // throw()
+    void slotMainWindowCreated(BrowserWindow* const) noexcept;
+    void slotMainWindowDeleted(BrowserWindow* const) noexcept;
+    void slotWebPageCreated(WebPage* const) noexcept;
 
 private:
-    static boost::scoped_ptr<Settings> m_settings;
+    static std::unique_ptr<Settings> m_settings;
 };
 
 } // namespace stylist

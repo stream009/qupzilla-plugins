@@ -11,13 +11,13 @@ const QString Settings::keyWaitTimer = QLatin1String("waitTimer");
 
 Settings::
 Settings(const QString &filename)
-    : navigationBar(this),
-      bookmarksBar(this),
-      statusBar(this),
-      menuBar(this),
-      menuBarKey(this),
-      waitTimer(this),
-      m_settings(filename, QSettings::IniFormat)
+    : navigationBar { this },
+      bookmarksBar { this },
+      statusBar { this },
+      menuBar { this },
+      menuBarKey { this },
+      waitTimer { this },
+      m_settings { filename, QSettings::IniFormat }
 {
     m_settings.beginGroup("Stylist");
 }

@@ -15,16 +15,16 @@ class Error : public std::exception
 {
 public:
     Error(const char* const message)
-        : m_message(message)
+        : m_message { message }
     {
 #ifdef HAVE_STACK_TRACE
         m_message += "\nStack trace:\n" + m_stackTrace.str();
 #endif
     }
 
-    virtual ~Error() throw() {}
+    virtual ~Error() noexcept {}
 
-    const char *what() const throw()
+    const char *what() const noexcept
     {
         return m_message.c_str();
     }
@@ -40,14 +40,14 @@ class RuntimeError : public Error
 {
 public:
     RuntimeError(const char* const message)
-        : Error(message) {}
+        : Error { message } {}
 };
 
 class InternalError : public Error
 {
 public:
     InternalError(const char* const message)
-        : Error(message) {}
+        : Error { message } {}
 };
 
 #define DEFAULT_EXCEPTION_HANDLER(exception) \

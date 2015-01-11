@@ -25,7 +25,7 @@ private:
         typedef typename boost::conditional<
                          boost::is_pod<T>::value, T, T&>::type TRef;
 
-        Property(Settings* const parent) : m_p(parent) {}
+        Property(Settings* const parent) : m_p { parent } {}
 
         operator T() const {
             const QVariant &value = m_p->m_settings.value(Key, Default);
