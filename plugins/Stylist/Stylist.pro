@@ -2,6 +2,8 @@ TARGET = $$qtLibraryTarget(Stylist)
 # OS/2 allows only 8 chars in TARGET
 os2: TARGET = Stylist
 
+CONFIG += precompile_header
+
 QMAKE_CXXFLAGS += -std=c++11
 QMAKE_CXXFLAGS += -Wno-deprecated-register
 
