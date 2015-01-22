@@ -1,11 +1,13 @@
 #ifndef STYLIST_PLUGIN_H
 #define STYLIST_PLUGIN_H
 
-#include "plugininterface.h"
-
 #include "settings.h"
+#include "webpage.h"
+
+#include <plugininterface.h>
 
 #include <memory>
+#include <vector>
 
 #include <QtCore/QObject>
 
@@ -15,6 +17,8 @@ class QWidget;
 class WebPage;
 
 namespace stylist {
+
+class Styles;
 
 class Plugin
     : public QObject, public PluginInterface
@@ -33,6 +37,7 @@ public:
     virtual ~Plugin() noexcept;
 
     static Settings &settings() noexcept;
+    static Styles &styles() noexcept;
 
 private:
     // @override PluginInterface. noexcept
@@ -44,12 +49,15 @@ private:
     virtual void showSettings(QWidget* parent = 0);
 
 private slots:
-    void slotMainWindowCreated(BrowserWindow* const) noexcept;
-    void slotMainWindowDeleted(BrowserWindow* const) noexcept;
-    void slotWebPageCreated(WebPage* const) noexcept;
+    void slotMainWindowCreated(BrowserWindow*) noexcept;
+    void slotMainWindowDeleted(BrowserWindow*) noexcept;
+    void slotWebPageCreated(WebPage*) noexcept;
 
 private:
     static std::unique_ptr<Settings> m_settings;
+    static std::unique_ptr<Styles> m_styles;
+
+    std::vector<std::unique_ptr<Page>> m_webPages;
 };
 
 } // namespace stylist

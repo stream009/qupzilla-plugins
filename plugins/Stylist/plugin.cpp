@@ -1,8 +1,11 @@
 #include "plugin.h"
 
 #include "error.h"
+#include "styles.h"
+#include "utility.h"
 
 #include <pluginproxy.h>
+#include <../webkit/webpage.h>
 
 #include <cassert>
 
@@ -11,7 +14,8 @@
 
 namespace stylist {
 
-//boost::scoped_ptr<Settings> Plugin::m_settings;
+std::unique_ptr<Settings> Plugin::m_settings;
+std::unique_ptr<Styles> Plugin::m_styles;
 
 Plugin::
 Plugin() noexcept
@@ -40,6 +44,13 @@ settings() noexcept
     return *m_settings;
 }
 
+Styles &Plugin::
+styles() noexcept
+{
+    assert(m_styles);
+    return *m_styles;
+}
+
 PluginSpec Plugin::
 pluginSpec() // noexcept
 {
@@ -66,10 +77,13 @@ init(InitState state, const QString &settingsPath) // noexcept
     try {
         assert(mApp->plugins());
 
-        if (!m_settings) {
-            m_settings.reset(
-                new Settings(settingsPath + QL1S("/extensions.ini")));
-        }
+        assert(!m_settings);
+        m_settings.reset(
+            new Settings(settingsPath + QL1S("/extensions.ini")));
+
+        assert(!m_styles);
+        const QString &path = settingsPath + "/stylist";
+        m_styles.reset(new Styles { path.toLocal8Bit().constData() });
 
         if (!mApp->plugins()) {
             throw RuntimeError("Fail to obtain plugin delegate");
@@ -80,6 +94,8 @@ init(InitState state, const QString &settingsPath) // noexcept
         this->connect(
             mApp->plugins(), SIGNAL(mainWindowDeleted(BrowserWindow*)),
             this,            SLOT(slotMainWindowDeleted(BrowserWindow*)));
+
+        using WebPage = ::WebPage;
         this->connect(
             mApp->plugins(), SIGNAL(webPageCreated(WebPage*)),
             this,            SLOT(slotWebPageCreated(WebPage*)));
@@ -183,12 +199,13 @@ slotMainWindowDeleted(BrowserWindow* const window) noexcept
 void Plugin::
 slotWebPageCreated(WebPage* const webPage) noexcept
 {
-    //qDebug() << __FUNCTION__;
+    qDebug() << __FUNCTION__;
     assert(webPage);
     try {
         if (!webPage) {
             throw RuntimeError("Receive invalid Web page.");
         }
+        m_webPages.emplace_back(new Page { webPage });
     }
     catch (const std::exception &e) {
         DEFAULT_EXCEPTION_HANDLER(e);
