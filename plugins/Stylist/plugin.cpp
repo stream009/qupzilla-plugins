@@ -3,6 +3,7 @@
 #include "error.h"
 #include "styles.h"
 #include "utility.h"
+#include "gui/settingdialog.h"
 
 #include <pluginproxy.h>
 #include <../webkit/webpage.h>
@@ -158,8 +159,8 @@ showSettings(QWidget* const parent) // noexcept
             throw RuntimeError("invalid window");
         }
 
-        //SettingDialog dialog(*parent);
-        //dialog.exec();
+        SettingDialog dialog(*parent);
+        dialog.exec();
     }
     catch (const std::exception &e) {
         DEFAULT_EXCEPTION_HANDLER(e);

@@ -4,6 +4,17 @@
 #include <QtCore/QObject>
 #include <QtCore/QTranslator>
 #include <QtCore/QUrl>
+#include <QtCore/QVariant>
+#include <QtGui/QAction>
+#include <QtGui/QApplication>
+#include <QtGui/QButtonGroup>
+#include <QtGui/QDialog>
+#include <QtGui/QDialogButtonBox>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QHeaderView>
+#include <QtGui/QPushButton>
+#include <QtGui/QTreeView>
+#include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
 #include <QtWebKit/QWebElement>
 #include <QtWebKit/QWebFrame>

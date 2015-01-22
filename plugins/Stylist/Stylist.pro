@@ -2,10 +2,7 @@ TARGET = $$qtLibraryTarget(Stylist)
 # OS/2 allows only 8 chars in TARGET
 os2: TARGET = Stylist
 
-CONFIG += precompile_header
-
-QMAKE_CXXFLAGS += -std=c++11
-QMAKE_CXXFLAGS += -Wno-deprecated-register
+include(common.pri)
 
 SOURCES += \
            error.cpp \
@@ -26,24 +23,19 @@ HEADERS += \
 	   webframe.h \
 	   webpage.h
 
-SOURCES += \
-           css/condition.cpp \
-	   css/documentrule.cpp \
-	   css/stylesheet.cpp
+PRECOMPILED_HEADER += stable.h
 
-HEADERS += \
-           css/condition.h \
-	   css/documentrule.h \
-	   css/stylesheet.h
+LIBS += -L./css -lcss
+POST_TARGETDEPS += css/libcss.a
+
+LIBS += -L./gui -lgui
+POST_TARGETDEPS += gui/libgui.a
 
 LIBS += \
            -lboost_filesystem \
            -lboost_iostreams \
            -lboost_regex \
            -lboost_system
-
-PRECOMPILED_DIR = build
-PRECOMPILED_HEADER += stable.h
 
 PLUGIN_DIR = $$PWD
 srcdir = $$(QUPZILLA_SRCDIR)
