@@ -32,9 +32,7 @@ Styles(const Path &path)
     );
 
     for (const auto &entry: range) {
-        css::StyleSheet css { entry.path() };
-        auto &rules = css.documentRules();
-        std::move(rules.begin(), rules.end(), std::back_inserter(m_styles));
+        m_styles.emplace_back(entry.path());
     }
 
     qDebug() << m_styles.size() << "styles are loaded"; //TODO remove
@@ -43,27 +41,17 @@ Styles(const Path &path)
 std::string Styles::
 query(const Url &url) const
 {
-    // Range adaptors require default copy constructable functor.
-    // A closure created by lambda expression does not satisfy that.
-    struct Filter {
-        bool operator()(const css::DocumentRule &rule) const {
-            return rule.match(m_url);
-        }
-        // Copy is mandatory since filter might outlive the given url.
-        Filter(const Url &url) : m_url { url } {}
-        Url m_url;
-    };
-
     struct Extractor {
-        const std::string &operator()(const css::DocumentRule &rule) const {
-            return rule.body();
+        std::string operator()(const css::StyleSheet &css) const {
+            return css.styleFor(*m_url);
         }
+        Extractor(const Url &url) : m_url { &url } {}
+        const Url *m_url;
     };
 
     namespace ba = boost::algorithm;
     namespace bad = boost::adaptors;
-    return ba::join(m_styles | bad::filtered(Filter { url })
-                             | bad::transformed(Extractor {}),
+    return ba::join(m_styles | bad::transformed(Extractor { url }),
                     "\n");
 }
 

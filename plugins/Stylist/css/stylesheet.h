@@ -1,6 +1,7 @@
 #ifndef STYLIST_STYLESHEET_H
 #define STYLIST_STYLESHEET_H
 
+#include "documentrule.h"
 #include "../utility.h"
 
 #include <vector>
@@ -11,27 +12,18 @@
 namespace stylist {
 namespace css {
 
-class DocumentRule;
-
 class StyleSheet
 {
 private:
     using Path = boost::filesystem::path;
-    using StyleRange = boost::any_range<
-                            const std::string &,
-                            boost::bidirectional_traversal_tag,
-                            const std::string &,
-                            std::ptrdiff_t>;
+
 public:
     explicit StyleSheet(const Path &path);
-    ~StyleSheet();
 
     StyleSheet(StyleSheet &&) = default;
 
-    bool hasStyleFor(const Url &) const; //TODO could be removed
-    StyleRange styleFor(const Url &) const; //TODO could be removed
-
-    std::vector<DocumentRule> &documentRules() { return m_documentRules; }
+    bool hasStyleFor(const Url &) const;
+    std::string styleFor(const Url &) const;
 
 private:
     Path m_filePath;

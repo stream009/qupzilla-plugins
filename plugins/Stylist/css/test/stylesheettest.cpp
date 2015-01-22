@@ -79,18 +79,15 @@ testStyleFor()
     QVERIFY(shouldBeEmpty.empty());
 
     const auto &oneStyle = css.styleFor("http://www.google.com");
-    QCOMPARE(boost::size(oneStyle), 1u);
-    QCOMPARE(boost::algorithm::trim_copy(oneStyle.front()),
-             std::string { "body { background: yellow !important; }" });
+    QCOMPARE(oneStyle,
+             std::string { " body { background: yellow !important; } " });
 
     const auto &twoStyles = css.styleFor("http://www.google.co.jp");
-    QCOMPARE(boost::size(twoStyles), 2u);
-    auto it = twoStyles.begin();
-    QCOMPARE(boost::algorithm::trim_copy(*it),
-             std::string { "body { background: yellow !important; }" });
-    ++it;
-    QCOMPARE(boost::algorithm::trim_copy(*it),
-             std::string { "body { background: red !important; }" });
+    QCOMPARE(twoStyles,
+             std::string {
+                " body { background: yellow !important; } \n"
+                " body { background: red !important; } "
+             });
 }
 
 } // namespace css

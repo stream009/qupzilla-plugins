@@ -15,10 +15,6 @@ public:
 
 private slots:
     void slotInitialLayoutCompleted();
-    void slotJavaScriptWindowObjectCleared();
-    void slotLoadStarted();
-    void slotLoadFinished(bool flag);
-    void slotPageChanged();
 
 private:
     QWebFrame *m_frame;

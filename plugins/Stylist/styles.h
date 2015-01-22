@@ -1,7 +1,7 @@
 #ifndef STYLIST_STYLES_H
 #define STYLIST_STYLES_H
 
-#include "css/documentrule.h"
+#include "css/stylesheet.h"
 
 #include <memory>
 #include <vector>
@@ -17,7 +17,6 @@ class Styles
 {
 private:
     using Path = boost::filesystem::path;
-    using Container = std::vector<css::DocumentRule>;
 
 public:
     Styles(const Path &path);
@@ -26,7 +25,7 @@ public:
 
 private:
     Path m_directory;
-    Container m_styles;
+    std::vector<css::StyleSheet> m_styles;
 };
 
 } // namespace stylist

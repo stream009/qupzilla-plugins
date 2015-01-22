@@ -25,14 +25,6 @@ WebFrame(QWebFrame* const frame)
 
     this->connect(frame, SIGNAL(initialLayoutCompleted()),
                   this,  SLOT(slotInitialLayoutCompleted()));
-    this->connect(frame, SIGNAL(javaScriptWindowObjectCleared()),
-                  this,  SLOT(slotJavaScriptWindowObjectCleared()));
-    this->connect(frame, SIGNAL(loadStarted()),
-                  this,  SLOT(slotLoadStarted()));
-    this->connect(frame, SIGNAL(loadFinished(bool)),
-                  this,  SLOT(slotLoadFinished(bool)));
-    this->connect(frame, SIGNAL(pageChanged()),
-                  this,  SLOT(slotPageChanged()));
 
     assert(m_frame);
 }
@@ -59,30 +51,6 @@ slotInitialLayoutCompleted()
 
     auto &&head = m_frame->findFirstElement("head");
     head.appendInside(html.c_str());
-}
-
-void WebFrame::
-slotJavaScriptWindowObjectCleared()
-{
-    qDebug() << __FUNCTION__ << this;
-}
-
-void WebFrame::
-slotLoadStarted()
-{
-    qDebug() << __FUNCTION__ << this;
-}
-
-void WebFrame::
-slotLoadFinished(bool flag)
-{
-    qDebug() << __FUNCTION__ << flag << this;
-}
-
-void WebFrame::
-slotPageChanged()
-{
-    qDebug() << __FUNCTION__ << this;
 }
 
 } // namespace stylist

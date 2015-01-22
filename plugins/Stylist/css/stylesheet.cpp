@@ -2,6 +2,7 @@
 
 #include "documentrule.h"
 
+#include <boost/algorithm/string/join.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/adaptor/transformed.hpp>
@@ -27,8 +28,6 @@ StyleSheet(const Path &path)
     DocumentRule::extract(contents, std::back_inserter(m_documentRules));
 }
 
-StyleSheet::~StyleSheet() = default;
-
 bool StyleSheet::
 hasStyleFor(const Url &url) const
 {
@@ -39,7 +38,7 @@ hasStyleFor(const Url &url) const
     );
 }
 
-StyleSheet::StyleRange StyleSheet::
+std::string StyleSheet::
 styleFor(const Url &url) const
 {
     // Range adaptors require default copy constructable functor.
@@ -59,9 +58,11 @@ styleFor(const Url &url) const
         }
     };
 
+    namespace ba = boost::algorithm;
     namespace bad = boost::adaptors;
-    return m_documentRules | bad::filtered(Filter { url })
-                           | bad::transformed(Extractor {});
+    return ba::join(m_documentRules | bad::filtered(Filter { url })
+                                    | bad::transformed(Extractor {}),
+                    "\n");
 }
 
 } // namespace css

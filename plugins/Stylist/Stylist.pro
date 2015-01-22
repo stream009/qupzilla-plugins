@@ -13,7 +13,8 @@ SOURCES += \
 	   settings.cpp \
 	   styles.cpp \
 	   utility.cpp \
-	   webframe.cpp
+	   webframe.cpp \
+	   webpage.cpp
 
 HEADERS += \
 	   error.h \

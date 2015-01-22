@@ -17,20 +17,10 @@ class Page : QObject
 {
     Q_OBJECT
 public:
-    Page(WebPage* const webPage)
-    {
-        qDebug() << __FUNCTION__;
-        this->connect(webPage, SIGNAL(frameCreated(QWebFrame*)),
-                      this,    SLOT(slotFrameCreated(QWebFrame*)));
-        slotFrameCreated(webPage->mainFrame());
-    }
+    explicit Page(WebPage* const webPage);
 
 private slots:
-    void slotFrameCreated(QWebFrame* frame) noexcept
-    {
-        qDebug() << __FUNCTION__ << frame;
-        m_frames.emplace_back(new WebFrame { frame });
-    }
+    void slotFrameCreated(QWebFrame* frame) noexcept;
 
 private:
     std::vector<std::unique_ptr<WebFrame>> m_frames;
