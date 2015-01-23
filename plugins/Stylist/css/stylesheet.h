@@ -18,12 +18,22 @@ private:
     using Path = boost::filesystem::path;
 
 public:
-    explicit StyleSheet(const Path &path);
+    template<typename Path>
+    explicit StyleSheet(Path &&path)
+        : m_filePath { std::forward<Path>(path) }
+    {
+        init();
+    }
 
-    StyleSheet(StyleSheet &&) = default;
+    StyleSheet(StyleSheet &&) noexcept;
 
     bool hasStyleFor(const Url &) const;
     std::string styleFor(const Url &) const;
+
+    const Path &path() const { return m_filePath; }
+
+private:
+    void init();
 
 private:
     Path m_filePath;

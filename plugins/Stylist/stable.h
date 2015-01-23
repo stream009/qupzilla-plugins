@@ -1,6 +1,9 @@
 #include <../webkit/webpage.h>
+#include <QObject>
 #include <QSettings>
+#include <QtCore/QAbstractListModel>
 #include <QtCore/QDebug>
+#include <QtCore/QModelIndex>
 #include <QtCore/QObject>
 #include <QtCore/QTranslator>
 #include <QtCore/QUrl>
@@ -12,6 +15,7 @@
 #include <QtGui/QDialogButtonBox>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QHeaderView>
+#include <QtGui/QListView>
 #include <QtGui/QPushButton>
 #include <QtGui/QTreeView>
 #include <QtGui/QVBoxLayout>
@@ -41,10 +45,12 @@
 #include <execinfo.h>
 #include <fstream>
 #include <iterator>
+#include <limits>
 #include <memory>
 #include <plugininterface.h>
 #include <pluginproxy.h>
 #include <sstream>
 #include <string>
 #include <type_traits>
+#include <unordered_map>
 #include <vector>

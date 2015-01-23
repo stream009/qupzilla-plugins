@@ -2,6 +2,7 @@
 #define STYLIST_SETTING_DIALOG_H
 
 #include "ui_settingdialog.h"
+#include "stylesitemmodel.h"
 
 #include <QtGui/QDialog>
 
@@ -16,6 +17,7 @@ public:
 
 private:
     Ui::SettingDialog m_ui;
+    StylesItemModel m_model;
 };
 
 } // namespace stylist

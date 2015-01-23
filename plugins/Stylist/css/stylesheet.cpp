@@ -11,22 +11,16 @@
 namespace stylist {
 namespace css {
 
+// At the moment of boost 1.57, path doesn't have move constructor.
+// So, in order to achieve noexcept behavior, we have to write this
+// move constructor manually.
+// This will become unnecessary once above problem has solved.
+// boost bug ticket: https://svn.boost.org/trac/boost/ticket/10291
 StyleSheet::
-StyleSheet(const Path &path)
-    : m_filePath { path }
-{
-    // mmap give us random access iterator (pointer to raw data)
-    // as opposed to fstream which give us only forward traversal
-    // iterator. To execute regular expression we need better iterator
-    // than forward traversal iterator.
-    // Alternative design would be reading file into the buffer first.
-    const boost::iostreams::mapped_file_source file { path };
-    const auto &contents = boost::make_iterator_range(
-        file.data(), file.data() + file.size()
-    );
-
-    DocumentRule::extract(contents, std::back_inserter(m_documentRules));
-}
+StyleSheet(StyleSheet &&rhs) noexcept
+    : m_filePath { std::move(rhs.m_filePath) },
+      m_documentRules { std::move(rhs.m_documentRules) }
+{}
 
 bool StyleSheet::
 hasStyleFor(const Url &url) const
@@ -63,6 +57,22 @@ styleFor(const Url &url) const
     return ba::join(m_documentRules | bad::filtered(Filter { url })
                                     | bad::transformed(Extractor {}),
                     "\n");
+}
+
+void StyleSheet::
+init()
+{
+    // mmap give us random access iterator (pointer to raw data)
+    // as opposed to fstream which give us only forward traversal
+    // iterator. To execute regular expression we need better iterator
+    // than forward traversal iterator.
+    // Alternative design would be reading file into the buffer first.
+    const boost::iostreams::mapped_file_source file { m_filePath };
+    const auto &contents = boost::make_iterator_range(
+        file.data(), file.data() + file.size()
+    );
+
+    DocumentRule::extract(contents, std::back_inserter(m_documentRules));
 }
 
 } // namespace css

@@ -1,5 +1,6 @@
 #include "styles.h"
 
+#include "plugin.h"
 #include "css/stylesheet.h"
 
 #include <algorithm>
@@ -10,6 +11,13 @@
 #include <boost/range/adaptor/transformed.hpp>
 
 namespace stylist {
+
+void Style::
+setEnabled(const bool enabled)
+{
+    m_enabled = enabled;
+    Q_EMIT Plugin::styles().changed();
+}
 
 Styles::
 Styles(const Path &path)
@@ -32,7 +40,9 @@ Styles(const Path &path)
     );
 
     for (const auto &entry: range) {
-        m_styles.emplace_back(entry.path());
+        auto name = entry.path().filename().string();
+        m_styles.emplace_back(
+            entry.path().filename().c_str(), entry.path(), true);
     }
 
     qDebug() << m_styles.size() << "styles are loaded"; //TODO remove
@@ -41,9 +51,14 @@ Styles(const Path &path)
 std::string Styles::
 query(const Url &url) const
 {
+    struct Filter {
+        bool operator()(const Style &style) const {
+            return style.enabled();
+        }
+    };
     struct Extractor {
-        std::string operator()(const css::StyleSheet &css) const {
-            return css.styleFor(*m_url);
+        std::string operator()(const Style &style) const {
+            return style.styleSheet().styleFor(*m_url);
         }
         Extractor(const Url &url) : m_url { &url } {}
         const Url *m_url;
@@ -51,7 +66,8 @@ query(const Url &url) const
 
     namespace ba = boost::algorithm;
     namespace bad = boost::adaptors;
-    return ba::join(m_styles | bad::transformed(Extractor { url }),
+    return ba::join(m_styles | bad::filtered(Filter {})
+                             | bad::transformed(Extractor { url }),
                     "\n");
 }
 

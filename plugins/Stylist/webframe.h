@@ -13,8 +13,11 @@ class WebFrame : QObject
 public:
     WebFrame(QWebFrame* const);
 
-private slots:
-    void slotInitialLayoutCompleted();
+private:
+    void removeStyle();
+
+private Q_SLOTS:
+    void insertStyle();
 
 private:
     QWebFrame *m_frame;

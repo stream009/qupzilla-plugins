@@ -1,3 +1,5 @@
+#include <QtCore/QAbstractListModel>
+#include <QtCore/QModelIndex>
 #include <QtCore/QVariant>
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
@@ -10,3 +12,4 @@
 #include <QtGui/QTreeView>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
+#include <limits>

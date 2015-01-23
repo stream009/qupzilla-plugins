@@ -6,7 +6,7 @@
 #include <../webkit/webpage.h>
 
 #include <memory>
-#include <vector>
+#include <unordered_map>
 
 #include <QtCore/QDebug>
 #include <QtCore/QObject>
@@ -19,11 +19,12 @@ class Page : QObject
 public:
     explicit Page(WebPage* const webPage);
 
-private slots:
+private Q_SLOTS:
     void slotFrameCreated(QWebFrame* frame) noexcept;
+    void slotFrameDestroyed();
 
 private:
-    std::vector<std::unique_ptr<WebFrame>> m_frames;
+    std::unordered_map<QObject*, std::unique_ptr<WebFrame>> m_frames;
 };
 
 } // namespace stylist

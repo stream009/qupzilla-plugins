@@ -48,7 +48,7 @@ private:
     virtual QTranslator* getTranslator(const QString &locale);
     virtual void showSettings(QWidget* parent = 0);
 
-private slots:
+private Q_SLOTS:
     void slotMainWindowCreated(BrowserWindow*) noexcept;
     void slotMainWindowDeleted(BrowserWindow*) noexcept;
     void slotWebPageCreated(WebPage*) noexcept;

@@ -8,7 +8,7 @@ QMAKE_CXXFLAGS += -Wno-deprecated-register
 
 CONFIG += precompile_header
 
-pch.commands = grep -hr \"$$(LITERAL_HASH)include <\" --include=\"*.cpp\" \
+pch.commands = grep -hr \"$${LITERAL_HASH}include <\" --include=\"*.cpp\" \
 		    --include=\"*.h\" --exclude-dir=test \
 		    | sort | uniq > stable.h
 QMAKE_EXTRA_TARGETS += pch
