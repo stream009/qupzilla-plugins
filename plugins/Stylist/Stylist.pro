@@ -5,25 +5,19 @@ os2: TARGET = Stylist
 include(common.pri)
 
 SOURCES += \
-           error.cpp \
            plugin.cpp \
 	   settings.cpp \
 	   styles.cpp \
-	   utility.cpp \
 	   webframe.cpp \
 	   webpage.cpp
 
 HEADERS += \
-	   error.h \
 	   plugin.h \
 	   settings.h \
-	   stacktrace.h \
 	   styles.h \
 	   utility.h \
 	   webframe.h \
 	   webpage.h
-
-PRECOMPILED_HEADER += stable.h
 
 LIBS += -L./css -lcss
 POST_TARGETDEPS += css/libcss.a
@@ -31,11 +25,17 @@ POST_TARGETDEPS += css/libcss.a
 LIBS += -L./gui -lgui
 POST_TARGETDEPS += gui/libgui.a
 
+LIBS += -L./util -lutil
+POST_TARGETDEPS += util/libutil.a
+
 LIBS += \
            -lboost_filesystem \
            -lboost_iostreams \
            -lboost_regex \
            -lboost_system
+
+subdirs.commands = (cd css; make) && (cd util; make) && (cd gui; make)
+QMAKE_EXTRA_TARGETS += subdirs
 
 PLUGIN_DIR = $$PWD
 srcdir = $$(QUPZILLA_SRCDIR)

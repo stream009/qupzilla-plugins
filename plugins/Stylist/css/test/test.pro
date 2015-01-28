@@ -1,15 +1,10 @@
 include(../../common.pri)
 CONFIG += qtestlib debug 
 TEMPLATE = app
-TARGET = 
-DEPENDPATH += .
-INCLUDEPATH += .
-INCLUDEPATH += ..
 
-PRECOMPILED_HEADER += stable.h
+INCLUDEPATH += ../..
 
 # Input
-SOURCES += ../../utility.cpp
 HEADERS += ../../utility.h
 
 SOURCES += main.cpp
@@ -25,6 +20,9 @@ HEADERS += stylesheettest.h
 
 LIBS += -L.. -lcss
 POST_TARGETDEPS += ../libcss.a
+
+LIBS += -L../../util -lutil
+POST_TARGETDEPS += ../../util/libutil.a
 
 LIBS += -lboost_filesystem \
         -lboost_iostreams \

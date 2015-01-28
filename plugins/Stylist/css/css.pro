@@ -8,6 +8,7 @@ SOURCES = condition.cpp \
 HEADERS = condition.h \
           documentrule.h \
           stylesheet.h
-PRECOMPILED_HEADER = stable.h
+
+INCLUDEPATH += ..
 
 # vim:ts=4 sw=4 sts=4 et:

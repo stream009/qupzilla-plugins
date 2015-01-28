@@ -1,7 +1,7 @@
 #include "styletest.h"
 
-#include "../utility.h"
-#include "../styles.h"
+#include "utility.h"
+#include "styles.h"
 
 #include <fstream>
 

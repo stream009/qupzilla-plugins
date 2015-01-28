@@ -5,9 +5,12 @@
 #include <string>
 
 #include <boost/filesystem.hpp>
+#include <boost/functional/hash.hpp>
 #include <boost/utility/string_ref.hpp>
 
 #include <QtCore/QDebug>
+#include <QtCore/QHash>
+#include <QtCore/QString>
 #include <QtCore/QUrl>
 
 namespace stylist {
@@ -29,22 +32,36 @@ public:
 };
 
 
-class Url : public QUrl
+inline QDebug &
+operator<<(QDebug dbg, const std::string &str)
 {
-public:
-    Url(const char* const url); //implicit
-    Url(const QUrl &url); // implicit
-    Url(const QuString &url); // implicit
-    ~Url() = default; // Caution! Not virtual
+    return dbg << str.c_str();
+}
 
-    std::string str() const;
-};
+inline QDebug &
+operator<<(QDebug dbg, const boost::string_ref &ref)
+{
+    return dbg << ref.to_string().c_str();
+}
 
+inline QDebug &
+operator<<(QDebug dbg, const boost::filesystem::path &path)
+{
+    return dbg << path.c_str();
+}
 
-QDebug &operator<<(QDebug dbg, const std::string &str);
-QDebug &operator<<(QDebug dbg, const boost::string_ref &ref);
-QDebug &operator<<(QDebug dbg, const boost::filesystem::path &path);
 
 } // namespace stylist
+
+namespace boost {
+template<>
+struct hash<QString>
+{
+    size_t operator()(const QString &str) const
+    {
+        return qHash(str);
+    }
+};
+} // namespace boost
 
 #endif // STYLIST_UTILITY_H

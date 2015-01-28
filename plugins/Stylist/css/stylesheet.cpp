@@ -15,12 +15,20 @@ namespace css {
 // So, in order to achieve noexcept behavior, we have to write this
 // move constructor manually.
 // This will become unnecessary once above problem has solved.
-// boost bug ticket: https://svn.boost.org/trac/boost/ticket/10291
+// https://svn.boost.org/trac/boost/ticket/10291
 StyleSheet::
 StyleSheet(StyleSheet &&rhs) noexcept
     : m_filePath { std::move(rhs.m_filePath) },
       m_documentRules { std::move(rhs.m_documentRules) }
 {}
+
+StyleSheet &StyleSheet::
+operator=(StyleSheet &&rhs) noexcept
+{
+    m_filePath = std::move(rhs.m_filePath);
+    m_documentRules = std::move(m_documentRules);
+    return *this;
+}
 
 bool StyleSheet::
 hasStyleFor(const Url &url) const

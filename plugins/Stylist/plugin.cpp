@@ -1,14 +1,17 @@
 #include "plugin.h"
 
-#include "error.h"
+#include "webpage.h"
 #include "styles.h"
 #include "utility.h"
 #include "gui/settingdialog.h"
+#include "util/error.h"
 
 #include <pluginproxy.h>
 #include <../webkit/webpage.h>
 
 #include <cassert>
+
+#include <boost/make_unique.hpp>
 
 #include <QtCore/QTranslator>
 #include <QtGui/QWidget>
@@ -206,11 +209,25 @@ slotWebPageCreated(WebPage* const webPage) noexcept
         if (!webPage) {
             throw RuntimeError("Receive invalid Web page.");
         }
-        m_webPages.emplace_back(new Page { webPage });
+
+        this->connect(webPage, SIGNAL(destroyed()),
+                      this,    SLOT(slotWebPageDestroyed()));
+
+        m_webPages.emplace(webPage, boost::make_unique<Page>(webPage));
     }
     catch (const std::exception &e) {
         DEFAULT_EXCEPTION_HANDLER(e);
     }
+}
+
+void Plugin::
+slotWebPageDestroyed()
+{
+    auto* const webPage = this->sender();
+    qDebug() << __FUNCTION__ << webPage;
+
+    assert(m_webPages.count(webPage) == 1);
+    m_webPages.erase(webPage);
 }
 
 #if QT_VERSION < 0x050000

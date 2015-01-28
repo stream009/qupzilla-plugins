@@ -1,8 +1,6 @@
 #ifndef STYLIST_WEBPAGE_H
 #define STYLIST_WEBPAGE_H
 
-#include "webframe.h"
-
 #include <../webkit/webpage.h>
 
 #include <memory>
@@ -13,11 +11,14 @@
 
 namespace stylist {
 
+class WebFrame;
+
 class Page : QObject
 {
     Q_OBJECT
 public:
     explicit Page(WebPage* const webPage);
+    virtual ~Page();
 
 private Q_SLOTS:
     void slotFrameCreated(QWebFrame* frame) noexcept;

@@ -7,3 +7,4 @@
 #include <boost/range/iterator_range.hpp>
 #include <fstream>
 #include <string>
+#include <util/url.h>

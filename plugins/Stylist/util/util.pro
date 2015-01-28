@@ -2,11 +2,17 @@ include(../common.pri)
 TEMPLATE = lib
 CONFIG += debug staticlib
 
-SOURCES = directorywatcher.cpp \
+SOURCES = error.cpp \
+          directorywatcher.cpp \
           directorywatcher_p.cpp \
-          signalbuffer.cpp
-HEADERS = directorywatcher.h \
+          signalbuffer.cpp \
+          url.cpp
+
+HEADERS = error.h \
+          directorywatcher.h \
           directorywatcher_p.h \
-          signalbuffer.h
+          signalbuffer.h \
+          stacktrace.h \
+          url.h
 
 # vim:ts=4 sw=4 sts=4 et:

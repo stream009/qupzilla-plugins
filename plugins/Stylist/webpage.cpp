@@ -1,5 +1,7 @@
 #include "webpage.h"
 
+#include "webframe.h"
+
 #include <boost/make_unique.hpp>
 
 namespace stylist {
@@ -12,6 +14,8 @@ Page(WebPage* const webPage)
                   this,    SLOT(slotFrameCreated(QWebFrame*)));
     slotFrameCreated(webPage->mainFrame());
 }
+
+Page::~Page() = default;
 
 void Page::
 slotFrameCreated(QWebFrame* frame) noexcept

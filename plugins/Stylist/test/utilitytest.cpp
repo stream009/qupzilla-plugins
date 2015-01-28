@@ -2,7 +2,7 @@
 
 #include "utilitytest.h"
 
-#include "../utility.h"
+#include <util/url.h>
 
 namespace stylist {
 

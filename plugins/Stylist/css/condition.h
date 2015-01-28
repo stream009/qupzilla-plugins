@@ -1,7 +1,8 @@
 #ifndef STYLIST_CSS_CONDITION_H
 #define STYLIST_CSS_CONDITION_H
 
-#include "../utility.h"
+#include "utility.h"
+#include "util/url.h"
 
 #include <string>
 

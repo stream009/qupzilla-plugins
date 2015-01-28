@@ -2,7 +2,7 @@
 #define STYLIST_STYLESHEET_H
 
 #include "documentrule.h"
-#include "../utility.h"
+#include "utility.h"
 
 #include <vector>
 
@@ -26,6 +26,7 @@ public:
     }
 
     StyleSheet(StyleSheet &&) noexcept;
+    StyleSheet &operator=(StyleSheet&&) noexcept;
 
     bool hasStyleFor(const Url &) const;
     std::string styleFor(const Url &) const;

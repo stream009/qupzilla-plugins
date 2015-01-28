@@ -2,12 +2,11 @@
 #define STYLIST_PLUGIN_H
 
 #include "settings.h"
-#include "webpage.h"
 
 #include <plugininterface.h>
 
 #include <memory>
-#include <vector>
+#include <unordered_map>
 
 #include <QtCore/QObject>
 
@@ -18,6 +17,7 @@ class WebPage;
 
 namespace stylist {
 
+class Page;
 class Styles;
 
 class Plugin
@@ -52,12 +52,13 @@ private Q_SLOTS:
     void slotMainWindowCreated(BrowserWindow*) noexcept;
     void slotMainWindowDeleted(BrowserWindow*) noexcept;
     void slotWebPageCreated(WebPage*) noexcept;
+    void slotWebPageDestroyed();
 
 private:
     static std::unique_ptr<Settings> m_settings;
     static std::unique_ptr<Styles> m_styles;
 
-    std::vector<std::unique_ptr<Page>> m_webPages;
+    std::unordered_map<QObject*, std::unique_ptr<Page>> m_webPages;
 };
 
 } // namespace stylist
