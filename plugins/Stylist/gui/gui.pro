@@ -11,8 +11,7 @@ HEADERS = settingdialog.h \
 
 FORMS = settingdialog.ui
 
-PRECOMPILED_HEADER = stable.h
-
+INCLUDEPATH += ..
 INCLUDEPATH += $$(QUPZILLA_SRCDIR)/src/lib/webkit \
                $$(QUPZILLA_SRCDIR)/src/lib/app \
                $$(QUPZILLA_SRCDIR)/src/lib/autofill \

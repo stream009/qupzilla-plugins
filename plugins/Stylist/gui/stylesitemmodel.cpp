@@ -19,13 +19,15 @@ data(const QModelIndex &index, int role) const
 {
     assert(index.isValid());
 
-    if (role == Qt::DisplayRole) {
+    switch (role) {
+    case Qt::DisplayRole:
         assert(index.row() < rowCount(index));
         return m_styles.at(index.row()).name().c_str();
-    }
-    else if (role == Qt::CheckStateRole) {
+    case Qt::CheckStateRole:
         return m_styles.at(index.row()).enabled()
                                         ? Qt::Checked : Qt::Unchecked;
+    case PathRole:
+        return m_styles.at(index.row()).styleSheet().path().c_str();
     }
     return QVariant {};
 }

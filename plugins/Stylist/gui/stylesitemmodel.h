@@ -23,6 +23,9 @@ private:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
+public:
+    static const int PathRole = Qt::UserRole;
+
 private:
     Styles &m_styles;
 };

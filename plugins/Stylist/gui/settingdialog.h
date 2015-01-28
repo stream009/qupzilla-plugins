@@ -4,20 +4,28 @@
 #include "ui_settingdialog.h"
 #include "stylesitemmodel.h"
 
+#include <QtGui/QAction>
 #include <QtGui/QDialog>
 
+class QItemSelection;
 class QWidget;
 
 namespace stylist {
 
 class SettingDialog : public QDialog
 {
+    Q_OBJECT
 public:
     SettingDialog(QWidget &parent);
+
+private Q_SLOTS:
+    void openEditor();
+    void slotSelectionChanged(const QItemSelection&, const QItemSelection &);
 
 private:
     Ui::SettingDialog m_ui;
     StylesItemModel m_model;
+    QAction m_openAction;
 };
 
 } // namespace stylist
