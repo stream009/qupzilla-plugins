@@ -16,8 +16,13 @@ private slots:
     void init();
     void cleanup();
 
-    void testConstructor();
-    void testQuery();
+    void testConstructor() const;
+    void testQuery() const;
+
+    void testAddFile() const;
+    void testDeleteFile() const;
+    void testModifyFile() const;
+    void testRenameFile() const;
 
 private:
     const boost::filesystem::path m_directory { "styles" };

@@ -1,6 +1,7 @@
 #ifndef STYLIST_UTILITY_H
 #define STYLIST_UTILITY_H
 
+#include <algorithm>
 #include <cassert>
 #include <string>
 
@@ -10,6 +11,7 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QHash>
+#include <QtCore/QMetaType>
 #include <QtCore/QString>
 #include <QtCore/QUrl>
 
@@ -50,18 +52,38 @@ operator<<(QDebug dbg, const boost::filesystem::path &path)
     return dbg << path.c_str();
 }
 
-
 } // namespace stylist
 
 namespace boost {
 template<>
 struct hash<QString>
 {
-    size_t operator()(const QString &str) const
-    {
+    size_t operator()(const QString &str) const {
         return qHash(str);
     }
 };
+
+template<>
+struct hash<QVariant>
+{
+    size_t operator()(const QVariant &value) const {
+        namespace bfs = boost::filesystem;
+
+        if (value.canConvert<QString>()) {
+            return qHash(value.toString());
+        }
+        else if (value.canConvert<bfs::path>()) {
+            const boost::hash<bfs::path> hash {};
+            return hash(value.value<bfs::path>());
+        }
+        else {
+            assert(false && "unimplemented type");
+        }
+    }
+};
+
 } // namespace boost
+
+Q_DECLARE_METATYPE(boost::filesystem::path);
 
 #endif // STYLIST_UTILITY_H

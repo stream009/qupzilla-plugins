@@ -3,12 +3,7 @@
 
 #include "css/stylesheet.h"
 
-#include <memory>
-#include <vector>
-
-#include <boost/filesystem.hpp>
-
-#include <QtCore/QObject>
+#include <string>
 
 namespace stylist {
 
@@ -28,15 +23,13 @@ public:
     {}
 
     Style(Style &&) noexcept = default; // required by vector
-    Style &operator=(Style &&) noexcept; // required by sort
+    Style &operator=(Style &&) noexcept; // required by remove
 
     const std::string &name() const { return m_name; }
     const css::StyleSheet &styleSheet() const { return m_styleSheet; }
 
     bool enabled() const { return m_enabled; }
     void setEnabled(const bool enabled);
-
-    friend bool operator<(const Style &lhs, const Style &rhs);
 
 private:
     const Styles &m_parent;
@@ -45,6 +38,18 @@ private:
     bool m_enabled;
 };
 
+} // namespace stylist
+
+#include "util/buffereddirectorywatcher.h"
+
+#include <memory>
+#include <vector>
+
+#include <boost/filesystem.hpp>
+
+#include <QtCore/QObject>
+
+namespace stylist {
 
 class Styles : public QObject
 {
@@ -55,28 +60,33 @@ private:
     using ConstIterator = Container::const_iterator;
 
 public:
-    Styles(const Path &path);
+    template<typename P>
+    explicit Styles(P &&path)
+        : m_directory { std::forward<P>(path) },
+          m_dirWatcher { m_directory }
+    { init(); }
 
     std::string query(const Url &url) const;
 
-    Container::const_iterator begin() const { return m_styles.begin(); }
-    Container::const_iterator end() const { return m_styles.end(); }
+    bool empty() const { return m_styles.empty(); }
     Container::size_type size() const { return m_styles.size(); }
-
-    Container::const_reference at(size_t pos) const
-    {
-        return m_styles.at(pos);
-    }
     Container::reference at(size_t pos) { return m_styles.at(pos); }
 
 Q_SIGNALS:
     void changed() const;
 
 private:
+    void init();
     void scanDirectory();
+
+private Q_SLOTS:
+    void addFile(const Path&);
+    void deleteFile(const Path&);
+    void slotFileModified(const Path&);
 
 private:
     Path m_directory;
+    BufferedDirectoryWatcher m_dirWatcher;
     Container m_styles;
 
     friend void Style::setEnabled(const bool);

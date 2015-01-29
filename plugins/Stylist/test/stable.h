@@ -1,5 +1,6 @@
 #include <QtCore/QObject>
 #include <QtGui/QApplication>
+#include <QtTest/QSignalSpy>
 #include <QtTest/QtTest>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/filesystem.hpp>

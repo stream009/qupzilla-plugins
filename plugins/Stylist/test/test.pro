@@ -2,19 +2,21 @@ include(../common.pri)
 CONFIG += qtestlib debug
 TEMPLATE = app
 
-INCLUDEPATH += ..
+QT += network webkit
 
-include($$(QUPZILLA_SRCDIR)/src/plugins.pri)
+INCLUDEPATH += ..
 
 # Input
 SOURCES += main.cpp
 
-SOURCES += styletest.cpp \
-           ../styles.cpp \
-	   ../plugin.cpp
-HEADERS += styletest.h \
-           ../styles.h \
-	   ../plubin.h
+SOURCES += styletest.cpp 
+HEADERS += styletest.h
+
+#SOURCES += ../styles.cpp \
+#           ../plugin.cpp
+
+LIBS += ../build/styles.o \
+        ../build/moc_styles.o
 
 LIBS += -L../css -lcss
 POST_TARGETDEPS += ../css/libcss.a

@@ -11,6 +11,7 @@
 #include <boost/range/iterator_range.hpp>
 
 #include <QtTest/QtTest>
+#include <QtTest/QSignalSpy>
 
 namespace stylist {
 
@@ -52,7 +53,7 @@ cleanup()
 }
 
 void StylesTest::
-testConstructor()
+testConstructor() const
 {
     bfs::ofstream ofs { m_directory / "test.css" };
     ofs << "@-moz-document url(http://www.google.com),"
@@ -73,9 +74,8 @@ createFile(const Path &path, const Contents &contents)
 }
 
 void StylesTest::
-testQuery()
+testQuery() const
 {
-    namespace ba = boost::algorithm;
     Styles styles0 { m_directory };
     QVERIFY(styles0.query("http://www.google.com").empty());
 
@@ -101,6 +101,120 @@ testQuery()
                 " body { background: yellow !important; } \n"
                 " body { background: red !important; } "
              });
+}
+
+void StylesTest::
+testAddFile() const
+{
+    Styles styles { m_directory };
+    QVERIFY(styles.empty());
+
+    QSignalSpy spy { &styles, SIGNAL(changed()) };
+    QVERIFY(spy.isEmpty());
+
+    const char contents[] =
+        "@-moz-document url(http://www.google.com),"
+        "               domain(google.co.jp)"
+        "{ body { background: yellow !important; } }";
+    createFile(m_directory / "test.css", contents);
+
+    QTest::qWait(400);
+    QCOMPARE(spy.size(), 1);
+    const auto &args = spy.takeFirst();
+    QVERIFY(args.isEmpty());
+
+    QCOMPARE(styles.size(), 1u);
+}
+
+void StylesTest::
+testDeleteFile() const
+{
+    Styles styles { m_directory };
+
+    const char contents[] =
+        "@-moz-document url(http://www.google.com),"
+        "               domain(google.co.jp)"
+        "{ body { background: yellow !important; } }";
+    const auto &path = m_directory / "test.css";
+    createFile(path, contents);
+
+    QTest::qWait(400);
+
+    QSignalSpy spy { &styles, SIGNAL(changed()) };
+    QVERIFY(spy.isEmpty());
+    QCOMPARE(styles.size(), 1u);
+
+    bfs::remove(path);
+    QTest::qWait(400);
+
+    QCOMPARE(spy.size(), 1);
+    const auto &args = spy.takeFirst();
+    QVERIFY(args.isEmpty());
+
+    QVERIFY(styles.empty());
+}
+
+void StylesTest::
+testModifyFile() const
+{
+    Styles styles { m_directory };
+
+    const char contents[] =
+        "@-moz-document url(http://www.google.com),"
+        "               domain(google.co.jp)"
+        "{ body { background: yellow !important; } }";
+    const auto &path = m_directory / "test.css";
+    createFile(path, contents);
+
+    QTest::qWait(400);
+
+    QSignalSpy spy { &styles, SIGNAL(changed()) };
+    QVERIFY(spy.isEmpty());
+    QCOMPARE(styles.size(), 1u);
+
+    bfs::fstream file { path };
+    const char addition[] =
+        "@-moz-document url(http://www.bing.com)"
+        "{ body { background: red !important; } }";
+    file << addition;
+    file.close();
+    QTest::qWait(400);
+
+    QCOMPARE(spy.size(), 1);
+    const auto &args = spy.takeFirst();
+    QVERIFY(args.isEmpty());
+
+    QCOMPARE(styles.size(), 1u);
+}
+
+void StylesTest::
+testRenameFile() const
+{
+    Styles styles { m_directory };
+
+    const char contents[] =
+        "@-moz-document url(http://www.google.com),"
+        "               domain(google.co.jp)"
+        "{ body { background: yellow !important; } }";
+    const auto &path = m_directory / "test.css";
+    createFile(path, contents);
+
+    QTest::qWait(400);
+
+    QSignalSpy spy { &styles, SIGNAL(changed()) };
+    QVERIFY(spy.isEmpty());
+    QCOMPARE(styles.size(), 1u);
+
+    bfs::rename(path, m_directory / "renamed.css");
+    QTest::qWait(400);
+
+    QCOMPARE(spy.size(), 2); // 1 delete, 1 add
+    auto args = spy.takeFirst();
+    QVERIFY(args.isEmpty());
+    args = spy.takeFirst();
+    QVERIFY(args.isEmpty());
+
+    QCOMPARE(styles.size(), 1u);
 }
 
 } // namespace stylist

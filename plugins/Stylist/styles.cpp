@@ -8,6 +8,7 @@
 #include <boost/iterator/filter_iterator.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/algorithm_ext/erase.hpp>
 
 #include <QtCore/QDebug>
 
@@ -33,22 +34,9 @@ operator=(Style &&rhs) noexcept
     return *this;
 }
 
-bool operator<(const Style &lhs, const Style &rhs)
-{
-    return lhs.m_styleSheet.path() < rhs.m_styleSheet.path();
-}
+} // namespace stylist
 
-
-Styles::
-Styles(const Path &path)
-    : m_directory { path }
-{
-    namespace bfs = boost::filesystem;
-
-    bfs::create_directory(path);
-
-    scanDirectory();
-}
+namespace stylist {
 
 std::string Styles::
 query(const Url &url) const
@@ -74,11 +62,30 @@ query(const Url &url) const
 }
 
 void Styles::
+init()
+{
+    namespace bfs = boost::filesystem;
+
+    bfs::create_directory(m_directory);
+
+    scanDirectory();
+
+    this->connect(&m_dirWatcher, SIGNAL(fileAdded(const Path&)),
+                  this,          SLOT(addFile(const Path&)));
+    this->connect(&m_dirWatcher, SIGNAL(fileDeleted(const Path&)),
+                  this,          SLOT(deleteFile(const Path&)));
+    this->connect(&m_dirWatcher, SIGNAL(fileModified(const Path&)),
+                  this,          SLOT(slotFileModified(const Path&)));
+}
+
+void Styles::
 scanDirectory()
 {
     namespace bfs = boost::filesystem;
 
-    struct Predicate {
+    m_styles.clear();
+
+    struct Filter {
         bool operator()(const bfs::directory_entry &e) const {
             return e.path().extension() == ".css";
         }
@@ -86,19 +93,42 @@ scanDirectory()
 
     const auto &range = boost::make_iterator_range(
         boost::make_filter_iterator(
-            Predicate {},
+            Filter {},
             bfs::directory_iterator { m_directory }),
         {}
     );
 
     for (const auto &entry: range) {
         const auto &path = entry.path();
-        const auto &name = path.filename().c_str();
-        m_styles.emplace_back(name, path, true, *this);
+        addFile(path);
     }
-    std::sort(m_styles.begin(), m_styles.end());
 
-    qDebug() << m_styles.size() << "styles are loaded"; //TODO remove
+    //qDebug() << m_styles.size() << "styles are loaded";
+}
+
+void Styles::
+addFile(const Path &path)
+{
+    const auto &name = path.filename();
+    m_styles.emplace_back(name.c_str(), path, true, *this);
+    Q_EMIT changed();
+}
+
+void Styles::
+deleteFile(const Path &path)
+{
+    boost::range::remove_erase_if(m_styles,
+        [&path] (const decltype(m_styles)::value_type &style) {
+            return style.styleSheet().path() == path;
+        }
+    );
+    Q_EMIT changed();
+}
+
+void Styles::
+slotFileModified(const Path &)
+{
+    Q_EMIT changed();
 }
 
 } // namespace stylist
