@@ -5,10 +5,18 @@ CONFIG += qtestlib debug
 SOURCES += main.cpp
 
 SOURCES += signalbuffertest.cpp
-HEADERS += signalbuffertest.h
+HEADERS += signalbuffertest.h \
+           ../signalbuffer.h
 
 SOURCES += directorywatchertest.cpp
-HEADERS += directorywatchertest.h
+HEADERS += directorywatchertest.h \
+           ../directorywatcher.h
+
+SOURCES += buffereddirectorywatchertest.cpp
+HEADERS += buffereddirectorywatchertest.h \
+           ../buffereddirectorywatcher.h
+
+INCLUDEPATH += ../..
 
 LIBS += -L.. -lutil
 POST_TARGETDEPS += ../libutil.a

@@ -14,7 +14,7 @@ private Q_SLOTS:
     void testBuffering3();
 
 Q_SIGNALS:
-    void fire(const QString &);
+    void fire(const QVariant&);
 };
 
 } // namespace stylist

@@ -2,16 +2,22 @@ include(../common.pri)
 TEMPLATE = lib
 CONFIG += debug staticlib
 
-SOURCES = error.cpp \
+INCLUDEPATH += ..
+
+SOURCES = buffereddirectorywatcher.cpp \
+          error.cpp \
           directorywatcher.cpp \
           directorywatcher_p.cpp \
           signalbuffer.cpp \
+          signalconverter.cpp \
           url.cpp
 
-HEADERS = error.h \
+HEADERS = buffereddirectorywatcher.h \
+          error.h \
           directorywatcher.h \
           directorywatcher_p.h \
           signalbuffer.h \
+          signalconverter.h \
           stacktrace.h \
           url.h
 

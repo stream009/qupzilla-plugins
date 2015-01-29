@@ -5,14 +5,9 @@
 namespace stylist {
 
 SignalBuffer::
-SignalBuffer(QObject &object, const char* const signal,
-             const size_t interval /*= 300*/)
+SignalBuffer(const size_t interval /*= 300*/)
     : m_interval { interval }
-{
-    assert(signal); //TODO better
-    this->connect(&object, signal,
-                  this,    SLOT(slotTriggered(const QString&)));
-}
+{}
 
 QTimer &SignalBuffer::
 makeTimer()
@@ -32,7 +27,7 @@ makeTimer()
 }
 
 void SignalBuffer::
-slotTriggered(const QString &arg)
+slotTriggered(const QVariant &arg)
 {
     //qDebug() << __func__ << arg;
     const auto it = m_timers.left.find(arg);

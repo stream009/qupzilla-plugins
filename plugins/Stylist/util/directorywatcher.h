@@ -1,6 +1,8 @@
 #ifndef DIRECTORY_WATCHER_H
 #define DIRECTORY_WATCHER_H
 
+#include "utility.h"
+
 #include <boost/filesystem.hpp>
 
 #include <QtCore/QObject>
@@ -32,7 +34,5 @@ private:
 };
 
 } // namespace stylist
-
-Q_DECLARE_METATYPE(boost::filesystem::path);
 
 #endif // DIRECTORY_WATCHER_H
