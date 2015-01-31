@@ -14,12 +14,14 @@
 
 namespace stylist {
 
-void Style::
-setEnabled(const bool enabled)
-{
-    m_enabled = enabled;
-    Q_EMIT m_parent.changed();
-}
+Style::
+Style(Style &&rhs) noexcept
+    : m_parent { rhs.m_parent },
+      m_name { std::move(rhs.m_name) },
+      m_path { std::move(rhs.m_path) },
+      m_enabled { rhs.m_enabled },
+      m_styleSheet { std::move(rhs.m_styleSheet) }
+{}
 
 // We have to write this manually, since libstd++ doesn't give noexcept
 // move assignment operator to std::string
@@ -28,10 +30,18 @@ Style &Style::
 operator=(Style &&rhs) noexcept
 {
     m_name = std::move(rhs.m_name);
+    m_path = std::move(rhs.m_path);
     m_styleSheet = std::move(rhs.m_styleSheet);
     m_enabled = rhs.m_enabled;
 
     return *this;
+}
+
+void Style::
+setEnabled(const bool enabled)
+{
+    m_enabled = enabled;
+    Q_EMIT m_parent.changed();
 }
 
 } // namespace stylist
@@ -48,7 +58,7 @@ query(const Url &url) const
     };
     struct Extractor {
         std::string operator()(const Container::value_type &value) const {
-            return value.styleSheet().styleFor(*m_url);
+            return value.styleFor(*m_url);
         }
         Extractor(const Url &url) : m_url { &url } {}
         const Url *m_url;
@@ -119,7 +129,7 @@ deleteFile(const Path &path)
 {
     boost::range::remove_erase_if(m_styles,
         [&path] (const decltype(m_styles)::value_type &style) {
-            return style.styleSheet().path() == path;
+            return style.path() == path;
         }
     );
     Q_EMIT changed();

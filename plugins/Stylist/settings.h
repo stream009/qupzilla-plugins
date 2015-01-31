@@ -12,12 +12,6 @@ namespace stylist {
 class Settings : public QObject
 {
     Q_OBJECT
-public:
-    explicit Settings(const QString &filename);
-
-signals:
-    void change(QString);
-
 private:
     template<typename T, const QString& Key, T Default>
     class Property {
@@ -25,24 +19,30 @@ private:
         typedef typename boost::conditional<
                          boost::is_pod<T>::value, T, T&>::type TRef;
 
-        Property(Settings* const parent) : m_p { parent } {}
+        Property(Settings &parent) : m_p { parent } {}
 
         operator T() const {
-            const QVariant &value = m_p->m_settings.value(Key, Default);
+            const QVariant &value = m_p.m_settings.value(Key, Default);
             assert(value.canConvert<T>());
             return value.value<T>();
         }
 
         void operator=(const TRef newValue) {
             if (operator T() != newValue) {
-                m_p->m_settings.setValue(Key, newValue);
-                emit m_p->change(Key);
+                m_p.m_settings.setValue(Key, newValue);
+                Q_EMIT m_p.change(Key);
             }
         }
 
     private:
-        Settings *m_p;
+        Settings &m_p;
     };
+
+public:
+    explicit Settings(const QString &filename);
+
+Q_SIGNALS:
+    void change(QString);
 
 public: // static
     static const QString keyNavigationBar;

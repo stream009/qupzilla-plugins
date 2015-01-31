@@ -5,6 +5,8 @@
 
 #include <string>
 
+#include <boost/filesystem.hpp>
+
 namespace stylist {
 
 class Condition;
@@ -13,29 +15,37 @@ class Styles;
 
 class Style
 {
+    using Path = boost::filesystem::path;
 public:
-    template<typename Str, typename Path>
-    Style(Str &&name, Path &&path, const bool enabled, const Styles &parent)
+    template<typename Str, typename P>
+    Style(Str &&name, P &&path, const bool enabled, const Styles &parent)
         : m_parent { parent },
           m_name { std::forward<Str>(name) },
-          m_styleSheet { std::forward<Path>(path) },
-          m_enabled { enabled }
+          m_path { std::forward<P>(path) },
+          m_enabled { enabled },
+          m_styleSheet { m_path }
     {}
 
-    Style(Style &&) noexcept = default; // required by vector
+    Style(Style &&) noexcept; // required by vector
     Style &operator=(Style &&) noexcept; // required by remove
 
     const std::string &name() const { return m_name; }
-    const css::StyleSheet &styleSheet() const { return m_styleSheet; }
+    const Path &path() const { return m_path; }
 
     bool enabled() const { return m_enabled; }
     void setEnabled(const bool enabled);
 
+    std::string styleFor(const Url &url) const
+    {
+        return m_styleSheet.styleFor(url);
+    }
+
 private:
     const Styles &m_parent;
     std::string m_name;
-    css::StyleSheet m_styleSheet;
+    Path m_path;
     bool m_enabled;
+    css::StyleSheet m_styleSheet;
 };
 
 } // namespace stylist
