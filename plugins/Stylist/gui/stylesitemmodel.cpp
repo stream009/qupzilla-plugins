@@ -27,7 +27,7 @@ data(const QModelIndex &index, int role) const
         return m_styles.at(index.row()).enabled()
                                         ? Qt::Checked : Qt::Unchecked;
     case PathRole:
-        return m_styles.at(index.row()).path();
+        return QVariant::fromValue(m_styles.at(index.row()).path());
     }
     return QVariant {};
 }
