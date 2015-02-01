@@ -5,13 +5,18 @@
 #include "utility.h"
 #include "gui/settingdialog.h"
 #include "util/error.h"
+#include "serialization/styles.h"
 
 #include <pluginproxy.h>
 #include <../webkit/webpage.h>
 
 #include <cassert>
 
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/filesystem/fstream.hpp>
 #include <boost/make_unique.hpp>
+#include <boost/serialization/unique_ptr.hpp>
 
 #include <QtCore/QTranslator>
 #include <QtGui/QWidget>
@@ -81,13 +86,33 @@ init(InitState state, const QString &settingsPath) // noexcept
     try {
         assert(mApp->plugins());
 
+        namespace bfs = boost::filesystem;
+        m_pluginPath = settingsPath.toLocal8Bit().constData();
+        m_pluginPath /= "stylist";
+        if (!bfs::exists(m_pluginPath)) {
+            if (!bfs::create_directory(m_pluginPath)) {
+                assert(false); //TODO better
+            }
+        }
+
         assert(!m_settings);
         m_settings.reset(
             new Settings(settingsPath + QL1S("/extensions.ini")));
 
         assert(!m_styles);
-        const QString &path = settingsPath + "/stylist";
-        m_styles.reset(new Styles { path.toLocal8Bit().constData() });
+
+        const Path &dataPath = m_pluginPath / "styles.dat"; //TODO factor out
+        if (bfs::exists(dataPath)) {
+            bfs::ifstream ifs { dataPath };
+            assert(ifs.good()); //TODO better
+            boost::archive::text_iarchive dat { ifs };
+
+            dat >> m_styles; //TODO handle exception
+        }
+        else {
+            m_styles.reset(new Styles { m_pluginPath });
+            m_styles->scanDirectory();
+        }
 
         if (!mApp->plugins()) {
             throw RuntimeError("Fail to obtain plugin delegate");
@@ -122,6 +147,14 @@ unload() // noexcept
 {
     //qDebug() << __FUNCTION__;
     try {
+        namespace bfs = boost::filesystem;
+
+        const Path &dataPath = m_pluginPath / "styles.dat"; //TODO factor out
+        bfs::ofstream ofs { dataPath };
+        assert(ofs.good()); //TODO better
+        boost::archive::text_oarchive dat { ofs };
+
+        dat << m_styles; //TODO handle exception
     }
     catch (const std::exception &e) {
         DEFAULT_EXCEPTION_HANDLER(e);

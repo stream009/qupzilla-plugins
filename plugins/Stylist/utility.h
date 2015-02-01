@@ -84,6 +84,32 @@ struct hash<QVariant>
 
 } // namespace boost
 
+#include <type_traits>
+
+#include <boost/filesystem/path.hpp>
+#include <boost/serialization/nvp.hpp>
+
+namespace boost { namespace serialization {
+
+template<typename Archive>
+inline void
+serialize(Archive &ar, boost::filesystem::path &p,
+          const unsigned int /*version*/)
+{
+    typename std::decay<decltype(p)>::type::string_type s;
+    if (Archive::is_saving::value) {
+        s = p.string();
+    }
+
+    ar & boost::serialization::make_nvp("string", s);
+
+    if (Archive::is_loading::value) {
+        p = s;
+    }
+}
+
+}} // namespace boost::serialization
+
 Q_DECLARE_METATYPE(boost::filesystem::path);
 
 #endif // STYLIST_UTILITY_H

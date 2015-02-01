@@ -78,7 +78,7 @@ init()
 
     bfs::create_directory(m_directory);
 
-    scanDirectory();
+    //scanDirectory();
 
     this->connect(&m_dirWatcher, SIGNAL(fileAdded(const Path&)),
                   this,          SLOT(addFile(const Path&)));

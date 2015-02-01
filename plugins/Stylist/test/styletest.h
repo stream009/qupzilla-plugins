@@ -9,7 +9,7 @@ namespace stylist {
 class StylesTest : public QObject
 {
     Q_OBJECT
-private slots:
+private Q_SLOTS:
     void initTestCase();
     void cleanupTestCase();
 
@@ -23,6 +23,8 @@ private slots:
     void testDeleteFile() const;
     void testModifyFile() const;
     void testRenameFile() const;
+
+    void testSerialize() const;
 
 private:
     const boost::filesystem::path m_directory { "styles" };

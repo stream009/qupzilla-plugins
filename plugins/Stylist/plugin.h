@@ -8,6 +8,8 @@
 #include <memory>
 #include <unordered_map>
 
+#include <boost/filesystem.hpp>
+
 #include <QtCore/QObject>
 
 class BrowserWindow;
@@ -20,8 +22,7 @@ namespace stylist {
 class Page;
 class Styles;
 
-class Plugin
-    : public QObject, public PluginInterface
+class Plugin : public QObject, public PluginInterface
 {
     // This class is the DLL/Shared Library boundary.
     // Exceptions must not leak from this class.
@@ -31,6 +32,7 @@ class Plugin
 #if QT_VERSION >= 0x050000
     Q_PLUGIN_METADATA(IID "QupZilla.Browser.plugin.Stylist")
 #endif
+    using Path = boost::filesystem::path;
 
 public:
     Plugin() noexcept;
@@ -58,6 +60,7 @@ private:
     static std::unique_ptr<Settings> m_settings;
     static std::unique_ptr<Styles> m_styles;
 
+    Path m_pluginPath;
     std::unordered_map<QObject*, std::unique_ptr<Page>> m_webPages;
 };
 

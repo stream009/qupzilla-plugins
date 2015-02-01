@@ -4,6 +4,8 @@ os2: TARGET = Stylist
 
 include(common.pri)
 
+INCLUDEPATH += include
+
 SOURCES += \
            plugin.cpp \
 	   settings.cpp \
@@ -32,6 +34,7 @@ LIBS += \
            -lboost_filesystem \
            -lboost_iostreams \
            -lboost_regex \
+	   -lboost_serialization \
            -lboost_system
 
 subdirs.commands = (cd css; make) && (cd util; make) && (cd gui; make)

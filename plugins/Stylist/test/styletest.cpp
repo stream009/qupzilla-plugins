@@ -2,10 +2,13 @@
 
 #include "utility.h"
 #include "styles.h"
+#include "serialization/styles.h"
 
 #include <fstream>
 
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/range/iterator_range.hpp>
@@ -62,6 +65,9 @@ testConstructor() const
     ofs.close();
 
     Styles styles { m_directory };
+    styles.scanDirectory();
+
+    QCOMPARE(styles.size(), 1u);
 }
 
 template<typename Path, typename Contents>
@@ -86,6 +92,7 @@ testQuery() const
     createFile(m_directory / "test1.css", contents1);
 
     Styles styles1 { m_directory };
+    styles1.scanDirectory();
     QCOMPARE(styles1.query("http://www.google.com"),
              std::string { " body { background: yellow !important; } " });
 
@@ -96,6 +103,7 @@ testQuery() const
     createFile(m_directory / "test2.css", contents2);
 
     Styles styles2 { m_directory };
+    styles2.scanDirectory();
     QCOMPARE(styles2.query("http://www.google.com"),
              std::string {
                 " body { background: yellow !important; } \n"
@@ -215,6 +223,43 @@ testRenameFile() const
     QVERIFY(args.isEmpty());
 
     QCOMPARE(styles.size(), 1u);
+}
+
+void StylesTest::
+testSerialize() const
+{
+    const char contents1[] =
+        "@-moz-document url(http://www.google.com),"
+        "               domain(google.co.jp)"
+        "{ body { background: yellow !important; } }";
+    const auto &path1 = m_directory / "test1.css";
+    createFile(path1, contents1);
+
+    Styles styles { m_directory };
+    styles.scanDirectory();
+    QCOMPARE(styles.size(), 1u);
+
+    std::stringstream ss;
+    boost::archive::text_oarchive dat { ss };
+
+    Styles *ptr = &styles;
+    dat << ptr;
+
+    //qDebug() << ss.str().c_str();
+
+    boost::archive::text_iarchive iar { ss };
+    ptr = nullptr;
+    iar >> ptr;
+    QVERIFY(ptr != &styles);
+
+    QCOMPARE(ptr->size(), 1u);
+    QCOMPARE(ptr->m_directory, m_directory);
+
+    const auto &first = ptr->at(0);
+    QCOMPARE(&first.m_parent, ptr);
+    QCOMPARE(first.name(), styles.at(0).name());
+    QCOMPARE(first.path(), styles.at(0).path());
+    QCOMPARE(first.enabled(), styles.at(0).enabled());
 }
 
 } // namespace stylist

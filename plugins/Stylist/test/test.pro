@@ -5,6 +5,7 @@ TEMPLATE = app
 QT += network webkit
 
 INCLUDEPATH += ..
+INCLUDEPATH += ../include
 
 # Input
 SOURCES += main.cpp
@@ -27,4 +28,5 @@ POST_TARGETDEPS += ../util/libutil.a
 LIBS += -lboost_filesystem \
         -lboost_iostreams \
 	-lboost_regex \
+	-lboost_serialization \
 	-lboost_system

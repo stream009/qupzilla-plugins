@@ -46,6 +46,17 @@ private:
     Path m_path;
     bool m_enabled;
     css::StyleSheet m_styleSheet;
+
+    friend class StylesTest;
+
+    template<typename Archive>
+    friend void boost::serialization::
+    save_construct_data(Archive&, const Style*,
+                                  const unsigned int version);
+    template<typename Archive>
+    friend void boost::serialization::
+    load_construct_data(Archive&, Style*,
+                                  const unsigned int version);
 };
 
 } // namespace stylist
@@ -82,12 +93,13 @@ public:
     Container::size_type size() const { return m_styles.size(); }
     Container::reference at(size_t pos) { return m_styles.at(pos); }
 
+    void scanDirectory();
+
 Q_SIGNALS:
     void changed() const;
 
 private:
     void init();
-    void scanDirectory();
 
 private Q_SLOTS:
     void addFile(const Path&);
@@ -99,7 +111,17 @@ private:
     BufferedDirectoryWatcher m_dirWatcher;
     Container m_styles;
 
+    friend class StylesTest;
     friend void Style::setEnabled(const bool);
+
+    template<typename Archive>
+    friend void boost::serialization::
+    save_construct_data(Archive &, const Styles*,
+                                   const unsigned int version);
+    template<typename Archive>
+    friend void boost::serialization::
+    load_construct_data(Archive &, Styles*,
+                                   const unsigned int version);
 };
 
 } // namespace stylist
