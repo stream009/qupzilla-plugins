@@ -87,19 +87,25 @@ public:
           m_dirWatcher { m_directory }
     { init(); }
 
+    template<typename P, typename C> // for deserialization
+    Styles(P &&path, C &&container)
+        : m_directory { std::forward<P>(path) },
+          m_dirWatcher { m_directory },
+          m_styles { std::forward<C>(container) }
+    { init(); }
+
     std::string query(const Url &url) const;
 
     bool empty() const { return m_styles.empty(); }
     Container::size_type size() const { return m_styles.size(); }
     Container::reference at(size_t pos) { return m_styles.at(pos); }
 
-    void scanDirectory();
-
 Q_SIGNALS:
     void changed() const;
 
 private:
     void init();
+    void scanDirectory();
 
 private Q_SLOTS:
     void addFile(const Path&);

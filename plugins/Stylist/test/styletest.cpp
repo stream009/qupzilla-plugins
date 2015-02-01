@@ -65,7 +65,6 @@ testConstructor() const
     ofs.close();
 
     Styles styles { m_directory };
-    styles.scanDirectory();
 
     QCOMPARE(styles.size(), 1u);
 }
@@ -92,7 +91,6 @@ testQuery() const
     createFile(m_directory / "test1.css", contents1);
 
     Styles styles1 { m_directory };
-    styles1.scanDirectory();
     QCOMPARE(styles1.query("http://www.google.com"),
              std::string { " body { background: yellow !important; } " });
 
@@ -103,7 +101,6 @@ testQuery() const
     createFile(m_directory / "test2.css", contents2);
 
     Styles styles2 { m_directory };
-    styles2.scanDirectory();
     QCOMPARE(styles2.query("http://www.google.com"),
              std::string {
                 " body { background: yellow !important; } \n"
@@ -236,7 +233,6 @@ testSerialize() const
     createFile(path1, contents1);
 
     Styles styles { m_directory };
-    styles.scanDirectory();
     QCOMPARE(styles.size(), 1u);
 
     std::stringstream ss;

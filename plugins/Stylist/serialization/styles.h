@@ -75,8 +75,7 @@ load_construct_data(Archive &ar, stylist::Styles *styles,
     Styles::Path path;           ar >> path;
     Styles::Container container; ar >> container;
 
-    ::new(styles) Styles { std::move(path) }; //TODO suppress initial scanning
-    styles->m_styles = std::move(container);
+    ::new(styles) Styles { std::move(path), std::move(container) };
 }
 
 }} // namespace boost::serialization

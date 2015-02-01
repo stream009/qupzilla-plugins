@@ -78,7 +78,7 @@ init()
 
     bfs::create_directory(m_directory);
 
-    //scanDirectory();
+    scanDirectory();
 
     this->connect(&m_dirWatcher, SIGNAL(fileAdded(const Path&)),
                   this,          SLOT(addFile(const Path&)));
@@ -93,8 +93,6 @@ scanDirectory()
 {
     namespace bfs = boost::filesystem;
 
-    m_styles.clear();
-
     struct Filter {
         bool operator()(const bfs::directory_entry &e) const {
             return e.path().extension() == ".css";
@@ -104,13 +102,25 @@ scanDirectory()
     const auto &range = boost::make_iterator_range(
         boost::make_filter_iterator(
             Filter {},
-            bfs::directory_iterator { m_directory }),
+            bfs::directory_iterator { m_directory }
+        ),
         {}
     );
 
+    const auto &isAlreadyRegistered =
+        [this] (const Path &path) {
+            return std::any_of(m_styles.begin(), m_styles.end(),
+                [&path] (const Container::value_type &s) {
+                    return s.path() == path;
+                }
+            );
+        };
+
     for (const auto &entry: range) {
         const auto &path = entry.path();
-        addFile(path);
+        if (!isAlreadyRegistered(path)) {
+            addFile(path);
+        }
     }
 
     //qDebug() << m_styles.size() << "styles are loaded";

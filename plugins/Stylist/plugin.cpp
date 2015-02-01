@@ -111,7 +111,6 @@ init(InitState state, const QString &settingsPath) // noexcept
         }
         else {
             m_styles.reset(new Styles { m_pluginPath });
-            m_styles->scanDirectory();
         }
 
         if (!mApp->plugins()) {
