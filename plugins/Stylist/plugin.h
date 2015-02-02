@@ -40,15 +40,16 @@ public:
 
     static Settings &settings() noexcept;
     static Styles &styles() noexcept;
+    static const Path &directory() noexcept;
 
 private:
     // @override PluginInterface. noexcept
-    virtual PluginSpec pluginSpec();
-    virtual void init(InitState state, const QString &settingsPath);
-    virtual void unload();
-    virtual bool testPlugin();
-    virtual QTranslator* getTranslator(const QString &locale);
-    virtual void showSettings(QWidget* parent = 0);
+    PluginSpec pluginSpec() override;
+    void init(InitState state, const QString &settingsPath) override;
+    void unload() override;
+    bool testPlugin() override;
+    QTranslator* getTranslator(const QString &locale) override;
+    void showSettings(QWidget* parent = 0) override;
 
 private Q_SLOTS:
     void slotMainWindowCreated(BrowserWindow*) noexcept;
@@ -60,7 +61,7 @@ private:
     static std::unique_ptr<Settings> m_settings;
     static std::unique_ptr<Styles> m_styles;
 
-    Path m_pluginPath;
+    static Path m_pluginPath;
     std::unordered_map<QObject*, std::unique_ptr<Page>> m_webPages;
 };
 

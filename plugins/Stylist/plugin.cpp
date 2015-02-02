@@ -8,15 +8,11 @@
 #include "serialization/styles.h"
 
 #include <pluginproxy.h>
-#include <../webkit/webpage.h>
+#include <../webkit/webpage.h> //TODO hack. fix it.
 
 #include <cassert>
 
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/filesystem/fstream.hpp>
 #include <boost/make_unique.hpp>
-#include <boost/serialization/unique_ptr.hpp>
 
 #include <QtCore/QTranslator>
 #include <QtGui/QWidget>
@@ -25,6 +21,7 @@ namespace stylist {
 
 std::unique_ptr<Settings> Plugin::m_settings;
 std::unique_ptr<Styles> Plugin::m_styles;
+Plugin::Path Plugin::m_pluginPath;
 
 Plugin::
 Plugin() noexcept
@@ -58,6 +55,13 @@ styles() noexcept
 {
     assert(m_styles);
     return *m_styles;
+}
+
+const Plugin::Path &Plugin::
+directory() noexcept
+{
+    assert(!m_pluginPath.empty());
+    return m_pluginPath;
 }
 
 PluginSpec Plugin::
@@ -100,18 +104,7 @@ init(InitState state, const QString &settingsPath) // noexcept
             new Settings(settingsPath + QL1S("/extensions.ini")));
 
         assert(!m_styles);
-
-        const Path &dataPath = m_pluginPath / "styles.dat"; //TODO factor out
-        if (bfs::exists(dataPath)) {
-            bfs::ifstream ifs { dataPath };
-            assert(ifs.good()); //TODO better
-            boost::archive::text_iarchive dat { ifs };
-
-            dat >> m_styles; //TODO handle exception
-        }
-        else {
-            m_styles.reset(new Styles { m_pluginPath });
-        }
+        m_styles = Styles::create();
 
         if (!mApp->plugins()) {
             throw RuntimeError("Fail to obtain plugin delegate");
@@ -146,14 +139,6 @@ unload() // noexcept
 {
     //qDebug() << __FUNCTION__;
     try {
-        namespace bfs = boost::filesystem;
-
-        const Path &dataPath = m_pluginPath / "styles.dat"; //TODO factor out
-        bfs::ofstream ofs { dataPath };
-        assert(ofs.good()); //TODO better
-        boost::archive::text_oarchive dat { ofs };
-
-        dat << m_styles; //TODO handle exception
     }
     catch (const std::exception &e) {
         DEFAULT_EXCEPTION_HANDLER(e);

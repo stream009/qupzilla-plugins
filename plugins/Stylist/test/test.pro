@@ -17,7 +17,13 @@ HEADERS += styletest.h
 #           ../plugin.cpp
 
 LIBS += ../build/styles.o \
-        ../build/moc_styles.o
+        ../build/moc_styles.o \
+	../build/plugin.o \
+	../build/moc_plugin.o \
+	../build/webpage.o \
+	../build/moc_webpage.o \
+	../build/webframe.o \
+	../build/moc_webframe.o
 
 LIBS += -L../css -lcss
 POST_TARGETDEPS += ../css/libcss.a

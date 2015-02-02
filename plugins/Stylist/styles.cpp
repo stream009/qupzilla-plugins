@@ -2,16 +2,6 @@
 
 #include "css/stylesheet.h"
 
-#include <algorithm>
-
-#include <boost/algorithm/string/join.hpp>
-#include <boost/iterator/filter_iterator.hpp>
-#include <boost/range/adaptor/filtered.hpp>
-#include <boost/range/adaptor/transformed.hpp>
-#include <boost/range/algorithm_ext/erase.hpp>
-
-#include <QtCore/QDebug>
-
 namespace stylist {
 
 Style::
@@ -46,7 +36,65 @@ setEnabled(const bool enabled)
 
 } // namespace stylist
 
+#include "plugin.h"
+#include "serialization/styles.h"
+
+#include <algorithm>
+
+#include <boost/algorithm/string/join.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/filesystem/fstream.hpp>
+#include <boost/iterator/filter_iterator.hpp>
+#include <boost/range/adaptor/filtered.hpp>
+#include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/algorithm_ext/erase.hpp>
+
+#include <QtCore/QDebug>
+
 namespace stylist {
+
+boost::filesystem::path
+dataPath()
+{
+    static const auto &path = Plugin::directory() / "styles.dat";
+    return path;
+}
+
+std::unique_ptr<Styles> Styles::
+create()
+{
+    namespace bfs = boost::filesystem;
+
+    Styles *ptr;
+
+    if (bfs::exists(dataPath())) {
+        bfs::ifstream ifs { dataPath() };
+        assert(ifs.good()); //TODO better
+        boost::archive::text_iarchive dat { ifs };
+
+        dat >> ptr; //TODO handle exception
+    }
+    else {
+        ptr = new Styles { Plugin::directory() };
+    }
+
+    assert(ptr);
+    return std::unique_ptr<Styles>(ptr);
+}
+
+Styles::
+~Styles() //TODO noexcept
+{
+    namespace bfs = boost::filesystem;
+
+    bfs::ofstream ofs { dataPath() };
+    assert(ofs.good()); //TODO better
+    boost::archive::text_oarchive dat { ofs };
+
+    Styles *ptr = this; //TODO why does this necessary?
+    dat << ptr; //TODO handle exception
+}
 
 std::string Styles::
 query(const Url &url) const

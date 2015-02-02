@@ -81,6 +81,19 @@ private:
     using ConstIterator = Container::const_iterator;
 
 public:
+    static std::unique_ptr<Styles> create();
+    ~Styles() override;
+
+    std::string query(const Url &url) const;
+
+    bool empty() const { return m_styles.empty(); }
+    Container::size_type size() const { return m_styles.size(); }
+    Container::reference at(size_t pos) { return m_styles.at(pos); }
+
+Q_SIGNALS:
+    void changed() const;
+
+private:
     template<typename P>
     explicit Styles(P &&path)
         : m_directory { std::forward<P>(path) },
@@ -94,16 +107,6 @@ public:
           m_styles { std::forward<C>(container) }
     { init(); }
 
-    std::string query(const Url &url) const;
-
-    bool empty() const { return m_styles.empty(); }
-    Container::size_type size() const { return m_styles.size(); }
-    Container::reference at(size_t pos) { return m_styles.at(pos); }
-
-Q_SIGNALS:
-    void changed() const;
-
-private:
     void init();
     void scanDirectory();
 
