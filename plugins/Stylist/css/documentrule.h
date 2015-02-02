@@ -1,8 +1,9 @@
 #ifndef STYLIST_DOCUMENT_RULE_H
 #define STYLIST_DOCUMENT_RULE_H
 
-#include "utility.h"
 #include "condition.h"
+
+#include "core/utility.h"
 
 #include <iterator>
 #include <memory>

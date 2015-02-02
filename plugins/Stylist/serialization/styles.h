@@ -1,7 +1,7 @@
 #ifndef STYLIST_SERIALIZATION_STYLES_H
 #define STYLIST_SERIALIZATION_STYLES_H
 
-#include "gui/../styles.h" //TODO hack fix this
+#include "core/styles.h"
 
 /// For stylist::Style
 namespace boost { namespace serialization {
@@ -60,8 +60,7 @@ save_construct_data(Archive &ar, const stylist::Styles *styles,
                                  const unsigned int /*version*/)
 {
     //qDebug() << "Styles" << __func__;
-    ar << styles->m_directory
-       << styles->m_styles;
+    ar << styles->m_styles;
 }
 
 template<typename Archive>
@@ -72,10 +71,9 @@ load_construct_data(Archive &ar, stylist::Styles *styles,
     //qDebug() << "Styles" << __func__;
     using stylist::Styles;
 
-    Styles::Path path;           ar >> path;
     Styles::Container container; ar >> container;
 
-    ::new(styles) Styles { std::move(path), std::move(container) };
+    ::new(styles) Styles { std::move(container) };
 }
 
 }} // namespace boost::serialization

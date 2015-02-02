@@ -39,7 +39,6 @@ public:
     virtual ~Plugin() noexcept;
 
     static Settings &settings() noexcept;
-    static Styles &styles() noexcept;
     static const Path &directory() noexcept;
 
 private:
@@ -59,9 +58,8 @@ private Q_SLOTS:
 
 private:
     static std::unique_ptr<Settings> m_settings;
-    static std::unique_ptr<Styles> m_styles;
-
     static Path m_pluginPath;
+
     std::unordered_map<QObject*, std::unique_ptr<Page>> m_webPages;
 };
 

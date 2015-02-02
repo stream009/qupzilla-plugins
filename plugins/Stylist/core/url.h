@@ -1,7 +1,7 @@
 #ifndef STYLIST_URL_H
 #define STYLIST_URL_H
 
-#include "../utility.h"
+#include "utility.h"
 
 #include <string>
 

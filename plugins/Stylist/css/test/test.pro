@@ -21,8 +21,8 @@ HEADERS += stylesheettest.h
 LIBS += -L.. -lcss
 POST_TARGETDEPS += ../libcss.a
 
-LIBS += -L../../util -lutil
-POST_TARGETDEPS += ../../util/libutil.a
+LIBS += -L../../core -lcore
+POST_TARGETDEPS += ../../core/libcore.a
 
 LIBS += -lboost_filesystem \
         -lboost_iostreams \

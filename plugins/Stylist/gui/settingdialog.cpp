@@ -1,6 +1,6 @@
 #include "settingdialog.h"
 
-#include "../plugin.h"
+#include "core/styles.h"
 
 #include <QtGui/QDesktopServices>
 #include <QtGui/QItemSelection>
@@ -12,7 +12,7 @@ namespace stylist {
 SettingDialog::
 SettingDialog(QWidget &parent)
     : QDialog { &parent },
-      m_model { Plugin::styles() },
+      m_model { Styles::instance() },
       m_openAction { tr("&Open"), nullptr }
 {
     m_ui.setupUi(this);

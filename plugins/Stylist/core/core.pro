@@ -3,6 +3,7 @@ TEMPLATE = lib
 CONFIG += debug staticlib
 
 INCLUDEPATH += ..
+INCLUDEPATH += ../include
 
 SOURCES = buffereddirectorywatcher.cpp \
           error.cpp \
@@ -10,6 +11,7 @@ SOURCES = buffereddirectorywatcher.cpp \
           directorywatcher_p.cpp \
           signalbuffer.cpp \
           signalconverter.cpp \
+          styles.cpp \
           url.cpp
 
 HEADERS = buffereddirectorywatcher.h \
@@ -19,6 +21,8 @@ HEADERS = buffereddirectorywatcher.h \
           signalbuffer.h \
           signalconverter.h \
           stacktrace.h \
-          url.h
+          styles.h \
+          url.h \
+          utility.h
 
 # vim:ts=4 sw=4 sts=4 et:

@@ -61,7 +61,7 @@ private:
 
 } // namespace stylist
 
-#include "util/buffereddirectorywatcher.h"
+#include "core/buffereddirectorywatcher.h"
 
 #include <memory>
 #include <vector>
@@ -81,7 +81,7 @@ private:
     using ConstIterator = Container::const_iterator;
 
 public:
-    static std::unique_ptr<Styles> create();
+    static Styles &instance();
     ~Styles() override;
 
     std::string query(const Url &url) const;
@@ -90,23 +90,22 @@ public:
     Container::size_type size() const { return m_styles.size(); }
     Container::reference at(size_t pos) { return m_styles.at(pos); }
 
+    static const Path &directory();
+    static void setDirectory(const Path &);
+
 Q_SIGNALS:
     void changed() const;
 
 private:
-    template<typename P>
-    explicit Styles(P &&path)
-        : m_directory { std::forward<P>(path) },
-          m_dirWatcher { m_directory }
-    { init(); }
+    Styles();
 
-    template<typename P, typename C> // for deserialization
-    Styles(P &&path, C &&container)
-        : m_directory { std::forward<P>(path) },
-          m_dirWatcher { m_directory },
+    template<typename C> // for deserialization
+    Styles(C &&container)
+        : m_dirWatcher { m_directory },
           m_styles { std::forward<C>(container) }
     { init(); }
 
+    static std::unique_ptr<Styles> create();
     void init();
     void scanDirectory();
 
@@ -116,7 +115,7 @@ private Q_SLOTS:
     void slotFileModified(const Path&);
 
 private:
-    Path m_directory;
+    static Path m_directory;
     BufferedDirectoryWatcher m_dirWatcher;
     Container m_styles;
 

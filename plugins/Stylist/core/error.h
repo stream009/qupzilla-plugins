@@ -51,7 +51,7 @@ public:
 };
 
 #define DEFAULT_EXCEPTION_HANDLER(exception) \
-    defaultExceptionHandler(__FILE__, __LINE__, __FUNCTION__, exception)
+    defaultExceptionHandler(__FILE__, __LINE__, __func__, exception)
 
 void defaultExceptionHandler(const char* const fileName,
                              const size_t lineNo,

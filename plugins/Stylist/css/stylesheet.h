@@ -2,7 +2,8 @@
 #define STYLIST_STYLESHEET_H
 
 #include "documentrule.h"
-#include "utility.h"
+
+#include "core/utility.h"
 
 #include <vector>
 

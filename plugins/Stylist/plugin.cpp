@@ -1,11 +1,11 @@
 #include "plugin.h"
 
 #include "webpage.h"
-#include "styles.h"
-#include "utility.h"
+
+#include "core/error.h"
+#include "core/styles.h"
 #include "gui/settingdialog.h"
-#include "util/error.h"
-#include "serialization/styles.h"
+#include "core/utility.h"
 
 #include <pluginproxy.h>
 #include <../webkit/webpage.h> //TODO hack. fix it.
@@ -20,7 +20,6 @@
 namespace stylist {
 
 std::unique_ptr<Settings> Plugin::m_settings;
-std::unique_ptr<Styles> Plugin::m_styles;
 Plugin::Path Plugin::m_pluginPath;
 
 Plugin::
@@ -48,13 +47,6 @@ settings() noexcept
 {
     assert(m_settings);
     return *m_settings;
-}
-
-Styles &Plugin::
-styles() noexcept
-{
-    assert(m_styles);
-    return *m_styles;
 }
 
 const Plugin::Path &Plugin::
@@ -86,7 +78,7 @@ pluginSpec() // noexcept
 void Plugin::
 init(InitState state, const QString &settingsPath) // noexcept
 {
-    //qDebug() << __FUNCTION__;
+    //qDebug() << __func__;
     try {
         assert(mApp->plugins());
 
@@ -98,13 +90,11 @@ init(InitState state, const QString &settingsPath) // noexcept
                 assert(false); //TODO better
             }
         }
+        Styles::setDirectory(m_pluginPath);
 
         assert(!m_settings);
         m_settings.reset(
             new Settings(settingsPath + QL1S("/extensions.ini")));
-
-        assert(!m_styles);
-        m_styles = Styles::create();
 
         if (!mApp->plugins()) {
             throw RuntimeError("Fail to obtain plugin delegate");
@@ -137,7 +127,7 @@ init(InitState state, const QString &settingsPath) // noexcept
 void Plugin::
 unload() // noexcept
 {
-    //qDebug() << __FUNCTION__;
+    //qDebug() << __func__;
     try {
     }
     catch (const std::exception &e) {
@@ -190,7 +180,7 @@ showSettings(QWidget* const parent) // noexcept
 void Plugin::
 slotMainWindowCreated(BrowserWindow* const window) noexcept
 {
-    //qDebug() << __FUNCTION__ << window;
+    //qDebug() << __func__ << window;
     assert(window);
     try {
         if (!window) {
@@ -205,7 +195,7 @@ slotMainWindowCreated(BrowserWindow* const window) noexcept
 void Plugin::
 slotMainWindowDeleted(BrowserWindow* const window) noexcept
 {
-    //qDebug() << __FUNCTION__;
+    //qDebug() << __func__;
     assert(window);
     try {
         if (!window) {
@@ -220,7 +210,7 @@ slotMainWindowDeleted(BrowserWindow* const window) noexcept
 void Plugin::
 slotWebPageCreated(WebPage* const webPage) noexcept
 {
-    qDebug() << __FUNCTION__;
+    qDebug() << __func__;
     assert(webPage);
     try {
         if (!webPage) {
@@ -241,7 +231,7 @@ void Plugin::
 slotWebPageDestroyed()
 {
     auto* const webPage = this->sender();
-    qDebug() << __FUNCTION__ << webPage;
+    qDebug() << __func__ << webPage;
 
     assert(m_webPages.count(webPage) == 1);
     m_webPages.erase(webPage);

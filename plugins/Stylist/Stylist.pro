@@ -9,26 +9,23 @@ INCLUDEPATH += include
 SOURCES += \
            plugin.cpp \
 	   settings.cpp \
-	   styles.cpp \
 	   webframe.cpp \
 	   webpage.cpp
 
 HEADERS += \
 	   plugin.h \
 	   settings.h \
-	   styles.h \
-	   utility.h \
 	   webframe.h \
 	   webpage.h
+
+LIBS += -L./core -lcore
+POST_TARGETDEPS += core/libcore.a
 
 LIBS += -L./css -lcss
 POST_TARGETDEPS += css/libcss.a
 
 LIBS += -L./gui -lgui
 POST_TARGETDEPS += gui/libgui.a
-
-LIBS += -L./util -lutil
-POST_TARGETDEPS += util/libutil.a
 
 LIBS += \
            -lboost_filesystem \

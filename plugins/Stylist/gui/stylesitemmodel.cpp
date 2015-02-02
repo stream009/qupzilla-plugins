@@ -1,6 +1,6 @@
 #include "stylesitemmodel.h"
 
-#include "../styles.h"
+#include "core/styles.h"
 
 #include <cassert>
 #include <limits>
@@ -39,7 +39,7 @@ setData(const QModelIndex &index,
     assert(index.isValid());
     assert(value.isValid());
 
-    //qDebug() << __FUNCTION__ << index << value << role;
+    //qDebug() << __func__ << index << value << role;
     if (role == Qt::CheckStateRole) {
         m_styles.at(index.row()).setEnabled(value.toInt() == Qt::Checked);
         Q_EMIT dataChanged(index, index);

@@ -18,8 +18,8 @@ HEADERS += buffereddirectorywatchertest.h \
 
 INCLUDEPATH += ../..
 
-LIBS += -L.. -lutil
-POST_TARGETDEPS += ../libutil.a
+LIBS += -L.. -lcore
+POST_TARGETDEPS += ../libcore.a
 
 LIBS += -lboost_filesystem \
         -lboost_system

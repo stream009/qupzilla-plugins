@@ -1,8 +1,7 @@
 #include "webframe.h"
 
-#include "plugin.h"
-#include "styles.h"
-#include "utility.h"
+#include "core/styles.h"
+#include "core/utility.h"
 
 #include <cassert>
 #include <fstream>
@@ -19,14 +18,14 @@ WebFrame::
 WebFrame(QWebFrame* const frame)
     : m_frame { frame }
 {
-    qDebug() << __FUNCTION__ << this << frame;
+    qDebug() << __func__ << this << frame;
 
     assert(frame);
 
     this->connect(frame, SIGNAL(initialLayoutCompleted()),
                   this,  SLOT(insertStyle()));
-    this->connect(&Plugin::styles(), SIGNAL(changed()),
-                  this,              SLOT(insertStyle()));
+    this->connect(&Styles::instance(), SIGNAL(changed()),
+                  this,                SLOT(insertStyle()));
 
     assert(m_frame);
 }
@@ -50,7 +49,7 @@ removeStyle()
 void WebFrame::
 insertStyle()
 {
-    qDebug() << __FUNCTION__ << this;
+    qDebug() << __func__ << this;
 
     const auto &url = m_frame->url();
     if (!url.isValid()) return;
@@ -58,7 +57,7 @@ insertStyle()
     qDebug() << url;
     removeStyle();
 
-    const auto &style = Plugin::styles().query(url);
+    const auto &style = Styles::instance().query(url);
     if (style.empty()) return;
     qDebug() << "matched" << url;
 

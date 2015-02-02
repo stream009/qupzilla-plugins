@@ -36,7 +36,6 @@ setEnabled(const bool enabled)
 
 } // namespace stylist
 
-#include "plugin.h"
 #include "serialization/styles.h"
 
 #include <algorithm>
@@ -54,33 +53,22 @@ setEnabled(const bool enabled)
 
 namespace stylist {
 
-boost::filesystem::path
+using Path = boost::filesystem::path;
+
+Path Styles::m_directory;
+
+static Path
 dataPath()
 {
-    static const auto &path = Plugin::directory() / "styles.dat";
+    static const auto &path = Styles::directory() / "styles.dat";
     return path;
 }
 
-std::unique_ptr<Styles> Styles::
-create()
+Styles &Styles::
+instance()
 {
-    namespace bfs = boost::filesystem;
-
-    Styles *ptr;
-
-    if (bfs::exists(dataPath())) {
-        bfs::ifstream ifs { dataPath() };
-        assert(ifs.good()); //TODO better
-        boost::archive::text_iarchive dat { ifs };
-
-        dat >> ptr; //TODO handle exception
-    }
-    else {
-        ptr = new Styles { Plugin::directory() };
-    }
-
-    assert(ptr);
-    return std::unique_ptr<Styles>(ptr);
+    static std::unique_ptr<Styles> instance = create();
+    return *instance;
 }
 
 Styles::
@@ -119,11 +107,56 @@ query(const Url &url) const
                     "\n");
 }
 
+const Path &Styles::
+directory()
+{
+    assert(!m_directory.empty());
+    return m_directory;
+}
+
+void Styles::
+setDirectory(const Path &path)
+{
+    namespace bfs = boost::filesystem;
+    assert(bfs::exists(path));
+    m_directory = path;
+}
+
+Styles::
+Styles()
+    : m_dirWatcher { m_directory }
+{
+    init();
+}
+
+std::unique_ptr<Styles> Styles::
+create()
+{
+    namespace bfs = boost::filesystem;
+
+    Styles *ptr;
+
+    if (bfs::exists(dataPath())) {
+        bfs::ifstream ifs { dataPath() };
+        assert(ifs.good()); //TODO better
+        boost::archive::text_iarchive dat { ifs };
+
+        dat >> ptr; //TODO handle exception
+    }
+    else {
+        ptr = new Styles {};
+    }
+
+    assert(ptr);
+    return std::unique_ptr<Styles>(ptr);
+}
+
 void Styles::
 init()
 {
     namespace bfs = boost::filesystem;
 
+    assert(!m_directory.empty());
     bfs::create_directory(m_directory);
 
     scanDirectory();
