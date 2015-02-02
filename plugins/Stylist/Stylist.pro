@@ -1,47 +1,22 @@
-TARGET = $$qtLibraryTarget(Stylist)
-# OS/2 allows only 8 chars in TARGET
-os2: TARGET = Stylist
+TEMPLATE = subdirs
+QMAKE_SUBSTITUTES += .qmake.cache.in
+SUBDIRS = common \
+          core \
+          css \
+	      gui \
+	      plugin
 
-include(common.pri)
+core.depends = common css
+css.depends = common
+gui.depends = common core
+plugin.depends = common core css gui
 
-INCLUDEPATH += include
+SUBDIRS += core_test \
+           css_test
 
-SOURCES += \
-           plugin.cpp \
-	   settings.cpp \
-	   webframe.cpp \
-	   webpage.cpp
+core_test.subdir = core/test
+core_test.depends = core
+css_test.subdir = css/test
+css_test.depends = common css core
 
-HEADERS += \
-	   plugin.h \
-	   settings.h \
-	   webframe.h \
-	   webpage.h
-
-LIBS += -L./core -lcore
-POST_TARGETDEPS += core/libcore.a
-
-LIBS += -L./css -lcss
-POST_TARGETDEPS += css/libcss.a
-
-LIBS += -L./gui -lgui
-POST_TARGETDEPS += gui/libgui.a
-
-LIBS += \
-           -lboost_filesystem \
-           -lboost_iostreams \
-           -lboost_regex \
-	   -lboost_serialization \
-           -lboost_system
-
-subdirs.commands = (cd css; make) && (cd util; make) && (cd gui; make)
-QMAKE_EXTRA_TARGETS += subdirs
-
-PLUGIN_DIR = $$PWD
-srcdir = $$(QUPZILLA_SRCDIR)
-equals(srcdir, "") {
-    include(../../plugins.pri)
-}
-else {
-    include($$srcdir/src/plugins.pri)
-}
+# vim:ts=4 sw=4 sts=4 et:

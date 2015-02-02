@@ -3,7 +3,7 @@
 
 #include "documentrule.h"
 
-#include "core/utility.h"
+#include "common/utility.h"
 
 #include <vector>
 

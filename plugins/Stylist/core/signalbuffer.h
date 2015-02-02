@@ -1,7 +1,7 @@
 #ifndef STYLIST_SIGNALBUFFER_H
 #define STYLIST_SIGNALBUFFER_H
 
-#include "utility.h"
+#include "common/utility.h"
 
 #include <memory>
 

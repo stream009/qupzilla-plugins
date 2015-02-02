@@ -9,6 +9,4 @@ HEADERS = condition.h \
           documentrule.h \
           stylesheet.h
 
-INCLUDEPATH += ..
-
 # vim:ts=4 sw=4 sts=4 et:

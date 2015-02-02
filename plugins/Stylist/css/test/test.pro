@@ -2,11 +2,7 @@ include(../../common.pri)
 CONFIG += qtestlib debug 
 TEMPLATE = app
 
-INCLUDEPATH += ../..
-
 # Input
-HEADERS += ../../utility.h
-
 SOURCES += main.cpp
 
 SOURCES += conditiontest.cpp
@@ -18,11 +14,10 @@ HEADERS += documentruletest.h
 SOURCES += stylesheettest.cpp
 HEADERS += stylesheettest.h 
 
-LIBS += -L.. -lcss
-POST_TARGETDEPS += ../libcss.a
+POST_TARGETDEPS += ../libcss.a \
+                   $$project_root/common/libcommon.a
 
-LIBS += -L../../core -lcore
-POST_TARGETDEPS += ../../core/libcore.a
+LIBS += -lcss -lcommon
 
 LIBS += -lboost_filesystem \
         -lboost_iostreams \

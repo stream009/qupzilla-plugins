@@ -1,3 +1,6 @@
+#ifndef STYLE_TEST_H
+#define STYLE_TEST_H
+
 #include <string>
 
 #include <boost/filesystem.hpp>
@@ -31,3 +34,5 @@ private:
 };
 
 } // namespace stylist
+
+#endif // STYLE_TEST_H

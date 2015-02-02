@@ -1,27 +1,30 @@
-include(../../common.pri)
+include($$project_root/common.pri)
 TEMPLATE = app
 CONFIG += qtestlib debug
 
 SOURCES += main.cpp
 
 SOURCES += signalbuffertest.cpp
-HEADERS += signalbuffertest.h \
-           ../signalbuffer.h
+HEADERS += signalbuffertest.h
 
 SOURCES += directorywatchertest.cpp
-HEADERS += directorywatchertest.h \
-           ../directorywatcher.h
+HEADERS += directorywatchertest.h
 
 SOURCES += buffereddirectorywatchertest.cpp
-HEADERS += buffereddirectorywatchertest.h \
-           ../buffereddirectorywatcher.h
+HEADERS += buffereddirectorywatchertest.h
 
-INCLUDEPATH += ../..
+SOURCES += styletest.cpp
+HEADERS += styletest.h
 
-LIBS += -L.. -lcore
-POST_TARGETDEPS += ../libcore.a
+POST_TARGETDEPS += ../libcore.a \
+                   $$project_root/common/libcommon.a \
+                   $$project_root/css/libcss.a
 
+LIBS += -lcore -lcss -lcommon
 LIBS += -lboost_filesystem \
+        -lboost_iostreams \
+        -lboost_regex \
+        -lboost_serialization \
         -lboost_system
 
 # vim:ts=4 sw=4 sts=4 et:

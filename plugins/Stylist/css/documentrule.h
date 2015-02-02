@@ -3,7 +3,7 @@
 
 #include "condition.h"
 
-#include "core/utility.h"
+#include "common/utility.h"
 
 #include <iterator>
 #include <memory>

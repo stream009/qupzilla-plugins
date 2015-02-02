@@ -1,8 +1,8 @@
 #include "styletest.h"
 
-#include "utility.h"
-#include "styles.h"
-#include "serialization/styles.h"
+#include "common/utility.h"
+#include "core/styles.h"
+#include "core/styles_serialization.h"
 
 #include <fstream>
 
@@ -30,6 +30,8 @@ initTestCase()
     bfs::create_directory(m_directory);
     QVERIFY(bfs::exists(m_directory) &&
             bfs::is_directory(m_directory));
+
+    Styles::setDirectory(m_directory);
 }
 
 void StylesTest::
@@ -64,7 +66,7 @@ testConstructor() const
         << "{ body { background: yellow !important; } }";
     ofs.close();
 
-    Styles styles { m_directory };
+    Styles styles;
 
     QCOMPARE(styles.size(), 1u);
 }
@@ -81,7 +83,7 @@ createFile(const Path &path, const Contents &contents)
 void StylesTest::
 testQuery() const
 {
-    Styles styles0 { m_directory };
+    Styles styles0;
     QVERIFY(styles0.query("http://www.google.com").empty());
 
     const char contents1[] =
@@ -90,7 +92,7 @@ testQuery() const
         "{ body { background: yellow !important; } }";
     createFile(m_directory / "test1.css", contents1);
 
-    Styles styles1 { m_directory };
+    Styles styles1;
     QCOMPARE(styles1.query("http://www.google.com"),
              std::string { " body { background: yellow !important; } " });
 
@@ -100,7 +102,7 @@ testQuery() const
         "{ body { background: red !important; } }";
     createFile(m_directory / "test2.css", contents2);
 
-    Styles styles2 { m_directory };
+    Styles styles2;
     QCOMPARE(styles2.query("http://www.google.com"),
              std::string {
                 " body { background: yellow !important; } \n"
@@ -111,7 +113,7 @@ testQuery() const
 void StylesTest::
 testAddFile() const
 {
-    Styles styles { m_directory };
+    Styles styles;
     QVERIFY(styles.empty());
 
     QSignalSpy spy { &styles, SIGNAL(changed()) };
@@ -134,7 +136,7 @@ testAddFile() const
 void StylesTest::
 testDeleteFile() const
 {
-    Styles styles { m_directory };
+    Styles styles;
 
     const char contents[] =
         "@-moz-document url(http://www.google.com),"
@@ -162,7 +164,7 @@ testDeleteFile() const
 void StylesTest::
 testModifyFile() const
 {
-    Styles styles { m_directory };
+    Styles styles;
 
     const char contents[] =
         "@-moz-document url(http://www.google.com),"
@@ -195,7 +197,7 @@ testModifyFile() const
 void StylesTest::
 testRenameFile() const
 {
-    Styles styles { m_directory };
+    Styles styles;
 
     const char contents[] =
         "@-moz-document url(http://www.google.com),"
@@ -232,7 +234,7 @@ testSerialize() const
     const auto &path1 = m_directory / "test1.css";
     createFile(path1, contents1);
 
-    Styles styles { m_directory };
+    Styles styles;
     QCOMPARE(styles.size(), 1u);
 
     std::stringstream ss;

@@ -17,3 +17,13 @@ QMAKE_EXTRA_TARGETS += stable
 
 PRE_TARGETDEPS += stable.h
 QMAKE_CLEAN += stable.h
+
+INCLUDEPATH += $$project_root \
+               $$project_root/include
+DEPENDPATH += $$project_root
+
+LIBS += -L$$project_root/core \
+        -L$$project_root/css \
+        -L$$project_root/common \
+        -L$$project_root/gui \
+        -L$$project_root/plugin

@@ -2,10 +2,10 @@
 
 #include "webpage.h"
 
-#include "core/error.h"
+#include "common/utility.h"
+#include "common/error.h"
 #include "core/styles.h"
 #include "gui/settingdialog.h"
-#include "core/utility.h"
 
 #include <pluginproxy.h>
 #include <../webkit/webpage.h> //TODO hack. fix it.

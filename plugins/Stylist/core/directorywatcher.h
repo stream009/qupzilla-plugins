@@ -1,7 +1,7 @@
 #ifndef DIRECTORY_WATCHER_H
 #define DIRECTORY_WATCHER_H
 
-#include "utility.h"
+#include "common/utility.h"
 
 #include <boost/filesystem.hpp>
 

@@ -5,7 +5,7 @@
 #include "signalbuffer.h"
 #include "signalconverter.h"
 
-#include "utility.h"
+#include "common/utility.h"
 
 #include <boost/filesystem.hpp>
 

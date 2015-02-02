@@ -1,7 +1,5 @@
 #include "styles.h"
 
-#include "css/stylesheet.h"
-
 namespace stylist {
 
 Style::
@@ -36,7 +34,7 @@ setEnabled(const bool enabled)
 
 } // namespace stylist
 
-#include "serialization/styles.h"
+#include "styles_serialization.h"
 
 #include <algorithm>
 

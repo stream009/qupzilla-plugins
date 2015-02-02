@@ -1,12 +1,14 @@
 #include "webframe.h"
 
+#include "common/utility.h"
 #include "core/styles.h"
-#include "core/utility.h"
 
 #include <cassert>
 #include <fstream>
 #include <sstream>
 #include <type_traits>
+
+#include <boost/format.hpp>
 
 #include <QtCore/QDebug>
 #include <QtWebKit/QWebElement>
