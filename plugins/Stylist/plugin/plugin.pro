@@ -16,14 +16,11 @@ HEADERS += \
 	   webframe.h \
 	   webpage.h
 
-LIBS += -L../core -lcore
-POST_TARGETDEPS += ../core/libcore.a
-
-LIBS += -L../css -lcss
-POST_TARGETDEPS += ../css/libcss.a
-
-LIBS += -L../gui -lgui
-POST_TARGETDEPS += ../gui/libgui.a
+LIBS += -lgui -lcore -lcss -lcommon
+POST_TARGETDEPS += $$project_root/common/libcommon.a \
+		   $$project_root/core/libcore.a \
+		   $$project_root/css/libcss.a \
+		   $$project_root/gui/libgui.a
 
 LIBS +=  -lboost_filesystem \
          -lboost_iostreams \

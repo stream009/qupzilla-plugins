@@ -30,6 +30,13 @@ public:
     Style &operator=(Style &&) noexcept; // required by remove
 
     const std::string &name() const { return m_name; }
+    template<typename Str>
+    void setName(Str &&name)
+    {
+        m_name = std::forward<Str>(name);
+    }
+
+
     const Path &path() const { return m_path; }
 
     bool enabled() const { return m_enabled; }

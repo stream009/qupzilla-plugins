@@ -20,12 +20,13 @@ public:
 
 private Q_SLOTS:
     void openEditor();
+    void renameStyle();
     void slotSelectionChanged(const QItemSelection&, const QItemSelection &);
 
 private:
     Ui::SettingDialog m_ui;
     StylesItemModel m_model;
-    QAction m_openAction;
+    QActionGroup m_styleActions;
 };
 
 } // namespace stylist

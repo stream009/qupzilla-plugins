@@ -21,6 +21,7 @@ data(const QModelIndex &index, int role) const
 
     switch (role) {
     case Qt::DisplayRole:
+    case Qt::EditRole:
         assert(index.row() < rowCount(index));
         return m_styles.at(index.row()).name().c_str();
     case Qt::CheckStateRole:
@@ -28,6 +29,9 @@ data(const QModelIndex &index, int role) const
                                         ? Qt::Checked : Qt::Unchecked;
     case PathRole:
         return QVariant::fromValue(m_styles.at(index.row()).path());
+    default:
+        //qDebug() << __func__ << "unimplemented role:" << role;
+        break;
     }
     return QVariant {};
 }
@@ -40,11 +44,23 @@ setData(const QModelIndex &index,
     assert(value.isValid());
 
     //qDebug() << __func__ << index << value << role;
-    if (role == Qt::CheckStateRole) {
-        m_styles.at(index.row()).setEnabled(value.toInt() == Qt::Checked);
+    auto &style = m_styles.at(index.row()); //TODO throw
+    switch (role) {
+    case Qt::CheckStateRole:
+        assert(value.type() == QVariant::Int);
+        style.setEnabled(value.toInt() == Qt::Checked);
         Q_EMIT dataChanged(index, index);
         return true;
+    case Qt::EditRole:
+        assert(value.type() == QVariant::String);
+        style.setName(value.toString().toUtf8().constData());
+        Q_EMIT dataChanged(index, index);
+        return true;
+    default:
+        //qDebug() << __func__ << "unimplemented role:" << role;
+        break;
     }
+
     return false;
 }
 
@@ -58,8 +74,10 @@ rowCount(const QModelIndex &) const
 Qt::ItemFlags StylesItemModel::
 flags(const QModelIndex &) const
 {
-    return Qt::ItemIsSelectable | Qt::ItemIsUserCheckable
-                                | Qt::ItemIsEnabled;
+    return Qt::ItemIsSelectable
+         | Qt::ItemIsEditable
+         | Qt::ItemIsUserCheckable
+         | Qt::ItemIsEnabled;
 }
 
 } // namespace stylist
