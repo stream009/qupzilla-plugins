@@ -11,9 +11,11 @@
 #include <QtGui/QHeaderView>
 #include <QtGui/QItemSelection>
 #include <QtGui/QItemSelectionModel>
+#include <QtGui/QListView>
 #include <QtGui/QPushButton>
 #include <QtGui/QTreeView>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
+#include <boost/filesystem.hpp>
 #include <cassert>
 #include <limits>

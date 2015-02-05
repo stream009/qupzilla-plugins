@@ -3,10 +3,12 @@ TEMPLATE = lib
 CONFIG += staticlib
 
 SOURCES = settingdialog.cpp \
-          stylesitemmodel.cpp
+          stylesitemmodel.cpp \
+          stylesview.cpp
 
 HEADERS = settingdialog.h \
-          stylesitemmodel.h
+          stylesitemmodel.h \
+          stylesview.h
 
 FORMS = settingdialog.ui
 
