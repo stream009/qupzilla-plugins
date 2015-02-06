@@ -12,12 +12,8 @@ namespace stylist {
 
 class SettingDialog : public QDialog
 {
-    Q_OBJECT
 public:
     SettingDialog(QWidget &parent);
-
-private Q_SLOTS:
-    void addStyle();
 
 private:
     Ui::SettingDialog m_ui;

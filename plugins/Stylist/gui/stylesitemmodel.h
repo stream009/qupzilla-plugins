@@ -1,6 +1,8 @@
 #ifndef STYLIST_STYLES_ITEM_MODEL_H
 #define STYLIST_STYLES_ITEM_MODEL_H
 
+#include <boost/filesystem.hpp>
+
 #include <QtCore/QAbstractListModel>
 
 class QModelIndex;
@@ -12,6 +14,7 @@ class Styles;
 class StylesItemModel : public QAbstractListModel
 {
     Q_OBJECT
+    using Path = boost::filesystem::path;
 public:
     StylesItemModel(Styles &);
 
@@ -24,8 +27,12 @@ private:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
+Q_SIGNALS:
+    void openStyle(const Path &);
+
 private Q_SLOTS:
     void slotStylesChanged();
+    void slotOpenStyle(const QModelIndex &);
 
 public:
     static const int PathRole = Qt::UserRole;

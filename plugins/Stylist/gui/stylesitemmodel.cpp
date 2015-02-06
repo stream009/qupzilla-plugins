@@ -94,4 +94,15 @@ slotStylesChanged()
     Q_EMIT dataChanged(topLeft, bottomRight);
 }
 
+void StylesItemModel::
+slotOpenStyle(const QModelIndex &index)
+{
+    const auto data = this->data(index, StylesItemModel::PathRole);
+    assert(data.isValid());
+    assert(strcmp(data.typeName(), "boost::filesystem::path") == 0);
+
+    const auto path = data.value<boost::filesystem::path>();
+    Q_EMIT openStyle(path);
+}
+
 } // namespace stylist

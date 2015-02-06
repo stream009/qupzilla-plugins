@@ -1,6 +1,8 @@
 #include "settingdialog.h"
 
 #include "core/styles.h"
+#include "action/addstyle.h"
+#include "action/openstyle.h"
 
 #include <QtGui/QFileDialog>
 
@@ -12,26 +14,24 @@ SettingDialog(QWidget &parent)
 {
     m_ui.setupUi(this);
 
+    // this will take ownership of actions
+    auto* const addStyleAction = new action::AddStyle { nullptr };
+    this->addAction(addStyleAction);
+
+    auto* const openStyleAction = new action::OpenStyle;
+    this->addAction(openStyleAction);
+
+    // connect with button
     auto *button = m_ui.m_addStyleSheetButton;
     assert(button);
-    this->connect(button, SIGNAL(clicked(bool)),
-                  this,   SLOT(addStyle()));
-}
+    this->connect(button,         SIGNAL(clicked(bool)),
+                  addStyleAction, SIGNAL(triggered(bool)));
 
-void SettingDialog::
-addStyle()
-{
-    const auto &filename = QFileDialog::getOpenFileName(
-        this,
-        tr("Select style sheet to add"),
-        "",
-        tr("Style Sheet (*.css)")
-    );
-    if (filename.isNull()) return;
-
-    qDebug() << __func__ << filename;
-    auto &styles = Styles::instance();
-    styles.import(filename.toUtf8().constData());
+    // connect with StylesView
+    auto *stylesView = m_ui.m_stylesView;
+    assert(stylesView);
+    this->connect(stylesView, SIGNAL(openStyle(const Path&)),
+                  openStyleAction, SLOT(run(const Path&)));
 }
 
 } // namespace stylist
