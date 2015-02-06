@@ -12,7 +12,10 @@ namespace stylist {
 StylesItemModel::
 StylesItemModel(Styles &styles)
     : m_styles { styles }
-{}
+{
+    this->connect(&m_styles, SIGNAL(changed()),
+                  this,      SLOT(slotStylesChanged()));
+}
 
 QVariant StylesItemModel::
 data(const QModelIndex &index, int role) const
@@ -78,6 +81,17 @@ flags(const QModelIndex &) const
          | Qt::ItemIsEditable
          | Qt::ItemIsUserCheckable
          | Qt::ItemIsEnabled;
+}
+
+void StylesItemModel::
+slotStylesChanged()
+{
+    const auto &topLeft = this->index(0, 0);
+    const auto &bottomRight =
+        this->index(this->rowCount() - 1);
+
+    //qDebug() << __func__ << topLeft << bottomRight;
+    Q_EMIT dataChanged(topLeft, bottomRight);
 }
 
 } // namespace stylist

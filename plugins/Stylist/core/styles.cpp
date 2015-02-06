@@ -208,8 +208,11 @@ scanDirectory()
 void Styles::
 addFile(const Path &path)
 {
+    if (path.extension() != ".css") return;
+
     const auto &name = path.filename();
     m_styles.emplace_back(name.c_str(), path, true, *this);
+
     Q_EMIT changed();
 }
 
@@ -228,6 +231,22 @@ void Styles::
 slotFileModified(const Path &)
 {
     Q_EMIT changed();
+}
+
+void Styles::
+import(const Path &path)
+{
+    namespace bfs = boost::filesystem;
+
+    assert(bfs::exists(path)); //TODO better
+    assert(bfs::is_regular_file(path)); //TODO better
+
+    const auto &destination = m_directory / path.filename();
+    //TODO check if destination already exists
+
+    bfs::copy_file(path, destination); //TODO exception
+
+    // Directory watcher will take care rest of the process.
 }
 
 } // namespace stylist

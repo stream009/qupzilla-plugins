@@ -84,7 +84,7 @@ class Styles : public QObject
     Q_OBJECT
 private:
     using Path = boost::filesystem::path;
-    using Container = std::vector<Style>;
+    using Container = std::vector<Style>; //TODO set would be more appropriate
     using ConstIterator = Container::const_iterator;
 
 public:
@@ -96,6 +96,8 @@ public:
     bool empty() const { return m_styles.empty(); }
     Container::size_type size() const { return m_styles.size(); }
     Container::reference at(size_t pos) { return m_styles.at(pos); }
+
+    void import(const Path &path);
 
     static const Path &directory();
     static void setDirectory(const Path &);

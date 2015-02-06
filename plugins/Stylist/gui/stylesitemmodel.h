@@ -11,6 +11,7 @@ class Styles;
 
 class StylesItemModel : public QAbstractListModel
 {
+    Q_OBJECT
 public:
     StylesItemModel(Styles &);
 
@@ -22,6 +23,9 @@ private:
                  const QVariant &value, int role = Qt::EditRole) override;
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
+
+private Q_SLOTS:
+    void slotStylesChanged();
 
 public:
     static const int PathRole = Qt::UserRole;

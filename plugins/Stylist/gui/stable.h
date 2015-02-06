@@ -2,11 +2,13 @@
 #include <QtCore/QModelIndex>
 #include <QtCore/QVariant>
 #include <QtGui/QAction>
+#include <QtGui/QActionGroup>
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QDialog>
 #include <QtGui/QDialogButtonBox>
+#include <QtGui/QFileDialog>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QHeaderView>
 #include <QtGui/QItemSelection>
@@ -15,7 +17,6 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QTreeView>
 #include <QtGui/QVBoxLayout>
-#include <QtGui/QWidget>
 #include <boost/filesystem.hpp>
 #include <cassert>
 #include <limits>

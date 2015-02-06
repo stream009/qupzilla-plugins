@@ -119,11 +119,11 @@ testAddFile() const
     QSignalSpy spy { &styles, SIGNAL(changed()) };
     QVERIFY(spy.isEmpty());
 
-    const char contents[] =
+    const char contents1[] =
         "@-moz-document url(http://www.google.com),"
         "               domain(google.co.jp)"
         "{ body { background: yellow !important; } }";
-    createFile(m_directory / "test.css", contents);
+    createFile(m_directory / "test.css", contents1);
 
     QTest::qWait(400);
     QCOMPARE(spy.size(), 1);
@@ -131,6 +131,19 @@ testAddFile() const
     QVERIFY(args.isEmpty());
 
     QCOMPARE(styles.size(), 1u);
+
+    // irrelevant file extension
+    const char contents2[] =
+        "@-moz-document url(http://www.google.com),"
+        "               domain(google.co.jp)"
+        "{ body { background: blue !important; } }";
+    createFile(m_directory / "test.txt", contents2);
+
+    QTest::qWait(400);
+    QVERIFY(spy.isEmpty());
+
+    QCOMPARE(styles.size(), 1u); // there should be no change
+
 }
 
 void StylesTest::
@@ -258,6 +271,45 @@ testSerialize() const
     QCOMPARE(first.name(), styles.at(0).name());
     QCOMPARE(first.path(), styles.at(0).path());
     QCOMPARE(first.enabled(), styles.at(0).enabled());
+
+    // If file doesn't exist when deserializing
+    ss.seekg(0);
+    boost::archive::text_iarchive iar2 { ss };
+    ptr = nullptr;
+
+    bfs::remove(path1);
+
+    iar2 >> ptr;
+    QVERIFY(ptr != &styles);
+
+    QCOMPARE(ptr->size(), 0u);
+    QCOMPARE(ptr->m_directory, m_directory);
+}
+
+void StylesTest::
+testImport() const
+{
+    namespace bfs = boost::filesystem;
+
+    Styles styles;
+    QCOMPARE(styles.size(), 0u);
+
+    const char contents1[] =
+        "@-moz-document url(http://www.google.com),"
+        "               domain(google.co.jp)"
+        "{ body { background: yellow !important; } }";
+    const auto &path1 = "test1.css";
+    createFile(path1, contents1);
+
+    QTest::qWait(400);
+    QVERIFY(styles.empty());
+
+    styles.import(path1);
+
+    QTest::qWait(400);
+    QCOMPARE(styles.size(), 1u);
+
+    bfs::remove(path1);
 }
 
 } // namespace stylist

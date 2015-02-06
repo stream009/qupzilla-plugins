@@ -60,7 +60,17 @@ save_construct_data(Archive &ar, const stylist::Styles *styles,
                                  const unsigned int /*version*/)
 {
     //qDebug() << "Styles" << __func__;
-    ar << styles->m_styles;
+    const auto &container = styles->m_styles;
+
+    // ar << container.size();  //TODO why the f--- does this fail?
+    const auto count = container.size();
+    ar << count;
+
+    for (const auto &item: container) {
+        //ar << &item; //TODO ditto
+        const stylist::Styles::Container::value_type *ptr = &item;
+        ar << ptr;
+    }
 }
 
 template<typename Archive>
@@ -71,7 +81,18 @@ load_construct_data(Archive &ar, stylist::Styles *styles,
     //qDebug() << "Styles" << __func__;
     using stylist::Styles;
 
-    Styles::Container container; ar >> container;
+    Styles::Container container; //ar >> container;
+    size_t count; ar >> count;
+    for (auto i = 0u; i < count; ++i) {
+        Styles::Container::value_type *style;
+        try {
+            ar >> style;
+        }
+        catch (const std::exception &) { //TODO more specific exception
+            continue;
+        }
+        container.push_back(std::move(*style));
+    }
 
     ::new(styles) Styles { std::move(container) };
 }

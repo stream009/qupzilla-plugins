@@ -16,6 +16,9 @@ class SettingDialog : public QDialog
 public:
     SettingDialog(QWidget &parent);
 
+private Q_SLOTS:
+    void addStyle();
+
 private:
     Ui::SettingDialog m_ui;
 };

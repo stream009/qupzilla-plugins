@@ -28,6 +28,7 @@ private Q_SLOTS:
     void testRenameFile() const;
 
     void testSerialize() const;
+    void testImport() const;
 
 private:
     const boost::filesystem::path m_directory { "styles" };
