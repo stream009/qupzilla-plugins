@@ -1,4 +1,5 @@
---- /usr/include/boost/serialization/collections_load_imp.hpp	2014-12-25 19:07:00.721003101 +0900
+diff --recursive --unified --ignore-space /usr/include/boost/serialization/collections_load_imp.hpp boost/serialization/collections_load_imp.hpp
+--- /usr/include/boost/serialization/collections_load_imp.hpp	2015-02-04 18:33:35.774705946 +0900
 +++ boost/serialization/collections_load_imp.hpp	2015-02-01 21:39:15.509435975 +0900
 @@ -39,6 +39,8 @@
  #include <boost/serialization/collection_size_type.hpp>

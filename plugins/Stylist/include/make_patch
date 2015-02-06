@@ -1,0 +1,2 @@
+#!/bin/bash
+diff --recursive --unified --ignore-space /usr/include/boost boost | grep -v '^Only'
