@@ -1,0 +1,26 @@
+Yet another theme for QupZilla: Fergris
+
+   About: Full theme for QupZilla with own Qt style.
+Homepage: https://github.com/QupZilla/qupzilla-plugins/tree/master/themes/fergris
+Location: https://github.com/QupZilla/qupzilla-plugins/tree/master/themes/fergris
+  Author: Okvardz Votim
+
+Icons and images have been taken from the following themes:
+
+Faenza Icon Theme
+Homepage: http://tiheum.deviantart.com/art/Faenza-Icons-173323228
+Location: http://code.google.com/p/faenza-icon-theme
+ License: GPL3
+  Author: tiheum
+
+Mac like theme
+Homepage: http://www.qupzilla.com
+Location: https://github.com/QupZilla/qupzilla/tree/master/bin/themes/mac
+ License: Mozilla Public License Version 1.1
+  Author: David Rosca
+
+Audacity
+Homepage: http://audacity.sourceforge.net/
+Location: http://code.google.com/p/audacity/source/browse/audacity-src/trunk#trunk%2Fimages
+ License: GPL2
+  Author: See http://code.google.com/p/audacity/people/list
