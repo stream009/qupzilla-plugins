@@ -70,7 +70,10 @@ insertStyle()
     const auto &html = oss.str();
 
     auto &&head = m_frame->findFirstElement("head");
-    assert(!head.isNull());
+    if (head.isNull()) {
+        // It happens when the document is not html.
+        return;
+    }
 
     head.appendInside(html.c_str());
 }
