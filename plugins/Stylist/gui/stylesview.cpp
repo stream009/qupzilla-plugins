@@ -1,7 +1,16 @@
 #include "stylesview.h"
 
+#include "action/addstyle.h"
+#include "action/openstyle.h"
+#include "action/removestyle.h"
+#include "action/renamestyle.h"
+#include "settingactions.h"
+#include "stylesitemmodel.h"
+
 #include "common/utility.h"
 #include "core/styles.h"
+
+#include <boost/make_unique.hpp>
 
 #include <QtGui/QAction>
 #include <QtGui/QItemSelection>
@@ -11,32 +20,91 @@ namespace stylist {
 
 StylesView::
 StylesView(QWidget* const parent /*= 0*/)
-    : QListView { parent },
-      m_model { Styles::instance() },
-      m_styleActions { nullptr }
+    : QListView { parent }
 {
-    this->setModel(&m_model);
     this->setContextMenuPolicy(Qt::ActionsContextMenu);
+}
 
-    createActions();
+StylesView::~StylesView() = default;
 
-    connectWithModel();
-    connectWithSelectionModel();
+void StylesView::
+setActions(const SettingActions &actions)
+{
+    m_actions = &actions;
+    if (m_model) {
+        m_model->setActions(actions);
+    }
 
-    slotSelectionChanged(QItemSelection {}, QItemSelection {});
+    auto &addAction = m_actions->addStyle();
+    auto &openAction = m_actions->openStyle();
+    auto &removeAction = m_actions->removeStyle();
+    auto &renameAction = m_actions->renameStyle();
+
+    this->addAction(&addAction);
+    this->addAction(&openAction);
+    this->addAction(&removeAction);
+    this->addAction(&renameAction);
+
+    this->connect(&openAction, SIGNAL(triggered()),
+                  this,        SLOT(openCurrentStyle()));
+    this->connect(&removeAction, SIGNAL(triggered()),
+                  this,          SLOT(removeCurrentStyle()));
+    this->connect(&renameAction, SIGNAL(triggered()),
+                  this,          SLOT(renameCurrentStyle()));
+    this->connect(this,      SIGNAL(styleSelected(bool)),
+                  m_actions, SLOT(onStyleSelected(bool)));
+
+    assert(m_actions);
 }
 
 void StylesView::
-slotOpenStyle()
+setStyles(Styles &styles)
+{
+    m_model = boost::make_unique<StylesItemModel>(styles);
+    this->setModel(m_model.get());
+    if (m_actions) {
+        m_model->setActions(*m_actions);
+    }
+
+    connectWithSelectionModel();
+    // To setup actions' initial state
+    onSelectionChanged(QItemSelection {}, QItemSelection {});
+}
+
+void StylesView::
+openCurrentStyle()
 {
     //qDebug() << __func__;
+    assert(m_actions);
+
     const auto current = this->currentIndex();
     assert(current.isValid());
-    Q_EMIT openStyle(current);
+
+    auto* const model = dynamic_cast<StylesItemModel*>(this->model());
+    assert(model);
+    const auto &path = model->path(current);
+
+    m_actions->openStyle().run(path);
 }
 
 void StylesView::
-renameStyle()
+removeCurrentStyle()
+{
+    //qDebug() << __func__;
+    assert(m_actions);
+
+    const auto current = this->currentIndex();
+    assert(current.isValid());
+
+    auto* const model = dynamic_cast<StylesItemModel*>(this->model());
+    assert(model);
+    const auto &path = model->path(current);
+
+    m_actions->removeStyle().run(path);
+}
+
+void StylesView::
+renameCurrentStyle()
 {
     //qDebug() << __func__;
     const auto current = this->currentIndex();
@@ -46,54 +114,25 @@ renameStyle()
 }
 
 void StylesView::
-slotSelectionChanged(const QItemSelection&, const QItemSelection&)
+onSelectionChanged(const QItemSelection&, const QItemSelection&)
 {
     //qDebug() << __func__;
     auto* const selectionModel = this->selectionModel();
     assert(selectionModel);
 
-    if (selectionModel->hasSelection()) {
-        m_styleActions.setEnabled(true);
-    }
-    else {
-        m_styleActions.setEnabled(false);
-    }
+    Q_EMIT styleSelected(selectionModel->hasSelection());
 }
 
 void StylesView::
-createActions()
-{
-    // m_styleActions will take ownership of actions
-    auto* const openAction = new QAction { tr("&Open"), &m_styleActions };
-    this->addAction(openAction);
-    this->connect(openAction, SIGNAL(triggered()),
-                  this,       SLOT(slotOpenSlot()));
-
-    auto* const renameAction = new QAction { tr("&Rename"), &m_styleActions };
-    this->addAction(renameAction);
-    this->connect(renameAction, SIGNAL(triggered()),
-                  this,         SLOT(renameStyle()));
-}
-
-void StylesView::
-connectWithModel()
+connectWithSelectionModel()
 {
     auto* const selection = this->selectionModel();
     assert(selection);
     this->connect(selection, SIGNAL(
             selectionChanged(const QItemSelection&, const QItemSelection&)),
                   this,      SLOT(
-            slotSelectionChanged(const QItemSelection&, const QItemSelection&))
+            onSelectionChanged(const QItemSelection&, const QItemSelection&))
     );
-}
-
-void StylesView::
-connectWithSelectionModel()
-{
-    this->connect(this,          SIGNAL(openStyle(const QModelIndex&)),
-                  this->model(), SLOT(slotOpenStyle(const QModelIndex&)));
-    this->connect(this->model(), SIGNAL(openStyle(const Path&)),
-                  this,          SIGNAL(openStyle(const Path&)));
 }
 
 } // namespace stylist

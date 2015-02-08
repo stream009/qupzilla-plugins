@@ -2,19 +2,27 @@ include(../common.pri)
 TEMPLATE = lib
 CONFIG += staticlib
 
-SOURCES = settingdialog.cpp \
+SOURCES = settingactions.cpp \
+          settingdialog.cpp \
           stylesitemmodel.cpp \
           stylesview.cpp
 
-SOURCES += action/addstyle.cpp \
-           action/openstyle.cpp
-
-HEADERS = settingdialog.h \
+HEADERS = settingactions.h \
+          settingdialog.h \
           stylesitemmodel.h \
           stylesview.h
 
+SOURCES += action/addstyle.cpp \
+           action/enablestyle.cpp \
+           action/openstyle.cpp \
+           action/removestyle.cpp \
+           action/renamestyle.cpp
+
 HEADERS += action/addstyle.h \
-           action/openstyle.h
+           action/enablestyle.h \
+           action/openstyle.h \
+           action/removestyle.h \
+           action/renamestyle.h
 
 FORMS = settingdialog.ui
 

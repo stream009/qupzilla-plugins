@@ -20,7 +20,6 @@ class WebPage;
 namespace stylist {
 
 class Page;
-class Styles;
 
 class Plugin : public QObject, public PluginInterface
 {

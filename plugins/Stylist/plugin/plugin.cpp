@@ -169,7 +169,7 @@ showSettings(QWidget* const parent) // noexcept
             throw RuntimeError("invalid window");
         }
 
-        SettingDialog dialog(*parent);
+        SettingDialog dialog(Styles::instance(), *parent);
         dialog.exec();
     }
     catch (const std::exception &e) {

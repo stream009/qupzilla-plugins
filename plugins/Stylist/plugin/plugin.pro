@@ -28,8 +28,7 @@ LIBS +=  -lboost_filesystem \
 	 -lboost_serialization \
          -lboost_system
 
-subdirs.commands = (cd css; make) && (cd util; make) && (cd gui; make)
-QMAKE_EXTRA_TARGETS += subdirs
+QMAKE_LFLAGS += -Wl,--no-undefined
 
 PLUGIN_DIR = $$PWD
 include($$(QUPZILLA_SRCDIR)/src/plugins.pri)

@@ -9,14 +9,11 @@ namespace stylist { namespace action {
 
 class OpenStyle : public QAction
 {
-    Q_OBJECT
     using Path = boost::filesystem::path;
-
 public:
     OpenStyle(QObject* const parent = nullptr);
 
-public Q_SLOTS:
-    void run(const Path &);
+    void run(const Path &) const;
 };
 
 }} // namespace stylist::action

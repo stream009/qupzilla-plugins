@@ -10,8 +10,9 @@
 namespace stylist { namespace action {
 
 AddStyle::
-AddStyle(QObject* const parent/* = nullptr */)
-    : QAction { parent }
+AddStyle(Styles &styles, QObject* const parent/* = nullptr */)
+    : QAction { tr("&Add"), parent },
+      m_styles { styles }
 {
     this->connect(this, SIGNAL(triggered()),
                   this, SLOT(run()));
@@ -32,8 +33,7 @@ run() const
     if (filename.isNull()) return;
 
     //qDebug() << __func__ << filename;
-    auto &styles = Styles::instance();
-    styles.import(filename.toUtf8().constData());
+    m_styles.import(filename.toUtf8().constData());
 }
 
 }} // namespace stylist::action

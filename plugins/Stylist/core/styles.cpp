@@ -105,6 +105,51 @@ query(const Url &url) const
                     "\n");
 }
 
+Styles::Container::reference Styles::
+at(const Path &path)
+{
+    const auto it = std::find_if(m_styles.begin(), m_styles.end(),
+        [&path] (const Style &style) {
+            return style.path() == path;
+        }
+    );
+    if (it == m_styles.end()) {
+        throw "something"; //TODO better std::out_of_range?
+    }
+    return *it;
+}
+
+void Styles::
+import(const Path &path)
+{
+    namespace bfs = boost::filesystem;
+
+    assert(bfs::exists(path)); //TODO better
+    assert(bfs::is_regular_file(path)); //TODO better
+
+    const auto &destination = m_directory / path.filename();
+    //TODO check if destination already exists
+
+    bfs::copy_file(path, destination); //TODO exception
+
+    // Directory watcher will take care rest of the process.
+}
+
+void Styles::
+remove(const Path &path)
+{
+    namespace bfs = boost::filesystem;
+
+    //qDebug() << __func__ << path;
+    if (!bfs::exists(path)) {
+        //TODO something
+        return;
+    }
+    bfs::remove(path);
+
+    // Directory watcher will take care rest of the process.
+}
+
 const Path &Styles::
 directory()
 {
@@ -231,22 +276,6 @@ void Styles::
 slotFileModified(const Path &)
 {
     Q_EMIT changed();
-}
-
-void Styles::
-import(const Path &path)
-{
-    namespace bfs = boost::filesystem;
-
-    assert(bfs::exists(path)); //TODO better
-    assert(bfs::is_regular_file(path)); //TODO better
-
-    const auto &destination = m_directory / path.filename();
-    //TODO check if destination already exists
-
-    bfs::copy_file(path, destination); //TODO exception
-
-    // Directory watcher will take care rest of the process.
 }
 
 } // namespace stylist

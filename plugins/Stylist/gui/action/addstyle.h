@@ -5,16 +5,23 @@
 
 class QObject;
 
-namespace stylist { namespace action {
+namespace stylist {
+
+class Styles;
+
+namespace action {
 
 class AddStyle : public QAction
 {
     Q_OBJECT
 public:
-    AddStyle(QObject* const parent = nullptr);
+    AddStyle(Styles &, QObject* const parent = nullptr);
 
-private Q_SLOTS:
+public Q_SLOTS:
     void run() const;
+
+private:
+    Styles &m_styles;
 };
 
 }} // namespace stylist::action

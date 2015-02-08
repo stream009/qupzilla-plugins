@@ -1,37 +1,36 @@
 #include "settingdialog.h"
 
-#include "core/styles.h"
+#include "ui_settingdialog.h"
+#include "settingactions.h"
 #include "action/addstyle.h"
 #include "action/openstyle.h"
+#include "action/renamestyle.h"
+#include "action/removestyle.h"
+
+#include "core/styles.h"
 
 #include <QtGui/QFileDialog>
 
 namespace stylist {
 
 SettingDialog::
-SettingDialog(QWidget &parent)
-    : QDialog { &parent }
+SettingDialog(Styles &styles, QWidget &parent)
+    : QDialog { &parent },
+      m_ui { new Ui::SettingDialog },
+      m_actions { new SettingActions { styles } }
 {
-    m_ui.setupUi(this);
-
-    // this will take ownership of actions
-    auto* const addStyleAction = new action::AddStyle { nullptr };
-    this->addAction(addStyleAction);
-
-    auto* const openStyleAction = new action::OpenStyle;
-    this->addAction(openStyleAction);
+    m_ui->setupUi(this);
+    m_ui->m_stylesView->setActions(*m_actions);
+    m_ui->m_stylesView->setStyles(styles);
 
     // connect with button
-    auto *button = m_ui.m_addStyleSheetButton;
+    auto *button = m_ui->m_addStyleSheetButton;
     assert(button);
-    this->connect(button,         SIGNAL(clicked(bool)),
-                  addStyleAction, SIGNAL(triggered(bool)));
-
-    // connect with StylesView
-    auto *stylesView = m_ui.m_stylesView;
-    assert(stylesView);
-    this->connect(stylesView, SIGNAL(openStyle(const Path&)),
-                  openStyleAction, SLOT(run(const Path&)));
+    auto &addStyleAction = m_actions->addStyle();
+    this->connect(button,          SIGNAL(clicked(bool)),
+                  &addStyleAction, SIGNAL(triggered(bool)));
 }
+
+SettingDialog::~SettingDialog() = default;
 
 } // namespace stylist

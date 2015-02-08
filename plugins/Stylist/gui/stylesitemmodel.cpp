@@ -1,13 +1,21 @@
 #include "stylesitemmodel.h"
 
+#include "action/enablestyle.h"
+#include "action/renamestyle.h"
+#include "settingactions.h"
+
 #include "core/styles.h"
 
 #include <cassert>
 #include <limits>
 
 #include <QtCore/QModelIndex>
+#include <QtCore/QUrl>
+#include <QtGui/QDesktopServices>
 
 namespace stylist {
+
+using Path = boost::filesystem::path;
 
 StylesItemModel::
 StylesItemModel(Styles &styles)
@@ -15,6 +23,19 @@ StylesItemModel(Styles &styles)
 {
     this->connect(&m_styles, SIGNAL(changed()),
                   this,      SLOT(slotStylesChanged()));
+}
+
+const Path &StylesItemModel::
+path(const QModelIndex &index) const
+{
+    const auto &style = m_styles.at(index.row());
+    return style.path();
+}
+
+void StylesItemModel::
+setActions(const SettingActions &actions)
+{
+    m_actions = &actions;
 }
 
 QVariant StylesItemModel::
@@ -51,12 +72,14 @@ setData(const QModelIndex &index,
     switch (role) {
     case Qt::CheckStateRole:
         assert(value.type() == QVariant::Int);
-        style.setEnabled(value.toInt() == Qt::Checked);
+        m_actions->enableStyle().run(
+                    style.path(), value.toInt() == Qt::Checked);
         Q_EMIT dataChanged(index, index);
         return true;
     case Qt::EditRole:
         assert(value.type() == QVariant::String);
-        style.setName(value.toString().toUtf8().constData());
+        m_actions->renameStyle().run(
+                style.path(), value.toString().toUtf8().constData());
         Q_EMIT dataChanged(index, index);
         return true;
     default:
@@ -92,17 +115,6 @@ slotStylesChanged()
 
     //qDebug() << __func__ << topLeft << bottomRight;
     Q_EMIT dataChanged(topLeft, bottomRight);
-}
-
-void StylesItemModel::
-slotOpenStyle(const QModelIndex &index)
-{
-    const auto data = this->data(index, StylesItemModel::PathRole);
-    assert(data.isValid());
-    assert(strcmp(data.typeName(), "boost::filesystem::path") == 0);
-
-    const auto path = data.value<boost::filesystem::path>();
-    Q_EMIT openStyle(path);
 }
 
 } // namespace stylist

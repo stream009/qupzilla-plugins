@@ -96,8 +96,10 @@ public:
     bool empty() const { return m_styles.empty(); }
     Container::size_type size() const { return m_styles.size(); }
     Container::reference at(size_t pos) { return m_styles.at(pos); }
+    Container::reference at(const Path &path);
 
     void import(const Path &path);
+    void remove(const Path &path);
 
     static const Path &directory();
     static void setDirectory(const Path &);

@@ -9,6 +9,7 @@ class QModelIndex;
 
 namespace stylist {
 
+class SettingActions;
 class Styles;
 
 class StylesItemModel : public QAbstractListModel
@@ -17,6 +18,10 @@ class StylesItemModel : public QAbstractListModel
     using Path = boost::filesystem::path;
 public:
     StylesItemModel(Styles &);
+
+    void setActions(const SettingActions &);
+
+    const Path &path(const QModelIndex&) const;
 
 private:
     // @override QAbstractItemModel
@@ -27,18 +32,15 @@ private:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-Q_SIGNALS:
-    void openStyle(const Path &);
-
 private Q_SLOTS:
     void slotStylesChanged();
-    void slotOpenStyle(const QModelIndex &);
 
 public:
     static const int PathRole = Qt::UserRole;
 
 private:
     Styles &m_styles;
+    const SettingActions *m_actions;
 };
 
 } // namespace stylist
