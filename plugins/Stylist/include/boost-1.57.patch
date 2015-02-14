@@ -1,0 +1,21 @@
+diff --recursive --unified --ignore-space /usr/include/boost/serialization/collections_load_imp.hpp boost/serialization/collections_load_imp.hpp
+--- /usr/include/boost/serialization/collections_load_imp.hpp	2015-02-04 18:33:35.774705946 +0900
++++ boost/serialization/collections_load_imp.hpp	2015-02-01 21:39:15.509435975 +0900
+@@ -39,6 +39,8 @@
+ #include <boost/serialization/collection_size_type.hpp>
+ #include <boost/serialization/item_version_type.hpp>
+ 
++#include <boost/move/utility.hpp>
++
+ namespace boost{
+ namespace serialization {
+ namespace stl {
+@@ -62,7 +64,7 @@
+         detail::stack_construct<Archive, type> t(ar, v);
+         // borland fails silently w/o full namespace
+         ar >> boost::serialization::make_nvp("item", t.reference());
+-        s.push_back(t.reference());
++        s.push_back(boost::move(t.reference()));
+         ar.reset_object_address(& s.back() , & t.reference());
+         return hint;
+     }
