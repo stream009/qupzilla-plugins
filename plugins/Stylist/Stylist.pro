@@ -3,8 +3,8 @@ QMAKE_SUBSTITUTES += .qmake.cache.in
 SUBDIRS = common \
           core \
           css \
-	      gui \
-	      plugin
+          gui \
+          plugin
 
 core.depends = common css
 css.depends = common
