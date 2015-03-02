@@ -1,5 +1,7 @@
 #include "plugin.h"
 
+#include "windowadaptor.h"
+
 #include "common/utility.h"
 #include "common/error.h"
 
@@ -7,6 +9,8 @@
 #include <webpage.h>
 
 #include <cassert>
+
+#include <boost/make_unique.hpp>
 
 #include <QtCore/QTranslator>
 #include <QtGui/QWidget>
@@ -94,18 +98,14 @@ init(InitState state, const QString &settingsPath) // noexcept
         }
         this->connect(
             mApp->plugins(), SIGNAL(mainWindowCreated(BrowserWindow*)),
-            this,            SLOT(slotMainWindowCreated(BrowserWindow*)));
+            this,            SLOT(onMainWindowCreated(BrowserWindow*)));
         this->connect(
             mApp->plugins(), SIGNAL(mainWindowDeleted(BrowserWindow*)),
-            this,            SLOT(slotMainWindowDeleted(BrowserWindow*)));
-
-        this->connect(
-            mApp->plugins(), SIGNAL(webPageCreated(WebPage*)),
-            this,            SLOT(slotWebPageCreated(WebPage*)));
+            this,            SLOT(onMainWindowDeleted(BrowserWindow*)));
 
         if (state == LateInitState) {
             for (BrowserWindow* const window: mApp->windows()) {
-                slotMainWindowCreated(window);
+                onMainWindowCreated(window);
             }
         }
     }
@@ -167,7 +167,7 @@ showSettings(QWidget* const parent) // noexcept
 }
 
 void Plugin::
-slotMainWindowCreated(BrowserWindow* const window) noexcept
+onMainWindowCreated(BrowserWindow* const window) noexcept
 {
     //qDebug() << __func__ << window;
     assert(window);
@@ -175,6 +175,8 @@ slotMainWindowCreated(BrowserWindow* const window) noexcept
         if (!window) {
             throw RuntimeError("invalid window");
         }
+        m_windows.emplace(
+            window, boost::make_unique<WindowAdaptor>(*window));
     }
     catch (const std::exception &e) {
         DEFAULT_EXCEPTION_HANDLER(e);
@@ -182,7 +184,7 @@ slotMainWindowCreated(BrowserWindow* const window) noexcept
 }
 
 void Plugin::
-slotMainWindowDeleted(BrowserWindow* const window) noexcept
+onMainWindowDeleted(BrowserWindow* const window) noexcept
 {
     //qDebug() << __func__;
     assert(window);
@@ -190,34 +192,11 @@ slotMainWindowDeleted(BrowserWindow* const window) noexcept
         if (!window) {
             throw RuntimeError("invalid window");
         }
+        m_windows.erase(window);
     }
     catch (const std::exception &e) {
         DEFAULT_EXCEPTION_HANDLER(e);
     }
-}
-
-void Plugin::
-slotWebPageCreated(WebPage* const webPage) noexcept
-{
-    qDebug() << __func__;
-    assert(webPage);
-    try {
-        if (!webPage) {
-            throw RuntimeError("Receive invalid Web page.");
-        }
-        this->connect(webPage, SIGNAL(destroyed()),
-                      this,    SLOT(slotWebPageDestroyed()));
-    }
-    catch (const std::exception &e) {
-        DEFAULT_EXCEPTION_HANDLER(e);
-    }
-}
-
-void Plugin::
-slotWebPageDestroyed()
-{
-    auto* const webPage = this->sender();
-    qDebug() << __func__ << webPage;
 }
 
 #if QT_VERSION < 0x050000

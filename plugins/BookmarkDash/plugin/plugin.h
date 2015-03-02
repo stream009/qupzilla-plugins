@@ -6,6 +6,7 @@
 #include <plugininterface.h>
 
 #include <memory>
+#include <unordered_map>
 
 #include <boost/filesystem.hpp>
 
@@ -18,7 +19,7 @@ class WebPage;
 
 namespace bookmark_dash {
 
-class Page;
+class WindowAdaptor;
 
 class Plugin : public QObject, public PluginInterface
 {
@@ -31,7 +32,8 @@ class Plugin : public QObject, public PluginInterface
     Q_PLUGIN_METADATA(IID "QupZilla.Browser.plugin.BookmarkDash")
 #endif
     using Path = boost::filesystem::path;
-
+    using WindowMap = std::unordered_map<
+                    BrowserWindow*, std::unique_ptr<WindowAdaptor>>;
 public:
     Plugin() noexcept;
     virtual ~Plugin() noexcept;
@@ -49,14 +51,14 @@ private:
     void showSettings(QWidget* parent = 0) override;
 
 private Q_SLOTS:
-    void slotMainWindowCreated(BrowserWindow*) noexcept;
-    void slotMainWindowDeleted(BrowserWindow*) noexcept;
-    void slotWebPageCreated(WebPage*) noexcept;
-    void slotWebPageDestroyed();
+    void onMainWindowCreated(BrowserWindow*) noexcept;
+    void onMainWindowDeleted(BrowserWindow*) noexcept;
 
 private:
     static std::unique_ptr<Settings> m_settings;
     static Path m_pluginPath;
+
+    WindowMap m_windows;
 };
 
 } // namespace bookmark_dash

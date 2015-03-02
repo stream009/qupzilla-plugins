@@ -22,6 +22,7 @@ INCLUDEPATH += $$project_root
 DEPENDPATH += $$project_root
 
 LIBS += -L$$project_root/plugin \
-        -L$$project_root/common
+        -L$$project_root/common \
+        -L$$project_root/bookmark
 
 # vim:ts=4 sw=4 sts=4 et:
