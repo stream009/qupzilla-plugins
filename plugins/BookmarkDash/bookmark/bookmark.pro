@@ -2,7 +2,11 @@ include($$project_root/common.pri)
 TEMPLATE = lib
 CONFIG += debug staticlib
 
-SOURCES += menudash.cpp
+SOURCES += menu.cpp bar.cpp context_menu.cpp bookmark_dialog.cpp \
+           folder_dialog.cpp 
+HEADERS += menu.h bar.cpp context_menu.h bookmark_dialog.h \
+           folder_dialog.h view.h
+FORMS += bookmark_dialog.ui folder_dialog.ui
 
 LIBS += -lcommon
 POST_TARGETDEPS += $$project_root/common/libcommon.a
