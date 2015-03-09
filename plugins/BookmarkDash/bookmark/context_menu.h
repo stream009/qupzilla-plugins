@@ -62,6 +62,7 @@ private:
     MenuContext &m_context;
     QActionGroup m_urlActions;
     QActionGroup m_folderActions;
+    QAction m_deleteAction { nullptr };
     QAction m_propertyAction { nullptr };
 };
 

@@ -78,11 +78,11 @@ ContextMenu(MenuContext &context, QWidget* const parent)
 
     this->addSeparator();
 #endif
-    action = new QAction { tr("&Delete"), this };
-    action->setIcon(QIcon::fromTheme("edit-delete"));
-    this->connect(action, SIGNAL(triggered()),
-                  this,     SLOT(onDelete()));
-    this->addAction(action);
+    m_deleteAction.setText(tr("&Delete"));
+    m_deleteAction.setIcon(QIcon::fromTheme("edit-delete"));
+    this->connect(&m_deleteAction, SIGNAL(triggered()),
+                  this,              SLOT(onDelete()));
+    this->addAction(&m_deleteAction);
 
     this->addSeparator();
 
@@ -102,6 +102,7 @@ onAboutToShow()
     if (!item) {
         m_urlActions.setVisible(false);
         m_folderActions.setVisible(false);
+        m_deleteAction.setVisible(false);
         m_propertyAction.setVisible(false);
     }
     else {
@@ -109,16 +110,19 @@ onAboutToShow()
         case BookmarkItem::Url:
             m_urlActions.setVisible(true);
             m_folderActions.setVisible(false);
+            m_deleteAction.setVisible(true);
             m_propertyAction.setVisible(true);
             break;
         case BookmarkItem::Folder:
             m_urlActions.setVisible(false);
             m_folderActions.setVisible(true);
+            m_deleteAction.setVisible(true);
             m_propertyAction.setVisible(true);
             break;
         default:
             m_urlActions.setVisible(false);
             m_folderActions.setVisible(false);
+            m_deleteAction.setVisible(true);
             m_propertyAction.setVisible(false);
             break;
         }
