@@ -3,6 +3,7 @@
 
 #include "view.h"
 
+#include "mixin/menu/tool_tip.hpp"
 #include "mixin/menu_view.hpp"
 #include "mixin/menu_view/drag.hpp"
 #include "mixin/menu_view/drop.hpp"
@@ -22,8 +23,9 @@ using MenuBase = View<
                     mixin::MenuView<
                     mixin::menu_view::Drag<
                     mixin::menu_view::Drop<
+                    mixin::menu::ToolTip<
                     mixin::widget::ContextMenu<
-                    ::Menu>>>>>;
+                    ::Menu>>>>>>;
 
 class Menu : public MenuBase
 {
@@ -40,6 +42,22 @@ private:
 
 private Q_SLOTS:
     void onMenuMiddleClicked(Menu*);
+};
+
+} // namespace bookmark_dash
+
+#include <toolbutton.h>
+
+class MenuButton;
+class QWidget;
+
+namespace bookmark_dash {
+
+class MenuButton : public ToolButton
+{
+    using Base = ToolButton;
+public:
+    MenuButton(QWidget* const parent = nullptr);
 };
 
 } // namespace bookmark_dash
