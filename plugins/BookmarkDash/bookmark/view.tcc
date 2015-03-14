@@ -114,13 +114,6 @@ model() const
 }
 
 template<typename BaseT>
-inline bool View<BaseT>::
-hasContext(const QPoint &) //TODO does this query has meaning?
-{
-    return true;
-}
-
-template<typename BaseT>
 inline void View<BaseT>::
 mousePressEvent(QMouseEvent* const event)
 {

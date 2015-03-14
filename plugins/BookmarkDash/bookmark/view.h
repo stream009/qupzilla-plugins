@@ -38,9 +38,6 @@ protected:
     // @override mixin::ActionView
     QAction &createItemAction(const QModelIndex&) override;
 
-    // @override mixin::widget::ContextMenu
-    bool hasContext(const QPoint&) override;
-
     // @override QWidget
     void mousePressEvent(QMouseEvent*) override;
 
