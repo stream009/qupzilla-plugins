@@ -3,12 +3,18 @@ TARGET = $$qtLibraryTarget(BookmarkDash)
 include($$project_root/common.pri)
 
 SOURCES += plugin.cpp \
-	   settings.cpp \
-	   windowadaptor.cpp
+	       settings.cpp \
+           settingsmenu.cpp \
+	       windowadaptor.cpp \
+           menuadaptor.cpp \
+           toolbaradaptor.cpp \
 
 HEADERS += plugin.h \
-	   settings.h \
-	   windowadaptor.h
+	       settings.h \
+           settingsmenu.h \
+	       windowadaptor.h \
+           menuadaptor.h \
+           toolbaradaptor.h \
 
 QMAKE_LFLAGS += -Wl,--no-undefined
 

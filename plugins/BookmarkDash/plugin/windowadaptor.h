@@ -1,41 +1,32 @@
 #ifndef BOOKMARK_DASH_WINDOW_ADAPTOR_H
 #define BOOKMARK_DASH_WINDOW_ADAPTOR_H
 
-#include <memory>
+#include "menuadaptor.h"
+#include "settingsmenu.h"
+#include "toolbaradaptor.h"
 
-class BookmarksMenu;
-class BookmarksToolbar;
 class BrowserWindow;
 
 namespace bookmark_dash {
 
 class Menu;
 class Bar;
+class Settings;
 
-class WindowAdaptor : public QObject
+class WindowAdaptor
 {
-    Q_OBJECT
 public:
-    WindowAdaptor(BrowserWindow &window);
+    WindowAdaptor(BrowserWindow &, Settings &);
     ~WindowAdaptor();
 
 private:
-    void saveOriginalMenu();
-    void createMenu();
-    void setModelToMenu();
-    void installMenu();
-
-private Q_SLOTS:
-    void bookmarkPage();
-    void bookmarkAllTabs();
-    void showBookmarksManager();
+    QMenu &toolsMenu() const;
 
 private:
     BrowserWindow &m_window;
-    BookmarksMenu *m_originalMenu = nullptr;
-    BookmarksToolbar *m_originalBar = nullptr;
-    std::unique_ptr<Menu> m_menu; // unique_ptr for cut dependency
-    std::unique_ptr<Bar> m_bar;
+    MenuAdaptor m_menu;
+    ToolBarAdaptor m_toolBar;
+    SettingsMenu m_settingsMenu;
 };
 
 } // namespace bookmark_dash

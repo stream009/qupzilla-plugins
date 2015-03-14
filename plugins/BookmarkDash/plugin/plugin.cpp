@@ -131,9 +131,10 @@ onMainWindowCreated(BrowserWindow* const window) noexcept
 {
     //qDebug() << __func__ << window;
     assert(window);
+    assert(m_settings);
     try {
         m_windows.emplace(
-            window, boost::make_unique<WindowAdaptor>(*window));
+            window, boost::make_unique<WindowAdaptor>(*window, *m_settings));
     }
     catch (const std::exception &e) {
         DEFAULT_EXCEPTION_HANDLER(e);
