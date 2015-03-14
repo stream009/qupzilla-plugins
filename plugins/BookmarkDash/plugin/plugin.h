@@ -8,8 +8,6 @@
 #include <memory>
 #include <unordered_map>
 
-#include <boost/filesystem.hpp>
-
 #include <QtCore/QObject>
 
 class BrowserWindow;
@@ -31,15 +29,11 @@ class Plugin : public QObject, public PluginInterface
 #if QT_VERSION >= 0x050000
     Q_PLUGIN_METADATA(IID "QupZilla.Browser.plugin.BookmarkDash")
 #endif
-    using Path = boost::filesystem::path;
     using WindowMap = std::unordered_map<
                     BrowserWindow*, std::unique_ptr<WindowAdaptor>>;
 public:
     Plugin() noexcept;
-    virtual ~Plugin() noexcept;
-
-    static Settings &settings() noexcept;
-    static const Path &directory() noexcept;
+    ~Plugin() noexcept override;
 
 private:
     // @override PluginInterface. noexcept
@@ -48,15 +42,13 @@ private:
     void unload() override;
     bool testPlugin() override;
     QTranslator* getTranslator(const QString &locale) override;
-    void showSettings(QWidget* parent = 0) override;
 
 private Q_SLOTS:
     void onMainWindowCreated(BrowserWindow*) noexcept;
     void onMainWindowDeleted(BrowserWindow*) noexcept;
 
 private:
-    static std::unique_ptr<Settings> m_settings;
-    static Path m_pluginPath;
+    std::unique_ptr<Settings> m_settings;
 
     WindowMap m_windows;
 };

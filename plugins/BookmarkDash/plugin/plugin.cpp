@@ -17,9 +17,6 @@
 
 namespace bookmark_dash {
 
-std::unique_ptr<Settings> Plugin::m_settings;
-Plugin::Path Plugin::m_pluginPath;
-
 Plugin::
 Plugin() noexcept
 {
@@ -40,20 +37,6 @@ Plugin::
     }
 }
 
-Settings &Plugin::
-settings() noexcept
-{
-    assert(m_settings);
-    return *m_settings;
-}
-
-const Plugin::Path &Plugin::
-directory() noexcept
-{
-    assert(!m_pluginPath.empty());
-    return m_pluginPath;
-}
-
 PluginSpec Plugin::
 pluginSpec() // noexcept
 {
@@ -65,7 +48,7 @@ pluginSpec() // noexcept
         spec.version = "0.0.1";
         spec.author = "stream9 <stream009@gmail.com>";
         spec.icon = QPixmap(":qupzilla.png");
-        spec.hasSettings = true;
+        spec.hasSettings = false;
     }
     catch (const std::exception &e) {
         DEFAULT_EXCEPTION_HANDLER(e);
@@ -80,18 +63,9 @@ init(InitState state, const QString &settingsPath) // noexcept
     try {
         assert(mApp->plugins());
 
-        namespace bfs = boost::filesystem;
-        m_pluginPath = settingsPath.toLocal8Bit().constData();
-        m_pluginPath /= "bookmark_dash";
-        if (!bfs::exists(m_pluginPath)) {
-            if (!bfs::create_directory(m_pluginPath)) {
-                assert(false); //TODO better
-            }
-        }
-
-        assert(!m_settings);
         m_settings.reset(
             new Settings(settingsPath + QL1S("/extensions.ini")));
+        assert(m_settings);
 
         if (!mApp->plugins()) {
             throw RuntimeError("Fail to obtain plugin delegate");
@@ -153,28 +127,11 @@ getTranslator(const QString &locale) // noexcept
 }
 
 void Plugin::
-showSettings(QWidget* const parent) // noexcept
-{
-    assert(parent);
-    try {
-        if (!parent) {
-            throw RuntimeError("invalid window");
-        }
-    }
-    catch (const std::exception &e) {
-        DEFAULT_EXCEPTION_HANDLER(e);
-    }
-}
-
-void Plugin::
 onMainWindowCreated(BrowserWindow* const window) noexcept
 {
     //qDebug() << __func__ << window;
     assert(window);
     try {
-        if (!window) {
-            throw RuntimeError("invalid window");
-        }
         m_windows.emplace(
             window, boost::make_unique<WindowAdaptor>(*window));
     }
