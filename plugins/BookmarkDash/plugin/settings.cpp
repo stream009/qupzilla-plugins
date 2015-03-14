@@ -2,24 +2,41 @@
 
 namespace bookmark_dash {
 
-const QString Settings::keyNavigationBar = QLatin1String("navigationBar");
-const QString Settings::keyBookmarksBar = QLatin1String("bookmarksBar");
-const QString Settings::keyStatusBar = QLatin1String("statusBar");
-const QString Settings::keyMenuBar = QLatin1String("menuBar");
-const QString Settings::keyMenuBarKey = QLatin1String("menuBarKey");
-const QString Settings::keyWaitTimer = QLatin1String("waitTimer");
-
 Settings::
 Settings(const QString &filename)
-    : navigationBar { *this },
-      bookmarksBar { *this },
-      statusBar { *this },
-      menuBar { *this },
-      menuBarKey { *this },
-      waitTimer { *this },
-      m_settings { filename, QSettings::IniFormat }
+    : m_settings { filename, QSettings::IniFormat },
+      m_bookmarksMenu { m_settings, "bookmarksMenu", true },
+      m_bookmarksBar { m_settings, "bookmarksBar", true }
 {
     m_settings.beginGroup("BookmarkDash");
+}
+
+} // namespace bookmark_dash
+
+namespace bookmark_dash {
+
+BoolSetting::
+BoolSetting(QSettings &settings, const char key[], const bool defaultValue)
+    : m_settings { settings },
+      m_key { key },
+      m_default { defaultValue }
+{}
+
+bool BoolSetting::
+value() const
+{
+    const auto &value = m_settings.value(m_key, m_default);
+    assert(value.template canConvert<bool>());
+    return value.toBool();
+}
+
+void BoolSetting::
+setValue(const bool newValue)
+{
+    if (value() != newValue) {
+        m_settings.setValue(m_key, newValue);
+        Q_EMIT changed(newValue);
+    }
 }
 
 } // namespace bookmark_dash
