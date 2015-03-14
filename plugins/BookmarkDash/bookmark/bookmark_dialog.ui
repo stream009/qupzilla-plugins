@@ -58,7 +58,7 @@
        <widget class="QLineEdit" name="keyword"/>
       </item>
       <item row="3" column="1">
-       <widget class="QTextEdit" name="description"/>
+       <widget class="QPlainTextEdit" name="description"/>
       </item>
      </layout>
     </widget>
