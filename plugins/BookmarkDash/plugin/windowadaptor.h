@@ -1,6 +1,7 @@
 #ifndef BOOKMARK_DASH_WINDOW_ADAPTOR_H
 #define BOOKMARK_DASH_WINDOW_ADAPTOR_H
 
+#include "iconchangewatcher.h"
 #include "menuadaptor.h"
 #include "settingsmenu.h"
 #include "toolbaradaptor.h"
@@ -27,6 +28,7 @@ private:
     MenuAdaptor m_menu;
     ToolBarAdaptor m_toolBar;
     SettingsMenu m_settingsMenu;
+    IconChangeWatcher m_iconWatcher;
 };
 
 } // namespace bookmark_dash

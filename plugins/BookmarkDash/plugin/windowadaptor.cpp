@@ -11,7 +11,8 @@ WindowAdaptor(BrowserWindow &window, Settings &settings)
     : m_window { window },
       m_menu { window, settings },
       m_toolBar { window, settings },
-      m_settingsMenu { settings }
+      m_settingsMenu { settings },
+      m_iconWatcher { window }
 {
     toolsMenu().addMenu(&m_settingsMenu);
 }

@@ -8,6 +8,7 @@ SOURCES += plugin.cpp \
 	       windowadaptor.cpp \
            menuadaptor.cpp \
            toolbaradaptor.cpp \
+           iconchangewatcher.cpp \
 
 HEADERS += plugin.h \
 	       settings.h \
@@ -15,6 +16,7 @@ HEADERS += plugin.h \
 	       windowadaptor.h \
            menuadaptor.h \
            toolbaradaptor.h \
+           iconchangewatcher.h \
 
 QMAKE_LFLAGS += -Wl,--no-undefined
 
