@@ -12,7 +12,7 @@ namespace bookmark_dash {
 
 Menu::
 Menu(BrowserWindow &window, QWidget* const parent)
-: Base { window, parent }
+    : Base { window, parent }
 {
     this->connect(this, SIGNAL(menuMiddleClicked(Menu*)),
                   this, SLOT(onMenuMiddleClicked(Menu*)));
