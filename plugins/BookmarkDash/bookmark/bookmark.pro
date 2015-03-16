@@ -5,7 +5,7 @@ CONFIG += debug staticlib
 
 SOURCES += menu.cpp bar.cpp context_menu.cpp bookmark_dialog.cpp \
            folder_dialog.cpp
-HEADERS += menu.h bar.cpp context_menu.h bookmark_dialog.h \
+HEADERS += menu.h bar.h context_menu.h bookmark_dialog.h \
            folder_dialog.h view.h
 FORMS += bookmark_dialog.ui folder_dialog.ui
 

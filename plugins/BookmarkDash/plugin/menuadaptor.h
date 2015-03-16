@@ -17,12 +17,13 @@ namespace bookmark_dash {
 class Menu;
 class MenuButton;
 class Settings;
+class WindowAdaptor;
 
 class MenuAdaptor : public QObject
 {
     Q_OBJECT
 public:
-    MenuAdaptor(BrowserWindow &, Settings &);
+    MenuAdaptor(WindowAdaptor &, Settings &);
     ~MenuAdaptor() override;
 
 private Q_SLOTS:

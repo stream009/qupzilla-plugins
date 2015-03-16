@@ -10,6 +10,7 @@
 
 #include <QtGui/QToolBar>
 
+class BookmarkItem;
 class BrowserWindow;
 class QAbstractItemModel;
 class QModelIndex;
@@ -26,9 +27,13 @@ using BarBase = View<
 
 class Bar : public BarBase
 {
+    Q_OBJECT
     using Base = BarBase;
 public:
     Bar(BrowserWindow &, QWidget* const parent);
+
+Q_SIGNALS:
+    void triggered(BookmarkItem&);
 
 private:
     // @override mixin::ToolBarView

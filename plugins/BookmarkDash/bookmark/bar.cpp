@@ -10,6 +10,7 @@
 #include <QtGui/QIcon>
 #include <QtGui/QWidget>
 
+#include <bookmarkitem.h>
 #include <browserwindow.h>
 
 namespace bookmark_dash {
@@ -27,21 +28,10 @@ void Bar::
 onActionTriggered(const QModelIndex &index)
 {
     assert(index.isValid());
-    auto &item = this->item(index);
-    assert(item.type() == BookmarkItem::Url);
 
-    const auto modifiers = QApplication::keyboardModifiers();
-    if (modifiers & Qt::ControlModifier ||
-        this->recentlyPressedButtons() & Qt::MiddleButton)
-    {
-        openBookmarkInNewTab(item);
-    }
-    else if (modifiers & Qt::ShiftModifier) {
-        openBookmarkInNewWindow(item);
-    }
-    else {
-        openBookmark(item);
-    }
+    auto &item = this->item(index);
+
+    Q_EMIT triggered(item);
 }
 
 QMenu &Bar::

@@ -2,6 +2,7 @@
 
 #include "bookmark/bar.h"
 #include "settings.h"
+#include "windowadaptor.h"
 
 #include <cassert>
 
@@ -16,8 +17,8 @@
 namespace bookmark_dash {
 
 ToolBarAdaptor::
-ToolBarAdaptor(BrowserWindow &window, Settings &settings)
-    : m_window { window }
+ToolBarAdaptor(WindowAdaptor &window, Settings &settings)
+    : m_window { window.window() }
 {
     m_original = m_window.bookmarksToolbar();
     assert(m_original);
@@ -28,6 +29,8 @@ ToolBarAdaptor(BrowserWindow &window, Settings &settings)
 
     m_bar.reset(new Bar { m_window, nullptr });
     assert(m_bar);
+    this->connect(m_bar.get(), SIGNAL(triggered(BookmarkItem&)),
+                  &window,       SLOT(onBookmarkTriggered(BookmarkItem&)));
 
     layout->insertWidget(layout->indexOf(m_original), m_bar.get());
 

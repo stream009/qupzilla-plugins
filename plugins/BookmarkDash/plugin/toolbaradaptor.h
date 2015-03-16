@@ -12,11 +12,12 @@ namespace bookmark_dash {
 
 class Bar;
 class Settings;
+class WindowAdaptor;
 
 class ToolBarAdaptor : public QObject
 {
 public:
-    ToolBarAdaptor(BrowserWindow&, Settings &);
+    ToolBarAdaptor(WindowAdaptor&, Settings &);
     ~ToolBarAdaptor() override;
 
 private:

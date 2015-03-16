@@ -2,29 +2,35 @@
 
 #include "bookmark/menu.h"
 #include "settings.h"
+#include "windowadaptor.h"
 
 #include <cassert>
 
 #include <QtCore/QDebug>
 #include <QtGui/QBoxLayout>
+#include <QtGui/QMenu>
+#include <QtGui/QMenuBar>
 
 #include <bookmarks.h>
 #include <bookmarksmenu.h>
 #include <bookmarksmodel.h>
 #include <bookmarkstools.h>
 #include <browserwindow.h>
+#include <browsinglibrary.h>
 #include <mainapplication.h>
 #include <navigationbar.h>
 
 namespace bookmark_dash {
 
 MenuAdaptor::
-MenuAdaptor(BrowserWindow &window, Settings &settings)
-    : m_window { window }
+MenuAdaptor(WindowAdaptor &window, Settings &settings)
+    : m_window { window.window() }
 {
     saveOriginal();
     createTopMenu();
     assert(m_menu);
+    this->connect(m_menu.get(), SIGNAL(triggered(BookmarkItem&)),
+                  &window,        SLOT(onBookmarkTriggered(BookmarkItem&)));
 
     m_menuButton.reset(new MenuButton);
     assert(m_menuButton);

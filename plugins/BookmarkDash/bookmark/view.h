@@ -23,31 +23,23 @@ public:
     View(BrowserWindow &, QWidget* const parent);
 
     // @overload mixin::ActionView
-    BookmarksModel &model() const;
+    BookmarksModel &model() const override;
 
     // @override MenuContext
     BrowserWindow &window() const override { return m_window; }
     BookmarkItem *currentItem() const override;
     BookmarkItem &parentItem() const override;
-    void openBookmark(BookmarkItem&) override;
-    void openBookmarkInNewTab(BookmarkItem&) override;
-    void openBookmarkInNewWindow(BookmarkItem&) override;
     void openFolderInTabs(BookmarkItem&) override;
 
 protected:
     // @override mixin::ActionView
     QAction &createItemAction(const QModelIndex&) override;
 
-    // @override QWidget
-    void mousePressEvent(QMouseEvent*) override;
-
 protected:
     BookmarkItem &item(const QModelIndex&) const;
-    Qt::MouseButtons recentlyPressedButtons() const;
 
 private:
     BrowserWindow &m_window;
-    Qt::MouseButtons m_recentlyPressedButtons = Qt::NoButton;
 };
 
 } // namespace bookmark_dash

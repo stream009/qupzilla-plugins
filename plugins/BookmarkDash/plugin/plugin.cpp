@@ -14,6 +14,7 @@
 
 #include <QtCore/QTranslator>
 #include <QtGui/QWidget>
+#include <QtGui/QMouseEvent>
 
 namespace bookmark_dash {
 
@@ -35,6 +36,19 @@ Plugin::
     catch (const std::exception &e) {
         DEFAULT_EXCEPTION_HANDLER(e);
     }
+}
+
+Settings &Plugin::
+settings() const
+{
+    assert(m_settings);
+    return *m_settings;
+}
+
+Qt::MouseButtons Plugin::
+recentlyPressedButtons() const
+{
+    return m_recentlyPressedButtons;
 }
 
 PluginSpec Plugin::
@@ -61,6 +75,8 @@ init(InitState state, const QString &settingsPath) // noexcept
 {
     //qDebug() << __func__;
     try {
+        assert(mApp);
+        mApp->installEventFilter(this);
         assert(mApp->plugins());
 
         m_settings.reset(
@@ -126,15 +142,26 @@ getTranslator(const QString &locale) // noexcept
     return translator;
 }
 
+bool Plugin::
+eventFilter(QObject* const, QEvent* const ev)
+{
+    assert(ev);
+    if (ev->type() == QEvent::MouseButtonPress) {
+        auto &event = static_cast<QMouseEvent&>(*ev);
+        m_recentlyPressedButtons = event.buttons();
+    }
+
+    return false;
+}
+
 void Plugin::
 onMainWindowCreated(BrowserWindow* const window) noexcept
 {
     //qDebug() << __func__ << window;
     assert(window);
-    assert(m_settings);
     try {
         m_windows.emplace(
-            window, boost::make_unique<WindowAdaptor>(*window, *m_settings));
+            window, boost::make_unique<WindowAdaptor>(*window, *this));
     }
     catch (const std::exception &e) {
         DEFAULT_EXCEPTION_HANDLER(e);

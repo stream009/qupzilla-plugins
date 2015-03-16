@@ -13,9 +13,6 @@ public:
     virtual BrowserWindow &window() const = 0;
     virtual BookmarkItem *currentItem() const = 0;
     virtual BookmarkItem &parentItem() const = 0;
-    virtual void openBookmark(BookmarkItem&) = 0;
-    virtual void openBookmarkInNewTab(BookmarkItem&) = 0;
-    virtual void openBookmarkInNewWindow(BookmarkItem&) = 0;
     virtual void openFolderInTabs(BookmarkItem&) = 0;
 };
 

@@ -3,15 +3,16 @@
 #include "bookmark_dialog.h"
 #include "folder_dialog.h"
 
+#include <cassert>
+#include <memory>
+
 #include <bookmarkitem.h>
 #include <bookmarks.h>
 #include <bookmarksmodel.h>
+#include <bookmarkstools.h>
 #include <browserwindow.h>
 #include <iconprovider.h>
 #include <mainapplication.h>
-
-#include <cassert>
-#include <memory>
 
 namespace bookmark_dash {
 
@@ -135,7 +136,7 @@ onOpen()
     auto* const item = m_context.currentItem();
     assert(item);
     assert(item->type() == BookmarkItem::Url);
-    m_context.openBookmark(*item);
+    BookmarksTools::openBookmark(&m_context.window(), item);
 }
 
 void ContextMenu::
@@ -144,7 +145,7 @@ onOpenInNewTab()
     auto* const item = m_context.currentItem();
     assert(item);
     assert(item->type() == BookmarkItem::Url);
-    m_context.openBookmarkInNewTab(*item);
+    BookmarksTools::openBookmarkInNewTab(&m_context.window(), item);
 }
 
 void ContextMenu::
@@ -153,7 +154,7 @@ onOpenInNewWindow()
     auto* const item = m_context.currentItem();
     assert(item);
     assert(item->type() == BookmarkItem::Url);
-    m_context.openBookmarkInNewWindow(*item);
+    BookmarksTools::openBookmarkInNewWindow(item);
 }
 
 void ContextMenu::

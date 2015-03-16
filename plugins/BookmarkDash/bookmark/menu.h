@@ -11,6 +11,7 @@
 
 #include <enhancedmenu.h>
 
+class BookmarkItem;
 class BrowserWindow;
 class QAbstractItemModel;
 class QMenu;
@@ -33,6 +34,9 @@ class Menu : public MenuBase
     using Base = MenuBase;
 public:
     Menu(BrowserWindow &, QWidget*const parent);
+
+Q_SIGNALS:
+    void triggered(BookmarkItem&);
 
 private:
     // @override mixin::MenuView

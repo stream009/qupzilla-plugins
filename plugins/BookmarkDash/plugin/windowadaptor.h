@@ -10,21 +10,29 @@ class BrowserWindow;
 
 namespace bookmark_dash {
 
-class Menu;
 class Bar;
+class Menu;
+class Plugin;
 class Settings;
 
-class WindowAdaptor
+class WindowAdaptor : public QObject
 {
+    Q_OBJECT
 public:
-    WindowAdaptor(BrowserWindow &, Settings &);
+    WindowAdaptor(BrowserWindow&, Plugin&);
     ~WindowAdaptor();
+
+    BrowserWindow &window() const;
+
+private Q_SLOTS:
+    void onBookmarkTriggered(BookmarkItem&);
 
 private:
     QMenu &toolsMenu() const;
 
 private:
     BrowserWindow &m_window;
+    Plugin &m_plugin;
     MenuAdaptor m_menu;
     ToolBarAdaptor m_toolBar;
     SettingsMenu m_settingsMenu;

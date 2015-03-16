@@ -32,27 +32,6 @@ View(BrowserWindow &window, QWidget*const parent)
 
 template<typename BaseT>
 inline void View<BaseT>::
-openBookmark(BookmarkItem &item)
-{
-    BookmarksTools::openBookmark(&m_window, &item);
-}
-
-template<typename BaseT>
-inline void View<BaseT>::
-openBookmarkInNewTab(BookmarkItem &item)
-{
-    BookmarksTools::openBookmarkInNewTab(&m_window, &item);
-}
-
-template<typename BaseT>
-inline void View<BaseT>::
-openBookmarkInNewWindow(BookmarkItem &item)
-{
-    BookmarksTools::openBookmarkInNewWindow(&item);
-}
-
-template<typename BaseT>
-inline void View<BaseT>::
 openFolderInTabs(BookmarkItem &item)
 {
     BookmarksTools::openFolderInTabs(&m_window, &item);
@@ -114,16 +93,6 @@ model() const
 }
 
 template<typename BaseT>
-inline void View<BaseT>::
-mousePressEvent(QMouseEvent* const event)
-{
-    assert(event);
-    Base::mousePressEvent(event);
-
-    m_recentlyPressedButtons = event->buttons();
-}
-
-template<typename BaseT>
 inline BookmarkItem &View<BaseT>::
 item(const QModelIndex &index) const
 {
@@ -133,13 +102,6 @@ item(const QModelIndex &index) const
     assert(result);
 
     return *result;
-}
-
-template<typename BaseT>
-Qt::MouseButtons View<BaseT>::
-recentlyPressedButtons() const
-{
-    return m_recentlyPressedButtons;
 }
 
 } // namespace bookmark_dash
