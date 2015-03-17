@@ -1,5 +1,7 @@
 #include "rootmenu.h"
 
+#include "bookmark_dialog.h"
+
 #include <QtCore/QAbstractItemModel>
 #include <QtGui/QAction>
 #include <QtGui/QWidget>
@@ -8,6 +10,7 @@
 #include <bookmarkstools.h>
 #include <browserwindow.h>
 #include <browsinglibrary.h>
+#include <tabbedwebview.h>
 
 namespace bookmark_dash {
 
@@ -61,7 +64,30 @@ void RootMenu::
 onBookmarkThisPage()
 {
     //qDebug() << __func__;
-    m_window.bookmarkPage();
+    auto* const webView = m_window.weView();
+    assert(webView);
+
+    const auto &url = webView->url();
+    assert(mApp);
+    auto* const bookmarks = mApp->bookmarks();
+    assert(bookmarks);
+
+    const auto &items = bookmarks->searchBookmarks(url);
+    if (!items.empty()) {
+        auto* const item = items.front();
+        assert(item);
+        BookmarkDialog dialog { *item, m_window };
+        dialog.setWindowTitle(tr("Bookmark Property"));
+
+        const auto result = dialog.exec();
+        if (result == QDialog::Accepted) {
+            bookmarks->changeBookmark(item);
+        }
+    }
+    else {
+        BookmarksTools::addBookmarkDialog(
+                                   &m_window, url, webView->title());
+    }
 }
 
 void RootMenu::

@@ -2,6 +2,7 @@ include($$project_root/common.pri)
 include($$project_root/qupzilla_includes.pri)
 TEMPLATE = lib
 CONFIG += debug staticlib
+QT += network webkit
 
 SOURCES += menu.cpp bar.cpp context_menu.cpp bookmark_dialog.cpp \
            folder_dialog.cpp rootmenu.cpp menubutton.cpp
