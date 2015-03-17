@@ -1,6 +1,7 @@
 #include "menuadaptor.h"
 
-#include "bookmark/menu.h"
+#include "bookmark/rootmenu.h"
+#include "bookmark/menubutton.h"
 #include "settings.h"
 #include "windowadaptor.h"
 
@@ -13,11 +14,7 @@
 
 #include <bookmarks.h>
 #include <bookmarksmenu.h>
-#include <bookmarksmodel.h>
-#include <bookmarkstools.h>
 #include <browserwindow.h>
-#include <browsinglibrary.h>
-#include <mainapplication.h>
 #include <navigationbar.h>
 
 namespace bookmark_dash {
@@ -27,8 +24,10 @@ MenuAdaptor(WindowAdaptor &window, Settings &settings)
     : m_window { window.window() }
 {
     saveOriginal();
-    createTopMenu();
+
+    m_menu.reset(new RootMenu { m_window, nullptr });
     assert(m_menu);
+
     this->connect(m_menu.get(), SIGNAL(triggered(BookmarkItem&)),
                   &window,        SLOT(onBookmarkTriggered(BookmarkItem&)));
 
@@ -54,31 +53,6 @@ MenuAdaptor::
 }
 
 void MenuAdaptor::
-bookmarkPage()
-{
-    //qDebug() << __func__;
-    m_window.bookmarkPage();
-}
-
-void MenuAdaptor::
-bookmarkAllTabs()
-{
-    //qDebug() << __func__;
-    BookmarksTools::bookmarkAllTabsDialog(&m_window, m_window.tabWidget());
-}
-
-void MenuAdaptor::
-showBookmarksManager()
-{
-    //qDebug() << __func__;
-    assert(mApp);
-    auto* const browsingLibrary = mApp->browsingLibrary();
-    assert(browsingLibrary);
-
-    browsingLibrary->showBookmarks(&m_window);
-}
-
-void MenuAdaptor::
 install(const bool flag)
 {
     if (flag) {
@@ -100,19 +74,19 @@ install()
     auto* const menuAction = m_original->menuAction();
     assert(menuAction);
 
-    // Install to menu bar
+    // Install the root menu to menu bar
     auto* const menuBar = m_window.menuBar();
     assert(menuBar);
     menuBar->insertMenu(menuAction, m_menu.get());
     menuBar->removeAction(menuAction);
 
-    // Install to super menu
+    // Install the root menu to super menu
     auto* const superMenu = m_window.superMenu();
     assert(superMenu);
     superMenu->insertMenu(menuAction, m_menu.get());
     superMenu->removeAction(menuAction);
 
-    // Install menu button to navigation bar
+    // Install the menu button to navigation bar
     auto* const navigationBar = m_window.navigationBar();
     assert(navigationBar);
     auto* const before =
@@ -123,11 +97,14 @@ install()
     const auto index = layout->indexOf(before);
     layout->insertWidget(index, m_menuButton.get());
 
-    // Install shortcut actions
-    assert(m_bookmarkThisPage);
-    assert(m_organizeBookmarks);
-    m_window.addAction(m_bookmarkThisPage);
-    m_window.addAction(m_organizeBookmarks);
+    // Install root menu's shortcut actions to the window
+    for (auto* const action: m_menu->actions()) {
+        assert(action);
+        if(!action->shortcuts().empty()) {
+            m_window.addAction(action);
+            m_installedShortcutActions.push_back(action);
+        }
+    }
 
     // Backup original shortcuts then remove them.
     QList<QKeySequence> emptyShortcuts;
@@ -172,12 +149,13 @@ uninstall()
     assert(layout);
     layout->removeWidget(m_menuButton.get());
 
-    // Uninstall shortcut actions
-    assert(m_bookmarkThisPage);
-    assert(m_organizeBookmarks);
-    m_window.removeAction(m_bookmarkThisPage);
-    m_window.removeAction(m_organizeBookmarks);
+    // Uninstall shortcut actions from window
+    for (auto* const action: m_installedShortcutActions) {
+        assert(action);
+        m_window.removeAction(action);
+    }
 
+    // Restore preserved shortcuts of original menu actions
     for (const auto &item: m_shortcutBackup) {
         auto* const action = item.first;
         const auto &shortcuts = item.second;
@@ -203,55 +181,6 @@ saveOriginal()
     assert(it != actions.end());
     m_original = static_cast<QMenu*>((*it)->menu());
     assert(m_original);
-}
-
-void MenuAdaptor::
-createTopMenu()
-{
-    m_menu.reset(new Menu { m_window, nullptr });
-    assert(m_menu);
-
-    m_menu->setTitle(tr("&Bookmarks"));
-
-    auto* action = new QAction { tr("Bookmark &This Page"), this };
-    assert(action);
-    action->setIcon(QIcon::fromTheme("bookmark-new"));
-    action->setShortcut(QKeySequence("Ctrl+D"));
-    this->connect(action, SIGNAL(triggered()),
-                  this,     SLOT(bookmarkPage()));
-    m_menu->addAction(action);
-    m_bookmarkThisPage = action;
-
-    action = new QAction { tr("Bookmark &All Tabs"), this };
-    assert(action);
-    action->setIcon(QIcon::fromTheme("bookmark-new-list"));
-    this->connect(action, SIGNAL(triggered()),
-                  this,     SLOT(bookmarkAllTabs()));
-    m_menu->addAction(action);
-
-    action = new QAction { tr("Organize &Bookmarks"), this };
-    assert(action);
-    action->setIcon(QIcon::fromTheme("bookmarks-organize"));
-    action->setShortcut(QKeySequence("Ctrl+Shift+O"));
-    this->connect(action, SIGNAL(triggered()),
-                  this,     SLOT(showBookmarksManager()));
-    m_menu->addAction(action);
-    m_organizeBookmarks = action;
-
-    m_menu->addSeparator();
-
-    assert(mApp);
-    auto* const bookmarks = mApp->bookmarks();
-    assert(bookmarks);
-    auto* const menuFolder = bookmarks->menuFolder();
-    assert(menuFolder);
-
-    auto* const model = bookmarks->model();
-    assert(model);
-    const auto &root = model->index(menuFolder);
-    assert(root.isValid());
-
-    m_menu->setModel(*model, root);
 }
 
 } // namespace bookmark_dash

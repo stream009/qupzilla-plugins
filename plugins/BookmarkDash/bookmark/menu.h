@@ -50,20 +50,4 @@ private Q_SLOTS:
 
 } // namespace bookmark_dash
 
-#include <toolbutton.h>
-
-class MenuButton;
-class QWidget;
-
-namespace bookmark_dash {
-
-class MenuButton : public ToolButton
-{
-    using Base = ToolButton;
-public:
-    MenuButton(QWidget* const parent = nullptr);
-};
-
-} // namespace bookmark_dash
-
 #endif // BOOKMARK_DASH_MENU_H

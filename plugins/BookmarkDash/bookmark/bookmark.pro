@@ -4,9 +4,9 @@ TEMPLATE = lib
 CONFIG += debug staticlib
 
 SOURCES += menu.cpp bar.cpp context_menu.cpp bookmark_dialog.cpp \
-           folder_dialog.cpp
+           folder_dialog.cpp rootmenu.cpp menubutton.cpp
 HEADERS += menu.h bar.h context_menu.h bookmark_dialog.h \
-           folder_dialog.h view.h
+           folder_dialog.h view.h rootmenu.h menubutton.h
 FORMS += bookmark_dialog.ui folder_dialog.ui
 
 LIBS += -lcommon
