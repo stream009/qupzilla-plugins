@@ -15,7 +15,7 @@ void OpenStyle::
 run(const Path &path) const
 {
     const QUrl url { path.c_str() };
-    qDebug() << "Opening" << url;
+    //qDebug() << "Opening" << url;
     QDesktopServices::openUrl(url);
 }
 

@@ -106,7 +106,6 @@ init(InitState state, const QString &settingsPath) // noexcept
             mApp->plugins(), SIGNAL(mainWindowDeleted(BrowserWindow*)),
             this,            SLOT(slotMainWindowDeleted(BrowserWindow*)));
 
-        using WebPage = ::WebPage;
         this->connect(
             mApp->plugins(), SIGNAL(webPageCreated(WebPage*)),
             this,            SLOT(slotWebPageCreated(WebPage*)));
@@ -210,7 +209,7 @@ slotMainWindowDeleted(BrowserWindow* const window) noexcept
 void Plugin::
 slotWebPageCreated(WebPage* const webPage) noexcept
 {
-    qDebug() << __func__;
+    //qDebug() << __func__;
     assert(webPage);
     try {
         if (!webPage) {
@@ -231,7 +230,7 @@ void Plugin::
 slotWebPageDestroyed()
 {
     auto* const webPage = this->sender();
-    qDebug() << __func__ << webPage;
+    //qDebug() << __func__ << webPage;
 
     assert(m_webPages.count(webPage) == 1);
     m_webPages.erase(webPage);
