@@ -20,7 +20,7 @@ WebFrame::
 WebFrame(QWebFrame* const frame)
     : m_frame { frame }
 {
-    qDebug() << __func__ << this << frame;
+    //qDebug() << __func__ << this << frame;
 
     assert(frame);
 
@@ -43,7 +43,7 @@ removeStyle()
     auto &&style =
         m_frame->findFirstElement(selector.c_str());
     if (!style.isNull()) {
-        qDebug() << "removing style";
+        //qDebug() << "removing style";
         style.removeFromDocument();
     }
 }
@@ -51,17 +51,17 @@ removeStyle()
 void WebFrame::
 insertStyle()
 {
-    qDebug() << __func__ << this;
+    //qDebug() << __func__ << this;
 
     const auto &url = m_frame->url();
     if (!url.isValid()) return;
 
-    qDebug() << url;
+    //qDebug() << url;
     removeStyle();
 
     const auto &style = Styles::instance().query(url);
     if (style.empty()) return;
-    qDebug() << "matched" << url;
+    //qDebug() << "matched" << url;
 
     std::ostringstream oss;
     oss << "<style id=\"" << styleId << "\" type=\"text/css\">"

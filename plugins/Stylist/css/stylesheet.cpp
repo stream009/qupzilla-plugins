@@ -26,7 +26,7 @@ StyleSheet &StyleSheet::
 operator=(StyleSheet &&rhs) noexcept
 {
     m_filePath = std::move(rhs.m_filePath);
-    m_documentRules = std::move(m_documentRules);
+    m_documentRules = std::move(rhs.m_documentRules);
     return *this;
 }
 

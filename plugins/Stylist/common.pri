@@ -4,7 +4,13 @@ RCC_DIR = build
 PRECOMPILED_DIR = build
 
 QMAKE_CXXFLAGS += -std=c++11
-QMAKE_CXXFLAGS += -Wno-deprecated-register
+QMAKE_CXXFLAGS += -Wno-deprecated-register -Wall -Wextra
+QMAKE_CXXFLAGS += -Werror -Wfatal-errors
+
+equals(QMAKE_CXX, "clang++") {
+    QMAKE_CXXFLAGS += -fcolor-diagnostics
+    QMAKE_CXXFLAGS += -Wno-inconsistent-missing-override
+}
 
 CONFIG += precompile_header
 PRECOMPILED_HEADER = stable.h
