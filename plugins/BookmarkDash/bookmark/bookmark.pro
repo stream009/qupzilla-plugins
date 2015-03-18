@@ -5,9 +5,9 @@ CONFIG += debug staticlib
 QT += network webkit
 
 SOURCES += menu.cpp bar.cpp context_menu.cpp bookmark_dialog.cpp \
-           folder_dialog.cpp rootmenu.cpp menubutton.cpp
+           folder_dialog.cpp rootmenu.cpp menubutton.cpp view_p.cpp
 HEADERS += menu.h bar.h context_menu.h bookmark_dialog.h \
-           folder_dialog.h view.h rootmenu.h menubutton.h
+           folder_dialog.h view.h rootmenu.h menubutton.h view_p.h
 FORMS += bookmark_dialog.ui folder_dialog.ui
 
 LIBS += -lcommon

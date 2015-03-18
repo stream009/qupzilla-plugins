@@ -18,6 +18,8 @@ HEADERS += plugin.h \
            toolbaradaptor.h \
            iconchangewatcher.h \
 
+FORMS += $$project_root/bookmark/bookmark_dialog.ui
+
 QMAKE_LFLAGS += -Wl,--no-undefined
 
 LIBS += -lcommon

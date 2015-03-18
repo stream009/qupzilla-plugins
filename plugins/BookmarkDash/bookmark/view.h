@@ -2,6 +2,7 @@
 #define BOOKMARK_DASH_VIEW_H
 
 #include "context_menu.h"
+#include "view_p.h"
 
 class QAbstractItemModel;
 class QMenu;
@@ -16,7 +17,7 @@ class BookmarkItem;
 namespace bookmark_dash {
 
 template<typename BaseT>
-class View : public BaseT, public MenuContext
+class View : public BaseT, public MenuContext, public view::UrlDrop
 {
     using Base = BaseT;
 public:
@@ -35,11 +36,27 @@ protected:
     // @override mixin::ActionView
     QAction &createItemAction(const QModelIndex&) override;
 
+    // @override mixin::widget::Drag
+    void prepareDrag(QDrag &, const QPoint &) override;
+
+    // @override mixin::widget::Drop
+    bool canDrop(const QDragMoveEvent &) override;
+    bool canDrop(const QMimeData &) override;
+    void onDrop(QDropEvent&) override;
+
+    // @override view::Slot
+    void onUrlDropped(
+        const QString &title, const QUrl&, const QModelIndex&) override;
+
 protected:
     BookmarkItem &item(const QModelIndex&) const;
 
 private:
+    bool isSupportedByModel(const QMimeData&) const;
+
+private:
     BrowserWindow &m_window;
+    view::UrlDropHandler m_urlDropHandler;
 };
 
 } // namespace bookmark_dash
