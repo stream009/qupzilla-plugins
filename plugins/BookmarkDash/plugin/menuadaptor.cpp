@@ -35,9 +35,10 @@ MenuAdaptor(WindowAdaptor &window, Settings &settings)
     assert(m_menuButton);
     m_menuButton->setMenu(m_menu.get());
 
-    install();
-
     const auto &setting = settings.bookmarksMenu();
+    if (setting.value()) {
+        install();
+    }
     this->connect(&setting, SIGNAL(changed(bool)),
                   this,        SLOT(install(bool)));
 
