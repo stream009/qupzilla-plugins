@@ -91,6 +91,16 @@ createItemAction(const QModelIndex &index)
 }
 
 template<typename BaseT>
+inline bool View<BaseT>::
+isMenuItem(const QModelIndex &index)
+{
+    assert(index.isValid());
+
+    auto &item = this->item(index);
+    return item.type() == BookmarkItem::Folder;
+}
+
+template<typename BaseT>
 inline void View<BaseT>::
 prepareDrag(QDrag &drag, const QPoint &pos)
 {
@@ -147,14 +157,14 @@ onDrop(QDropEvent &event)
 
     if (isSupportedByModel(*mimeData)) return Base::onDrop(event);
 
-    auto* const action = this->actionAt(event.pos());
-    assert(action);
-    const auto &index = this->index(*action);
-    if (!index.isValid()) return;
-
+    assert(mimeData->hasUrls());
     const auto &urls = mimeData->urls();
     assert(!urls.empty());
     const auto &url = urls.front();
+
+    auto* const action = this->actionAt(event.pos());
+    assert(action);
+    const auto &index = this->index(*action);
 
     // This function call will be back asynchronously.
     // We have to do this indirection because until drag & drop
@@ -165,10 +175,10 @@ onDrop(QDropEvent &event)
 
 template<typename BaseT>
 inline void View<BaseT>::
-onUrlDropped(const QString &title, const QUrl &url, const QModelIndex &index)
+onUrlDropped(const QString &title, const QUrl &url, const QModelIndex &before)
 {
     assert(url.isValid());
-    assert(index.isValid());
+    // before can be invalid.
 
     auto* const newItem = new BookmarkItem { BookmarkItem::Url };
     assert(newItem);
@@ -181,15 +191,21 @@ onUrlDropped(const QString &title, const QUrl &url, const QModelIndex &index)
 
     const auto result = dialog.exec();
     if (result == QDialog::Accepted) {
-        auto* const parent = this->item(index).parent();
-        assert(parent);
-
         assert(mApp);
         auto* const bookmarks = mApp->bookmarks();
         assert(bookmarks);
 
-        // BookmarkModel take ownership of the item.
-        bookmarks->insertBookmark(parent, index.row(), newItem);
+        auto &parent = this->item(this->rootIndex());
+
+        if (before.isValid()) {
+            assert(before.parent() == this->rootIndex());
+            // BookmarkModel will take ownership of the item.
+            bookmarks->insertBookmark(&parent, before.row(), newItem);
+        }
+        else {
+            // BookmarkModel will take ownership of the item.
+            bookmarks->addBookmark(&parent, newItem);
+        }
     }
     else {
         delete newItem;

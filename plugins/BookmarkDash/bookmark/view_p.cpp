@@ -10,14 +10,14 @@ UrlDropHandler(UrlDrop &host)
 {}
 
 void UrlDropHandler::
-drop(const QString &title, const QUrl &url, const QModelIndex &index)
+drop(const QString &title, const QUrl &url, const QModelIndex &before)
 {
     assert(url.isValid());
-    assert(index.isValid());
+    // before can be invalid.
 
     m_title = title;
     m_url = url;
-    m_index = index;
+    m_before = before;
 
     QTimer::singleShot(0, this, SLOT(onTimeout()));
 }
@@ -26,9 +26,8 @@ void UrlDropHandler::
 onTimeout()
 {
     assert(m_url.isValid());
-    assert(m_index.isValid());
 
-    m_host.onUrlDropped(m_title, m_url, m_index);
+    m_host.onUrlDropped(m_title, m_url, m_before);
 }
 
 }} // namespace bookmark_dash::view

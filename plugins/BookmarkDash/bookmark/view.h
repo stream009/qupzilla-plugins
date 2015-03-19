@@ -35,6 +35,7 @@ public:
 protected:
     // @override mixin::ActionView
     QAction &createItemAction(const QModelIndex&) override;
+    bool isMenuItem(const QModelIndex&) override;
 
     // @override mixin::widget::Drag
     void prepareDrag(QDrag &, const QPoint &) override;
@@ -46,7 +47,7 @@ protected:
 
     // @override view::Slot
     void onUrlDropped(
-        const QString &title, const QUrl&, const QModelIndex&) override;
+        const QString &title, const QUrl&, const QModelIndex &before) override;
 
 protected:
     BookmarkItem &item(const QModelIndex&) const;
