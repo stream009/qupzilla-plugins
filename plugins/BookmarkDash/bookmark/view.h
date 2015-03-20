@@ -53,9 +53,6 @@ protected:
     BookmarkItem &item(const QModelIndex&) const;
 
 private:
-    bool isSupportedByModel(const QMimeData&) const;
-
-private:
     BrowserWindow &m_window;
     view::UrlDropHandler m_urlDropHandler;
 };

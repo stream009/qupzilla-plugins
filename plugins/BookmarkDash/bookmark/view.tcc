@@ -130,22 +130,26 @@ template<typename BaseT>
 inline bool View<BaseT>::
 canDrop(const QDragMoveEvent &event)
 {
-    auto* const action = this->actionAt(event.pos());
-    if (!action) return false;
+    if (Base::canDrop(event)) return true;
 
     auto* const mimeData = event.mimeData();
     assert(mimeData);
 
-    return isSupportedByModel(*mimeData) ?
-                Base::canDrop(event) : mimeData->hasUrls();
+    auto* const action = this->actionAt(event.pos());
+    if (!action) return false;
+    const auto &index = this->index(*action);
+    if (!index.isValid()) return false;
+
+    return mimeData->hasUrls();
 }
 
 template<typename BaseT>
 inline bool View<BaseT>::
 canDrop(const QMimeData &mimeData)
 {
-    return isSupportedByModel(mimeData) ?
-                Base::canDrop(mimeData) : mimeData.hasUrls();
+    if (Base::canDrop(mimeData)) return true;
+
+    return mimeData.hasUrls();
 }
 
 template<typename BaseT>
@@ -155,7 +159,7 @@ onDrop(QDropEvent &event)
     auto* const mimeData = event.mimeData();
     assert(mimeData);
 
-    if (isSupportedByModel(*mimeData)) return Base::onDrop(event);
+    if (Base::canDrop(*mimeData)) return Base::onDrop(event);
 
     assert(mimeData->hasUrls());
     const auto &urls = mimeData->urls();
@@ -229,19 +233,6 @@ item(const QModelIndex &index) const
     assert(result);
 
     return *result;
-}
-
-template<typename BaseT>
-inline bool View<BaseT>::
-isSupportedByModel(const QMimeData &mimeData) const
-{
-    const auto &mimeTypes = model().mimeTypes();
-    return std::any_of(
-        mimeTypes.begin(), mimeTypes.end(),
-        [&mimeData] (const QString &mimeType) {
-            return mimeData.hasFormat(mimeType);
-        }
-    );
 }
 
 } // namespace bookmark_dash
