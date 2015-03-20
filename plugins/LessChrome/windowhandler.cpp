@@ -12,6 +12,7 @@
 #include "navigationbar.h"
 #include "qzsettings.h"
 #include "tabbedwebview.h"
+#include "tabbar.h"
 
 #include <cassert>
 
@@ -115,6 +116,19 @@ captureWidgets()
         if (settings.bookmarksBar) {
             m_toolbar->capture(bookmarksBar());
         }
+    }
+
+    QLayout* const layout = m_navigationContainer->layout();
+    assert(layout);
+    for (int i = 0; i < layout->count(); ++i) {
+        QWidget* const widget = layout->itemAt(i)->widget();
+        assert(widget);
+
+        if (dynamic_cast<TabBar*>(widget)) continue;
+        if (widget == &navigationBar()) continue;
+        if (widget == &bookmarksBar()) continue;
+
+        m_toolbar->capture(*widget);
     }
 
     if (settings.statusBar) {
