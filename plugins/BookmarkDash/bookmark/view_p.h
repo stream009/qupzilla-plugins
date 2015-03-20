@@ -7,7 +7,7 @@ class UrlDrop
 {
 public:
     virtual void onUrlDropped(
-            const QString &title, const QUrl&, const QModelIndex&) = 0;
+        const QString &title, const QUrl&, const QModelIndex &before) = 0;
 };
 
 }} // namespace bookmark_dash::view
@@ -27,7 +27,7 @@ class UrlDropHandler : public QObject
 public:
     UrlDropHandler(UrlDrop&);
 
-    void drop(const QString &title, const QUrl&, const QModelIndex&);
+    void drop(const QString &title, const QUrl&, const QModelIndex &before);
 
 private Q_SLOTS:
     void onTimeout();
@@ -36,7 +36,7 @@ private:
     UrlDrop &m_host;
     QString m_title;
     QUrl m_url;
-    QModelIndex m_index;
+    QModelIndex m_before;
 };
 
 }} // namespace bookmark_dash::view

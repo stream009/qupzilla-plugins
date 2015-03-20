@@ -50,7 +50,7 @@ onMenuMiddleClicked(Menu* const menu)
     assert(index.isValid());
     auto &item = this->item(index);
 
-    openFolderInTabs(item);
+    this->openFolderInTabs(item);
 }
 
 } // namespace bookmark_dash
