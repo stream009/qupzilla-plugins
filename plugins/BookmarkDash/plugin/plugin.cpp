@@ -157,7 +157,6 @@ eventFilter(QObject* const, QEvent* const ev)
 void Plugin::
 onMainWindowCreated(BrowserWindow* const window) noexcept
 {
-    //qDebug() << __func__ << window;
     assert(window);
     try {
         m_windows.emplace(

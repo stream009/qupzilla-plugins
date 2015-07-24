@@ -63,7 +63,6 @@ RootMenu(BrowserWindow &window, QWidget* parent)
 void RootMenu::
 onBookmarkThisPage()
 {
-    //qDebug() << __func__;
     auto* const webView = m_window.weView();
     assert(webView);
 

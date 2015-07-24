@@ -4,12 +4,12 @@
 
 namespace bookmark_dash { namespace view {
 
-UrlDropHandler::
-UrlDropHandler(UrlDrop &host)
+SlotsDelegate::
+SlotsDelegate(Slots &host)
     : m_host { host }
 {}
 
-void UrlDropHandler::
+void SlotsDelegate::
 drop(const QString &title, const QUrl &url, const QModelIndex &before)
 {
     assert(url.isValid());
@@ -22,7 +22,7 @@ drop(const QString &title, const QUrl &url, const QModelIndex &before)
     QTimer::singleShot(0, this, SLOT(onTimeout()));
 }
 
-void UrlDropHandler::
+void SlotsDelegate::
 onTimeout()
 {
     assert(m_url.isValid());

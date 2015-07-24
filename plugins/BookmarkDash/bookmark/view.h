@@ -17,7 +17,7 @@ class BookmarkItem;
 namespace bookmark_dash {
 
 template<typename BaseT>
-class View : public BaseT, public MenuContext, public view::UrlDrop
+class View : public BaseT, public MenuContext, public view::Slots
 {
     using Base = BaseT;
 public:
@@ -54,7 +54,7 @@ protected:
 
 private:
     BrowserWindow &m_window;
-    view::UrlDropHandler m_urlDropHandler;
+    view::SlotsDelegate m_urlDropHandler;
 };
 
 } // namespace bookmark_dash

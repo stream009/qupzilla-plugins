@@ -3,7 +3,7 @@
 
 namespace bookmark_dash { namespace view {
 
-class UrlDrop
+class Slots
 {
 public:
     virtual void onUrlDropped(
@@ -21,11 +21,11 @@ class QModelIndex;
 
 namespace bookmark_dash { namespace view {
 
-class UrlDropHandler : public QObject
+class SlotsDelegate : public QObject
 {
     Q_OBJECT
 public:
-    UrlDropHandler(UrlDrop&);
+    SlotsDelegate(Slots&);
 
     void drop(const QString &title, const QUrl&, const QModelIndex &before);
 
@@ -33,7 +33,7 @@ private Q_SLOTS:
     void onTimeout();
 
 private:
-    UrlDrop &m_host;
+    Slots &m_host;
     QString m_title;
     QUrl m_url;
     QModelIndex m_before;
