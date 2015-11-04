@@ -53,8 +53,11 @@ protected:
     BookmarkItem &item(const QModelIndex&) const;
 
 private:
+    void setIcon(QAction&, BookmarkItem&);
+
+private:
     BrowserWindow &m_window;
-    view::SlotsDelegate m_urlDropHandler;
+    view::SlotsDelegate m_slotsDelegate;
 };
 
 } // namespace bookmark_dash

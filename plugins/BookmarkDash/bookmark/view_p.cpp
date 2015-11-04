@@ -1,6 +1,9 @@
 #include "view_p.h"
 
 #include <QtCore/QTimer>
+#include <QtGui/QAction>
+#include <QtGui/QImage>
+#include <QtGui/QPixmap>
 
 namespace bookmark_dash { namespace view {
 
@@ -30,5 +33,35 @@ onTimeout()
     m_host.onUrlDropped(m_title, m_url, m_before);
 }
 
+void SlotsDelegate::
+onActionImageReady(QAction* const action, const QImage &image)
+{
+    assert(action);
+    action->setIcon(QPixmap::fromImage(image));
+}
+
 }} // namespace bookmark_dash::view
 
+
+#include <QtGui/QAction>
+
+#include <bookmarkitem.h>
+#include <iconprovider.h>
+
+namespace bookmark_dash { namespace view {
+
+IconImageLoader::
+IconImageLoader(BookmarkItem &item, QAction &action)
+    : m_item { item }
+    , m_action { action }
+{}
+
+void IconImageLoader::
+run()
+{
+    const auto &image = IconProvider::imageForUrl(m_item.url());
+
+    Q_EMIT imageReady(&m_action, image);
+}
+
+}} // namespace bookmark_dash::view

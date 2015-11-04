@@ -3,9 +3,9 @@
 #include "bookmark_dialog.h"
 
 #include <QtCore/QAbstractItemModel>
-#include <QtCore/QDebug>
 #include <QtCore/QList>
 #include <QtCore/QModelIndex>
+#include <QtCore/QThreadPool>
 #include <QtCore/QUrl>
 #include <QtGui/QApplication>
 #include <QtGui/QDrag>
@@ -13,12 +13,14 @@
 #include <QtGui/QIcon>
 #include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QStyle>
 #include <QtGui/QWidget>
 
 #include <bookmarkitem.h>
 #include <bookmarksmodel.h>
 #include <bookmarkstools.h>
 #include <browserwindow.h>
+#include <iconprovider.h>
 
 namespace bookmark_dash {
 
@@ -27,7 +29,7 @@ View<BaseT>::
 View(BrowserWindow &window, QWidget*const parent)
     : Base { parent },
       m_window { window },
-      m_urlDropHandler { *this }
+      m_slotsDelegate { *this }
 {
     auto* const contextMenu =
                 new bookmark_dash::ContextMenu { *this, nullptr };
@@ -84,10 +86,32 @@ createItemAction(const QModelIndex &index)
     const auto &elidedText = fm.elidedText(title, Qt::ElideRight, 250);
     result.setText(elidedText);
 
-    const auto &icon = item.icon();
-    result.setIcon(icon);
+    setIcon(result, item);
 
     return result;
+}
+
+template<typename BaseT>
+inline void View<BaseT>::
+setIcon(QAction &action, BookmarkItem &item)
+{
+    if (item.type() == BookmarkItem::Url) {
+        auto* const updater = new view::IconImageLoader { item, action };
+        assert(updater);
+        QObject::connect(
+            updater,          SIGNAL(imageReady(QAction*, const QImage&)),
+            &m_slotsDelegate,   SLOT(onActionImageReady(QAction*, const QImage&)));
+
+        auto* const threadPool = QThreadPool::globalInstance();
+        assert(threadPool);
+
+        threadPool->start(updater);
+
+        action.setIcon(IconProvider::emptyWebIcon());
+    }
+    else if (item.type() == BookmarkItem::Folder) {
+        action.setIcon(IconProvider::standardIcon(QStyle::SP_DirIcon));
+    }
 }
 
 template<typename BaseT>
@@ -174,7 +198,7 @@ onDrop(QDropEvent &event)
     // We have to do this indirection because until drag & drop
     // operation has finished, mouse cursor won't be back to
     // the nomal state.
-    m_urlDropHandler.drop(mimeData->text(), url, index);
+    m_slotsDelegate.drop(mimeData->text(), url, index);
 }
 
 template<typename BaseT>
