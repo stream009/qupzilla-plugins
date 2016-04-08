@@ -1,0 +1,3 @@
+break /home/stream/src/qupzilla-plugins/plugins/AdBlockDash/gui/filter_set_widget.cpp:111
+break /home/stream/src/qupzilla-plugins/plugins/AdBlockDash/gui/filter_set_widget.cpp:118
+break /home/stream/src/qupzilla-plugins/plugins/AdBlockDash/gui/filter_set_actions.cpp:28

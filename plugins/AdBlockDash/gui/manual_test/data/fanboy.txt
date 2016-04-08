@@ -1,0 +1,1 @@
+/home/stream/.config/qupzilla/profiles/default/extensions/adblock_dash/fanboy.txt

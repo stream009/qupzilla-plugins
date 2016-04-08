@@ -1,0 +1,21 @@
+[Adblock Plus 2.0]
+@@||duckduckgo.com^$document
+bbbb
+aaaaaaaaaxccqqq
+duckduckgo.com#@#.has-ad
+||chatango.com^
+||connect.facebook.net/en_US/all.js
+||anyclip.com^
+||ajax.cloudflare.com^
+||paypal.com^
+||paypalobjects.com^
+||apis.google.com/js/plusone.js
+||google-analytics.com^
+||toptrailers.net^
+||bestories.xyz^
+@@||rapidrar.com^$document
+||google.com^$domain=doc.qt.io|scene-rls.com
+||facebook.*^$domain=doc.qt.io
+||twitter.com^$domain=qt.io
+||anothergamesite.com^
+||smartchatbox.com^

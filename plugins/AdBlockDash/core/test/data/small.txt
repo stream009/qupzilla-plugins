@@ -1,0 +1,4 @@
+[Adblock Plus 2.0]
+adblock
+##div
+google.com##table

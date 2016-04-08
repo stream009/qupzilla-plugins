@@ -1,0 +1,5 @@
+[Adblock Plus 2.0]
+! Title: Second
+! Expires: 4 days (update frequency)
+! Homepage: https://easylist.adblockplus.org/
+&ad_box_
