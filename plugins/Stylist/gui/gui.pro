@@ -2,6 +2,8 @@ include(../common.pri)
 TEMPLATE = lib
 CONFIG += staticlib
 
+QT += widgets
+
 SOURCES = settingactions.cpp \
           settingdialog.cpp \
           stylesitemmodel.cpp \

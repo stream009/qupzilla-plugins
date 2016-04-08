@@ -1,7 +1,7 @@
 #ifndef MENU_DASH_SETTINGS_MENU_H
 #define MENU_DASH_SETTINGS_MENU_H
 
-#include <QtGui/QMenu>
+#include <QtWidgets/QMenu>
 
 namespace bookmark_dash {
 

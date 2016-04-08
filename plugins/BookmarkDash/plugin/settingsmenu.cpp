@@ -2,7 +2,7 @@
 
 #include "settings.h"
 
-#include <QtGui/QAction>
+#include <QtWidgets/QAction>
 
 namespace bookmark_dash {
 

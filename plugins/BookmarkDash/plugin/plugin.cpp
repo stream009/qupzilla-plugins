@@ -13,8 +13,8 @@
 #include <boost/make_unique.hpp>
 
 #include <QtCore/QTranslator>
-#include <QtGui/QWidget>
 #include <QtGui/QMouseEvent>
+#include <QtWidgets/QWidget>
 
 namespace bookmark_dash {
 

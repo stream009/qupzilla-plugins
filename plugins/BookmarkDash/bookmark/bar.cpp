@@ -8,7 +8,7 @@
 #include <QtCore/QSize>
 #include <QtGui/QFontMetrics>
 #include <QtGui/QIcon>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 #include <bookmarkitem.h>
 #include <browserwindow.h>

@@ -8,7 +8,7 @@
 #include "mixin/tool_bar_view/drop.hpp"
 #include "mixin/widget/context_menu.hpp"
 
-#include <QtGui/QToolBar>
+#include <QtWidgets/QToolBar>
 
 class BookmarkItem;
 class BrowserWindow;

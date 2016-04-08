@@ -4,7 +4,7 @@
 
 #include <QtCore/QMimeData>
 #include <QtGui/QDragEnterEvent>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 #include <bookmarks.h>
 #include <bookmarksmodel.h>

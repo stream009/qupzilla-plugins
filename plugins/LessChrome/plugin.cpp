@@ -14,9 +14,9 @@
 #include <boost/make_shared.hpp>
 
 #include <QtCore/QTranslator>
-#include <QtGui/QDialog>
 #include <QtGui/QMouseEvent>
-#include <QtGui/QWidget>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QWidget>
 
 namespace lesschrome {
 

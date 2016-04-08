@@ -4,11 +4,12 @@ RCC_DIR = build
 UI_DIR = build
 PRECOMPILED_DIR = build
 
-CONFIG += clang++
+QT += widgets webkit webkitwidgets
 
+clang:QMAKE_CXX = /usr/bin/clang++
 QMAKE_CXXFLAGS += -std=c++11
-QMAKE_CXXFLAGS += -Wno-deprecated-register
-clang++:QMAKE_CXXFLAGS += -fcolor-diagnostics -Wno-inconsistent-missing-override
+QMAKE_CXXFLAGS += -Wall -Wextra
+clang:QMAKE_CXXFLAGS += -fcolor-diagnostics -Wno-inconsistent-missing-override
 
 CONFIG += precompile_header
 PRECOMPILED_HEADER = stable.h

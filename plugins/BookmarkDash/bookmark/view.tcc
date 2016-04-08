@@ -4,17 +4,18 @@
 
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QList>
+#include <QtCore/QMimeData>
 #include <QtCore/QModelIndex>
 #include <QtCore/QThreadPool>
 #include <QtCore/QUrl>
-#include <QtGui/QApplication>
 #include <QtGui/QDrag>
 #include <QtGui/QFontMetrics>
 #include <QtGui/QIcon>
-#include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
-#include <QtGui/QStyle>
-#include <QtGui/QWidget>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QStyle>
+#include <QtWidgets/QWidget>
 
 #include <bookmarkitem.h>
 #include <bookmarksmodel.h>

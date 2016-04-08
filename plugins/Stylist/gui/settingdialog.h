@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 
 class QWidget;
 

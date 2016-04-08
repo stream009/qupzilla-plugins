@@ -4,8 +4,8 @@
 #include <boost/container/flat_map.hpp>
 
 #include <QtCore/QTimer>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QWidget>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QWidget>
 
 class BrowserWindow;
 class QWheelEvent;

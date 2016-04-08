@@ -7,8 +7,8 @@
 
 #include <QtCore/QString>
 #include <QtCore/QUrl>
-#include <QtGui/QPushButton>
-#include <QtGui/QWidget>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QWidget>
 
 namespace bookmark_dash {
 

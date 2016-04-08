@@ -1,5 +1,4 @@
 TEMPLATE = subdirs
-QMAKE_SUBSTITUTES += .qmake.cache.in
 SUBDIRS = common \
           core \
           css \

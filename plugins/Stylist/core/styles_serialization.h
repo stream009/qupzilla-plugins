@@ -54,6 +54,7 @@ inline void
 serialize(Archive &, stylist::Styles&, unsigned int /*version*/)
 {}
 
+#ifndef __GNUC__
 template<typename Archive>
 inline void
 save_construct_data(Archive &ar, const stylist::Styles *styles,
@@ -96,7 +97,7 @@ load_construct_data(Archive &ar, stylist::Styles *styles,
 
     ::new(styles) Styles { std::move(container) };
 }
-
+#endif // __GNUC__
 }} // namespace boost::serialization
 
 #endif // STYLIST_SERIALIZATION_STYLES_H

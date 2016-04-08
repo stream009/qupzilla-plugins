@@ -3,8 +3,8 @@
 #include "plugin.h"
 
 #include <QtCore/QObject>
-#include <QtGui/QApplication>
-#include <QtGui/QMenuBar>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMenuBar>
 
 #include <bookmarkitem.h>
 #include <bookmarkstools.h>

@@ -180,11 +180,17 @@ create()
     Styles *ptr;
 
     if (bfs::exists(dataPath())) {
-        bfs::ifstream ifs { dataPath() };
-        assert(ifs.good()); //TODO better
-        boost::archive::text_iarchive dat { ifs };
+        try {
+            bfs::ifstream ifs { dataPath() };
+            assert(ifs.good()); //TODO better
+            boost::archive::text_iarchive dat { ifs };
 
-        dat >> ptr; //TODO handle exception
+            dat >> ptr; //TODO handle exception
+        }
+        catch (const boost::archive::archive_exception &) {
+            qDebug() << "Stylist: data file" << dataPath() << "is corrupted";
+            ptr = new Styles {};
+        }
     }
     else {
         ptr = new Styles {};

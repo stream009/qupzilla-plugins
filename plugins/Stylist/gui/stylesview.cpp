@@ -12,9 +12,9 @@
 
 #include <boost/make_unique.hpp>
 
-#include <QtGui/QAction>
-#include <QtGui/QItemSelection>
-#include <QtGui/QItemSelectionModel>
+#include <QtWidgets/QAction>
+#include <QtCore/QItemSelection>
+#include <QtCore/QItemSelectionModel>
 
 namespace stylist {
 

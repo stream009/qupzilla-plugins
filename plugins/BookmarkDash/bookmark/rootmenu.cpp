@@ -3,8 +3,8 @@
 #include "bookmark_dialog.h"
 
 #include <QtCore/QAbstractItemModel>
-#include <QtGui/QAction>
-#include <QtGui/QWidget>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QWidget>
 
 #include <bookmarks.h>
 #include <bookmarkstools.h>

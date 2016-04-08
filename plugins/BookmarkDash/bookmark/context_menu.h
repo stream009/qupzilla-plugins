@@ -18,9 +18,9 @@ public:
 
 } // namespace bookmark_dash
 
-#include <QtGui/QAction>
-#include <QtGui/QActionGroup>
-#include <QtGui/QMenu>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QActionGroup>
+#include <QtWidgets/QMenu>
 
 class QWidget;
 

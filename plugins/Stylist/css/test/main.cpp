@@ -2,7 +2,7 @@
 #include "documentruletest.h"
 #include "stylesheettest.h"
 
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 #include <QtTest/QtTest>
 
 int main(int argc, char*argv[])

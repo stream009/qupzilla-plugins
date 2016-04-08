@@ -28,7 +28,7 @@ TabWatcher(BrowserWindow &window)
 
 // Send signal at the moment of the initial connection
 void TabWatcher::
-connectNotify(const char* const) // throw()
+connectNotify(const QMetaMethod&) // throw()
 {
     try {
         slotTabChanged();

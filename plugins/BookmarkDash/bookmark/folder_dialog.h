@@ -3,7 +3,7 @@
 
 #include "ui_folder_dialog.h"
 
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 
 class BookmarkItem;
 

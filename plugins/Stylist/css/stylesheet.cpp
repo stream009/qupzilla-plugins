@@ -75,7 +75,7 @@ init()
     // iterator. To execute regular expression we need better iterator
     // than forward traversal iterator.
     // Alternative design would be reading file into the buffer first.
-    const boost::iostreams::mapped_file_source file { m_filePath };
+    boost::iostreams::mapped_file_source file { m_filePath };
     const auto &contents = boost::make_iterator_range(
         file.data(), file.data() + file.size()
     );

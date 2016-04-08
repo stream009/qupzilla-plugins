@@ -1,7 +1,7 @@
 #ifndef STYLIST_ACTION_ADDSTYLE_H
 #define STYLIST_ACTION_ADDSTYLE_H
 
-#include <QtGui/QAction>
+#include <QtWidgets/QAction>
 
 class QObject;
 

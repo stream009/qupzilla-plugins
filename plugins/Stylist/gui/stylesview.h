@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include <QtGui/QListView>
+#include <QtWidgets/QListView>
 
 class QItemSelection;
 

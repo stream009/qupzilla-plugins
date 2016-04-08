@@ -3,7 +3,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include <QtGui/QAction>
+#include <QtWidgets/QAction>
 
 class QObject;
 

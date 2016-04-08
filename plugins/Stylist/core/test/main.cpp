@@ -3,7 +3,7 @@
 #include "buffereddirectorywatchertest.h"
 #include "styletest.h"
 
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 #include <QtTest/QtTest>
 
 int main(int argc, char*argv[])

@@ -8,9 +8,9 @@
 #include <cassert>
 
 #include <QtCore/QDebug>
-#include <QtGui/QBoxLayout>
-#include <QtGui/QMenu>
-#include <QtGui/QMenuBar>
+#include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMenuBar>
 
 #include <bookmarks.h>
 #include <bookmarksmenu.h>

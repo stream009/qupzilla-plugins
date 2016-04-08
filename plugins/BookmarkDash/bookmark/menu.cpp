@@ -2,9 +2,8 @@
 
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QModelIndex>
-#include <QtGui/QMenu>
-#include <QtGui/QMenu>
-#include <QtGui/QWidget>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QWidget>
 
 #include <bookmarkitem.h>
 #include <browserwindow.h>

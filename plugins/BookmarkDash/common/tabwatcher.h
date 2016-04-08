@@ -24,7 +24,7 @@ Q_SIGNALS:
 
 private:
     // @override QObject
-    virtual void connectNotify(const char* const signal); // throw()
+    void connectNotify(const QMetaMethod &signal) override; // throw()
 
 private Q_SLOTS:
     void slotTabChanged(); // throw()

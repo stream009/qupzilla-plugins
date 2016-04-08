@@ -1,9 +1,9 @@
-#include <QtCore/QObject>
-#include <QtGui/QApplication>
-#include <QtTest/QtTest>
 #include <algorithm>
 #include <boost/algorithm/string/trim.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/utility/string_ref.hpp>
+#include <QtCore/QObject>
+#include <QtTest/QtTest>
+#include <QtWidgets/QApplication>

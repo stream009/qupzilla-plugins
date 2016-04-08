@@ -10,7 +10,7 @@
 
 #include <QtCore/QDebug>
 #include <QtGui/QKeyEvent>
-#include <QtGui/QMenuBar>
+#include <QtWidgets/QMenuBar>
 
 namespace lesschrome {
 

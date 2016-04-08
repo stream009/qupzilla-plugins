@@ -1,6 +1,6 @@
 #include "iconchangewatcher.h"
 
-#include <QtWebKit/QWebView>
+#include <QtWebKitWidgets/QWebView>
 
 #include <bookmarkitem.h>
 #include <browserwindow.h>

@@ -7,7 +7,7 @@
 #include <cassert>
 
 #include <QtCore/QDebug>
-#include <QtGui/QBoxLayout>
+#include <QtWidgets/QBoxLayout>
 
 #include <bookmarks.h>
 #include <bookmarkstoolbar.h>

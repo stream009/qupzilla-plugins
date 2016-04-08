@@ -1,6 +1,7 @@
 include($$project_root/common.pri)
 TEMPLATE = app
 CONFIG += qtestlib debug
+QT += widgets
 
 SOURCES += main.cpp
 

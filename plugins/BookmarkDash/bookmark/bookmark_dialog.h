@@ -3,7 +3,7 @@
 
 #include "ui_bookmark_dialog.h"
 
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 
 class BookmarkItem;
 class QString;

@@ -5,7 +5,7 @@
 #include <cassert>
 
 #include <QtCore/QDebug>
-#include <QtGui/QFileDialog>
+#include <QtWidgets/QFileDialog>
 
 namespace stylist { namespace action {
 

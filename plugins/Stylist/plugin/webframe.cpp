@@ -12,7 +12,7 @@
 
 #include <QtCore/QDebug>
 #include <QtWebKit/QWebElement>
-#include <QtWebKit/QWebFrame>
+#include <QtWebKitWidgets/QWebFrame>
 
 namespace stylist {
 
@@ -51,17 +51,13 @@ removeStyle()
 void WebFrame::
 insertStyle()
 {
-    //qDebug() << __func__ << this;
-
     const auto &url = m_frame->url();
     if (!url.isValid()) return;
 
-    //qDebug() << url;
     removeStyle();
 
     const auto &style = Styles::instance().query(url);
     if (style.empty()) return;
-    //qDebug() << "matched" << url;
 
     std::ostringstream oss;
     oss << "<style id=\"" << styleId << "\" type=\"text/css\">"
@@ -69,13 +65,13 @@ insertStyle()
         << "</style>";
     const auto &html = oss.str();
 
-    auto &&head = m_frame->findFirstElement("head");
-    if (head.isNull()) {
+    auto &&body = m_frame->findFirstElement("body");
+    if (body.isNull()) {
         // It happens when the document is not html.
         return;
     }
 
-    head.appendInside(html.c_str());
+    body.prependInside(html.c_str());
 }
 
 } // namespace stylist

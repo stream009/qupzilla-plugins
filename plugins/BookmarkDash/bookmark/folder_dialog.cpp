@@ -4,7 +4,7 @@
 
 #include <cassert>
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 namespace bookmark_dash {
 

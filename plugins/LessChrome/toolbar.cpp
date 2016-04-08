@@ -12,9 +12,9 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QPoint>
-#include <QtGui/QStatusBar>
-#include <QtGui/QVBoxLayout>
 #include <QtGui/QWheelEvent>
+#include <QtWidgets/QStatusBar>
+#include <QtWidgets/QVBoxLayout>
 
 namespace lesschrome {
 

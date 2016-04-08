@@ -1,6 +1,7 @@
 include(../../common.pri)
 CONFIG += qtestlib debug 
 TEMPLATE = app
+QT += widgets
 
 # Input
 SOURCES += main.cpp

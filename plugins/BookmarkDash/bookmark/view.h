@@ -5,6 +5,8 @@
 #include "view_p.h"
 
 class QAbstractItemModel;
+class QDrag;
+class QDragMoveEvent;
 class QMenu;
 class QModelIndex;
 class QMouseEvent;

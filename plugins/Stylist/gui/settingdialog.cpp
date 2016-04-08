@@ -9,7 +9,7 @@
 
 #include "core/styles.h"
 
-#include <QtGui/QFileDialog>
+#include <QtWidgets/QFileDialog>
 
 namespace stylist {
 

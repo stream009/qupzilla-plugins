@@ -1,9 +1,9 @@
 #include "view_p.h"
 
 #include <QtCore/QTimer>
-#include <QtGui/QAction>
 #include <QtGui/QImage>
 #include <QtGui/QPixmap>
+#include <QtWidgets/QAction>
 
 namespace bookmark_dash { namespace view {
 
@@ -43,7 +43,7 @@ onActionImageReady(QAction* const action, const QImage &image)
 }} // namespace bookmark_dash::view
 
 
-#include <QtGui/QAction>
+#include <QtWidgets/QAction>
 
 #include <bookmarkitem.h>
 #include <iconprovider.h>

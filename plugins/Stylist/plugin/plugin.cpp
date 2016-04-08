@@ -15,7 +15,7 @@
 #include <boost/make_unique.hpp>
 
 #include <QtCore/QTranslator>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 namespace stylist {
 
