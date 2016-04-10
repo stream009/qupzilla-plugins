@@ -3,10 +3,10 @@
 
 #include "view.h"
 
-#include "mixin/tool_bar_view.hpp"
-#include "mixin/tool_bar_view/drag.hpp"
-#include "mixin/tool_bar_view/drop.hpp"
-#include "mixin/widget/context_menu.hpp"
+#include <stream9/qt/mixin/tool_bar_view.hpp>
+#include <stream9/qt/mixin/tool_bar_view/drag.hpp>
+#include <stream9/qt/mixin/tool_bar_view/drop.hpp>
+#include <stream9/qt/mixin/widget/context_menu.hpp>
 
 #include <QtWidgets/QToolBar>
 
@@ -19,10 +19,10 @@ class QWidget;
 namespace bookmark_dash {
 
 using BarBase = View<
-                    mixin::ToolBarView<
-                    mixin::tool_bar_view::Drag<
-                    mixin::tool_bar_view::Drop<
-                    mixin::widget::ContextMenu<
+                    stream9::qt::mixin::ToolBarView<
+                    stream9::qt::mixin::tool_bar_view::Drag<
+                    stream9::qt::mixin::tool_bar_view::Drop<
+                    stream9::qt::mixin::widget::ContextMenu<
                     QToolBar>>>>>;
 
 class Bar : public BarBase

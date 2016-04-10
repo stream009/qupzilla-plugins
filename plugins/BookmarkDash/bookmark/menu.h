@@ -3,11 +3,11 @@
 
 #include "view.h"
 
-#include "mixin/menu/tool_tip.hpp"
-#include "mixin/menu_view.hpp"
-#include "mixin/menu_view/drag.hpp"
-#include "mixin/menu_view/drop.hpp"
-#include "mixin/widget/context_menu.hpp"
+#include <stream9/qt/mixin/menu/tool_tip.hpp>
+#include <stream9/qt/mixin/menu_view.hpp>
+#include <stream9/qt/mixin/menu_view/drag.hpp>
+#include <stream9/qt/mixin/menu_view/drop.hpp>
+#include <stream9/qt/mixin/widget/context_menu.hpp>
 
 #include <enhancedmenu.h>
 
@@ -21,11 +21,11 @@ class QWidget;
 namespace bookmark_dash {
 
 using MenuBase = View<
-                    mixin::MenuView<
-                    mixin::menu_view::Drag<
-                    mixin::menu_view::Drop<
-                    mixin::menu::ToolTip<
-                    mixin::widget::ContextMenu<
+                    stream9::qt::mixin::MenuView<
+                    stream9::qt::mixin::menu_view::Drag<
+                    stream9::qt::mixin::menu_view::Drop<
+                    stream9::qt::mixin::menu::ToolTip<
+                    stream9::qt::mixin::widget::ContextMenu<
                     ::Menu>>>>>>;
 
 class Menu : public MenuBase

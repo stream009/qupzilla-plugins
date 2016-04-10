@@ -28,9 +28,7 @@ POST_TARGETDEPS += $$project_root/common/libcommon.a
 LIBS += -lbookmark
 POST_TARGETDEPS += $$project_root/bookmark/libbookmark.a
 
-LIBS += -lmixin5
-POST_TARGETDEPS += $$project_root/qt_mixin/lib/libmixin5.a
-
+LIBS += -lstream9_qt
 LIBS += -lboost_filesystem -lboost_system
 
 PLUGIN_DIR = $$PWD
