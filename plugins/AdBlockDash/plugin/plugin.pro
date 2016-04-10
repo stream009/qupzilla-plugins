@@ -22,11 +22,7 @@ POST_TARGETDEPS += $$project_root/core/libcore.a
 LIBS += -lcommon
 POST_TARGETDEPS += $$project_root/common/libcommon.a
 
-LIBS += -L$$project_root/adblock/build -ladblock
-
-INCLUDEPATH += $$project_root/lib
-LIBS += \
-    -L$$project_root/lib/qt_widget_list/build -lwidget_list
+LIBS += -ladblock -lstream9_qt
 
 LIBS += -lboost_filesystem -lboost_iostreams -lboost_regex -lboost_system
 

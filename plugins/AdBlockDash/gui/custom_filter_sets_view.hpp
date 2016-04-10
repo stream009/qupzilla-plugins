@@ -3,7 +3,8 @@
 
 #include "core/settings.hpp"
 #include "custom_filter_sets_model.hpp"
-#include "qt_widget_list/abstract_widget_list.hpp"
+
+#include <stream9/qt/abstract_widget_list.hpp>
 
 class QModelIndex;
 class QWidget;
@@ -12,9 +13,9 @@ namespace adblock_dash { namespace setting_dialog {
 
 class FilterSetsActions;
 
-class CustomFilterSetsView : public AbstractWidgetList
+class CustomFilterSetsView : public stream9::qt::AbstractWidgetList
 {
-    using Base = AbstractWidgetList;
+    using Base = stream9::qt::AbstractWidgetList;
 public:
     CustomFilterSetsView(Settings::FilterSets&,
                          FilterSetsActions &actions,

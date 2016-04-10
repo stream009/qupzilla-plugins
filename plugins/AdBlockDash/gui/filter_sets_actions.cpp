@@ -1,9 +1,10 @@
 #include "filter_sets_actions.hpp"
 
 #include "common/utility.hpp"
-#include "qt_widget_list/abstract_widget_list.hpp"
 
 #include <cassert>
+
+#include <stream9/qt/abstract_widget_list.hpp>
 
 namespace adblock_dash { namespace setting_dialog {
 

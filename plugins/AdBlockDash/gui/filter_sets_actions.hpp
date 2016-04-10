@@ -4,14 +4,18 @@
 #include <QtCore/QObject>
 #include <QtWidgets/QAction>
 
-class AbstractWidgetList;
 class QWidget;
+
+namespace stream9 { namespace qt {
+class AbstractWidgetList;
+}} // namespace stream9::qt
 
 namespace adblock_dash { namespace setting_dialog {
 
 class FilterSetsActions : public QObject
 {
     Q_OBJECT
+    using AbstractWidgetList = stream9::qt::AbstractWidgetList;
 public:
     FilterSetsActions();
 

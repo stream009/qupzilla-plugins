@@ -5,7 +5,6 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 
-class AbstractWidgetList;
 class QWidget;
 
 namespace adblock_dash { namespace setting_dialog {

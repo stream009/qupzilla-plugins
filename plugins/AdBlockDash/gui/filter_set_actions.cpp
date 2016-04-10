@@ -3,7 +3,6 @@
 #include "common/utility.hpp"
 #include "filter_set_widget.hpp"
 #include "filter_sets_actions.hpp"
-#include "qt_widget_list/abstract_widget_list.hpp"
 
 #include <cassert>
 

@@ -49,6 +49,7 @@
 #include <QtWidgets/QToolTip>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+#include <stream9/qt/abstract_widget_list.hpp>
 #include <string>
 #include <unordered_map>
 #include <vector>

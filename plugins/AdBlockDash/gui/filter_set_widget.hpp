@@ -13,7 +13,9 @@
 class QContextMenuEvent;
 class QModelIndex;
 
+namespace stream9 { namespace qt {
 class AbstractWidgetList;
+}} // namespace stream9::qt
 
 namespace adblock_dash { namespace setting_dialog {
 
@@ -21,6 +23,7 @@ class FilterSetWidget : public QWidget
 {
     Q_OBJECT
     using Base = QWidget;
+    using AbstractWidgetList = stream9::qt::AbstractWidgetList;
 public:
     //constructor
     FilterSetWidget(AbstractWidgetList&, const QModelIndex&,

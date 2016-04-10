@@ -2,8 +2,9 @@
 #define ADBLOCK_DASH_SUBSCRIPTIONS_VIEW_HPP
 
 #include "core/settings.hpp"
-#include "qt_widget_list/abstract_widget_list.hpp"
 #include "subscriptions_model.hpp"
+
+#include <stream9/qt/abstract_widget_list.hpp>
 
 class QAbstractItemModel;
 class QAction;
@@ -14,9 +15,9 @@ namespace adblock_dash { namespace setting_dialog {
 
 class FilterSetsActions;
 
-class SubscriptionsView : public AbstractWidgetList
+class SubscriptionsView : public stream9::qt::AbstractWidgetList
 {
-    using Base = AbstractWidgetList;
+    using Base = stream9::qt::AbstractWidgetList;
 public:
     SubscriptionsView(Settings::Subscriptions&,
                       FilterSetsActions&,
