@@ -118,8 +118,6 @@ newLine(const size_t lineNo)
         const auto &rc = m_idToLineStore.emplace(
                                 std::move(id), std::move(empty));
         assert(rc.second);
-        assert(rc.first->second.data() == lineRef.begin());
-        assert(rc.first->second.size() == lineRef.size());
     }
 
     m_edited = true;
@@ -147,7 +145,7 @@ save()
 {
     namespace bfs = boost::filesystem;
 
-    const auto &tmp = bfs::unique_path();
+    const auto &tmp = m_path.parent_path() / bfs::unique_path();
     assert(!bfs::exists(tmp)); //TODO properly
 
     std::ofstream ofs { tmp.c_str() };
