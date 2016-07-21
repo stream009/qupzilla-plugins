@@ -363,6 +363,9 @@ elementHideCss(const QUrl &url) const
         utf8.constData(), ::toSizeT(utf8.size()),
         &css, &cssLen
     );
+    if (css == nullptr) {
+        return {};
+    }
 
     const auto &result = QString::fromUtf8(css, ::toSignedInt(cssLen));
 
