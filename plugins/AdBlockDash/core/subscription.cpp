@@ -218,7 +218,7 @@ normalize(Str &buf)
     tmp.reserve(buf.size());
 
     assert(!buf.empty());
-    for (auto i = 0u, last = buf.size()-1; i <= last; ++i) {
+    for (std::size_t i = 0u, last = buf.size()-1; i <= last; ++i) {
         if (buf[i] == '\r') continue;
         if (buf[i] == '\n') {
             if (i != last && buf[i+1] == '\n') continue;

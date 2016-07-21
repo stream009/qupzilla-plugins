@@ -163,7 +163,8 @@ save()
 {
     m_settings.beginWriteArray(m_key);
 
-    for (auto i = 0u, len = m_entries.size(); i < len; ++i) {
+    auto const len = m_entries.size();
+    for (auto i = 0u; i < len; ++i) {
         m_settings.setArrayIndex(::toSignedInt(i));
         vector_setting::save(m_settings, m_entries[i]);
     }
