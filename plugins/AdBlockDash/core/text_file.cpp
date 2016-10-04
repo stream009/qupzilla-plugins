@@ -86,8 +86,6 @@ setLine(const size_t lineNo, std::string &&line) //TODO exception safty
         const auto &rc = m_idToLineStore.emplace(
                                 std::move(id), std::move(line));
         assert(rc.second);
-        assert(rc.first->second.data() == lineRef.begin());
-        assert(rc.first->second.size() == lineRef.size());
     }
 
     m_idToLineRef.erase(oldId);

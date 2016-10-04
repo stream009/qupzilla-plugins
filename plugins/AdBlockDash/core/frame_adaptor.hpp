@@ -20,10 +20,12 @@ public:
 
     Q_INVOKABLE bool shouldLoad(
             const QString &url, const QWebElement &element) const;
+    Q_INVOKABLE bool shouldLoadWebSocket(const QString &url) const;
 
-private Q_SLOTS:
-    void installCustomObject();
-    void injectElementHidingCss();
+private:
+    Q_SLOT void installCustomObject();
+    Q_SLOT void injectElementHidingCss();
+           void installWebSocketWrapper();
 
 private:
     QWebFrame &m_frame;

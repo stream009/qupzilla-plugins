@@ -16,7 +16,7 @@ POST_TARGETDEPS += ../libcore.a $$project_root/common/libcommon.a
 LIBS += -lcore -lcommon -lboost_iostreams -lboost_regex
 
 LIBS += -L$$(QUPZILLA_SRCDIR)/bin -lQupZilla
-LIBS += -L$$project_root/adblock/build -ladblock
+LIBS += -ladblock
 
 LIBS += -lboost_filesystem -lboost_system
 LIBS += -lgtest

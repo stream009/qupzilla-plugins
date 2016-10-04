@@ -16,6 +16,7 @@ SOURCES += \
     subscription.cpp \
     text_file.cpp \
     updater.cpp \
+    page_adaptor.cpp \
 
 HEADERS += \
     adblock_dash.hpp \
@@ -26,3 +27,4 @@ HEADERS += \
     subscription.hpp \
     text_file.hpp \
     updater.hpp \
+    page_adaptor.hpp \

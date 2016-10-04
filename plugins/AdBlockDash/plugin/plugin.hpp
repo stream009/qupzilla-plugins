@@ -48,6 +48,8 @@ private:
             const QNetworkAccessManager::Operation,
             const QNetworkRequest&, QIODevice *outgoingData) override;
 
+    void populateWebViewMenu(QMenu*, WebView*, const QWebHitTestResult&) override;
+
     Q_SLOT void openUrl(const QUrl&);
 
 private:

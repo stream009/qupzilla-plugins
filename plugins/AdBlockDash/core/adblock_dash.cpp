@@ -1,6 +1,6 @@
 #include "adblock_dash.hpp"
 
-#include "frame_adaptor.hpp"
+#include "page_adaptor.hpp"
 #include "common/utility.hpp"
 #include "settings.hpp"
 
@@ -11,12 +11,13 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QIODevice>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QAction>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 #include <QtWebKit/QWebElement>
 #include <QtWebKitWidgets/QWebFrame>
-#include <QtWebKitWidgets/QWebView> //TODO
 #include <QtWidgets/QApplication>
 
 #include <webpage.h>
@@ -275,6 +276,7 @@ AdBlockDash::
     ::adblock_destroy(m_adBlock);
 }
 
+// This overload will be called by request originated from web page element.
 bool AdBlockDash::
 shouldBlock(const QString &url, const QWebElement &element) const
 {
@@ -291,10 +293,10 @@ shouldBlock(const QString &url, const QWebElement &element) const
     assert(frame);
     const auto &origin = originatingUrl(*frame);
 
-    if (!origin.isEmpty()) {
-        const auto &utf8 = origin.toEncoded();
-        context.origin = utf8.constData();
-        context.origin_len = ::toSizeT(utf8.size());
+    const auto &originUtf8 = origin.toEncoded();
+    if (!originUtf8.isEmpty()) {
+        context.origin = originUtf8.constData();
+        context.origin_len = ::toSizeT(originUtf8.size());
     }
 
     const char *subscriptionPtr = nullptr;
@@ -305,14 +307,25 @@ shouldBlock(const QString &url, const QWebElement &element) const
     const QUrl &theUrl = normalizeUrl(origin, { url });
     const auto &buf = theUrl.toEncoded();
 
-    return ::adblock_should_block(
+    auto const result = ::adblock_should_block(
         m_adBlock,
         buf.constData(), ::toSizeT(buf.size()), &context,
         &subscriptionPtr, &subscriptionLen,
         &reasonPtr, &reasonLen
     );
+
+    if (result) {
+        logBlockedRequest(*frame, theUrl,
+                QString::fromUtf8(reasonPtr, reasonLen),
+                QString::fromUtf8(subscriptionPtr, subscriptionLen),
+                context
+        );
+    }
+
+    return result;
 }
 
+// This overload is called from request made by script, object, etc..
 bool AdBlockDash::
 shouldBlock(const QNetworkRequest &request) const
 {
@@ -329,10 +342,10 @@ shouldBlock(const QNetworkRequest &request) const
     context.content_type = guessContentType(request);
 
     const auto &origin = originatingUrl(*frame);
-    if (!origin.isEmpty()) {
-        const auto &utf8 = origin.toEncoded();
-        context.origin = utf8.data();
-        context.origin_len = ::toSizeT(utf8.size());
+    const auto &originUtf8 = origin.toEncoded();
+    if (!originUtf8.isEmpty()) {
+        context.origin = originUtf8.data();
+        context.origin_len = ::toSizeT(originUtf8.size());
     }
 
     const char *subscriptionPtr = nullptr;
@@ -343,12 +356,70 @@ shouldBlock(const QNetworkRequest &request) const
     const auto &utf8 = url.toEncoded();
     assert(!utf8.isEmpty());
 
-    return ::adblock_should_block(
+    auto const result = ::adblock_should_block(
                 m_adBlock,
                 utf8.constData(), ::toSizeT(utf8.size()), &context,
                 &subscriptionPtr, &subscriptionLen,
                 &reasonPtr, &reasonLen
            );
+
+    if (result) {
+        logBlockedRequest(*frame, url,
+                QString::fromUtf8(reasonPtr, reasonLen),
+                QString::fromUtf8(subscriptionPtr, subscriptionLen),
+                context
+        );
+    }
+
+    return result;
+}
+
+bool AdBlockDash::
+shouldBlockWebSocket(const QString &url, const QWebFrame &frame) const
+{
+    return shouldBlock(url, frame, TYPE_WEBSOCKET);
+}
+
+bool AdBlockDash::
+shouldBlock(const QString &url, const QWebFrame &frame,
+                             const enum ::content_type type) const
+{
+    ::adblock_context context;
+    memset(&context, 0, sizeof(context));
+
+    context.content_type = type;
+
+    const auto &origin = originatingUrl(frame);
+    const auto &originUtf8 = origin.toEncoded();
+    if (!originUtf8.isEmpty()) {
+        context.origin = originUtf8.data();
+        context.origin_len = ::toSizeT(originUtf8.size());
+    }
+
+    const char *subscriptionPtr = nullptr;
+    size_t subscriptionLen = 0;
+    const char *reasonPtr = nullptr;
+    size_t reasonLen;
+
+    const auto &utf8 = url.toUtf8();
+    assert(!utf8.isEmpty());
+
+    auto const result = ::adblock_should_block(
+                m_adBlock,
+                utf8.constData(), ::toSizeT(utf8.size()), &context,
+                &subscriptionPtr, &subscriptionLen,
+                &reasonPtr, &reasonLen
+           );
+
+    if (result) {
+        logBlockedRequest(frame, url,
+                QString::fromUtf8(reasonPtr, reasonLen),
+                QString::fromUtf8(subscriptionPtr, subscriptionLen),
+                context
+        );
+    }
+
+    return result;
 }
 
 QString AdBlockDash::
@@ -363,16 +434,43 @@ elementHideCss(const QUrl &url) const
         utf8.constData(), ::toSizeT(utf8.size()),
         &css, &cssLen
     );
-    if (css == nullptr) {
-        return {};
-    }
+
+    if (cssLen == 0) return {};
 
     const auto &result = QString::fromUtf8(css, ::toSignedInt(cssLen));
 
     const auto &freed = ::adblock_free(css);
-    assert(freed); (void)freed;
+    if (!freed) {
+        qDebug() << __PRETTY_FUNCTION__
+                 << QString("fail to free memory: addr = %1, len = %2")
+                        .number(reinterpret_cast<unsigned int const>(css), 16)
+                        .arg(cssLen);
+    }
 
     return result;
+}
+
+QMenu& AdBlockDash::
+pageMenu(QWebPage& page) const
+{
+    auto* const menu = new QMenu { "ADBlock Dash" };
+    assert(menu);
+
+    auto* const action = new QAction { "Dump blocked request" };
+    assert(action);
+
+    auto const it = m_pageAdaptors.find(&page);
+    assert(it != m_pageAdaptors.end());
+
+    auto* const adaptor = it->second;
+    assert(adaptor);
+
+    this->connect(action,  &QAction::triggered,
+                  adaptor, &PageAdaptor::dump);
+
+    menu->addAction(action);
+
+    return *menu;
 }
 
 void AdBlockDash::
@@ -462,26 +560,16 @@ onWebPageCreated(WebPage* const page)
 {
     assert(page);
 
-    this->connect(
-        page, SIGNAL(frameCreated(QWebFrame*)),
-        this,   SLOT(onFrameCreated(QWebFrame*))
-    );
-
-    auto* const mainFrame = page->mainFrame();
-    assert(mainFrame);
-    onFrameCreated(mainFrame);
-
-    this->connect(
-        mainFrame, SIGNAL(urlChanged(const QUrl&)),
-        this,        SLOT(onUrlChanged(const QUrl&))
-    );
+    auto* const adaptor = new PageAdaptor { *page, *this }; // page will take ownership
+    auto const& result = m_pageAdaptors.emplace(page, adaptor);
+    assert(result.second); (void)result;
 }
 
 void AdBlockDash::
-onFrameCreated(QWebFrame* const frame)
+onWebPageDeleted(WebPage* const page)
 {
-    assert(frame);
-    new FrameAdaptor { *frame, *this }; // frame will take ownership
+    auto const count = m_pageAdaptors.erase(page);
+    assert(count != 0); (void)count;
 }
 
 void AdBlockDash::
@@ -492,28 +580,56 @@ onSubscriptionAppended(const Subscription &subscription)
                  m_adBlock, path.c_str(), std::strlen(path.c_str()));
 }
 
-void AdBlockDash::
-onUrlChanged(const QUrl &url)
+static QString
+lookupSubscriptionName(Settings& settings, QString const& path)
 {
-    auto* const frame = dynamic_cast<QWebFrame*>(this->sender());
-    assert(frame);
+    auto const& subscriptions = settings.subscriptions();
 
-    auto* const page = frame->page();
-    assert(page);
-
-    const auto &urlStr = url.toString();
-    if (urlStr == "about:blank" ||
-        urlStr.endsWith(".gif") ||
-        urlStr.endsWith(".png") ||
-        urlStr.endsWith(".jpg") || urlStr.endsWith(".jpeg"))
-    {
-        page->setPalette(QApplication::palette());
+    auto const it = std::find_if(
+        subscriptions.begin(), subscriptions.end(),
+        [&](Subscription const& entry) {
+            return entry.path() == path.toUtf8().data();
+        });
+    if (it != subscriptions.end()) {
+        return it->name();
     }
     else {
-        QPalette pal = page->palette();
-        pal.setBrush(QPalette::Base, Qt::white);
-        page->setPalette(pal);
+        auto const& customFilterSets = settings.customFilterSets();
+
+        auto const it = std::find_if(
+            customFilterSets.begin(), customFilterSets.end(),
+            [&](FilterSet const& entry) {
+                return entry.path() == path.toUtf8().data();
+            });
+            assert(it != customFilterSets.end());
+
+            return it->name();
     }
+}
+
+void AdBlockDash::
+logBlockedRequest(
+        const QWebFrame& frame,
+        QUrl const& url,
+        QString const& reason,
+        QString const& subscription,
+        ::adblock_context const& context) const
+{
+    auto* const page = frame.page();
+    assert(page);
+
+    auto const& it = m_pageAdaptors.find(page);
+    assert(it != m_pageAdaptors.end());
+    auto* const adaptor = it->second;
+    assert(adaptor);
+
+    BlockedRequest req {
+        QDateTime::currentDateTime(),
+        url, reason,
+        lookupSubscriptionName(m_settings, subscription), context
+    };
+
+    adaptor->blockedRequests().push_back(req);
 }
 
 } // namespace adblock_dash

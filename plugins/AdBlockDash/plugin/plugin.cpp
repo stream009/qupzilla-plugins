@@ -66,6 +66,10 @@ init(InitState state, const QString &settingsPath)
         plugins,             SIGNAL(webPageCreated(WebPage*)),
         m_adBlockDash.get(),   SLOT(onWebPageCreated(WebPage*)));
 
+    this->connect(
+        plugins,             SIGNAL(webPageDeleted(WebPage*)),
+        m_adBlockDash.get(),   SLOT(onWebPageDeleted(WebPage*)));
+
     if (state == LateInitState) {
         for (auto* const window: mApp->windows()) {
             assert(window);
@@ -172,6 +176,21 @@ createRequest(const QNetworkAccessManager::Operation op,
     else {
         return nullptr;
     }
+}
+
+void Plugin::
+populateWebViewMenu(QMenu* const menu,
+                    WebView* const view, const QWebHitTestResult&)
+{
+    assert(menu);
+    assert(view);
+
+    auto* const page = view->page();
+    assert(page);
+
+    auto& subMenu = m_adBlockDash->pageMenu(*page);
+
+    menu->addMenu(&subMenu);
 }
 
 void Plugin::
