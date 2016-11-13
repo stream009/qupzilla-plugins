@@ -5,7 +5,7 @@ os2: TARGET = Stylist
 include(../common.pri)
 
 SOURCES += \
-           plugin.cpp \
+       plugin.cpp \
 	   settings.cpp \
 	   webframe.cpp \
 	   webpage.cpp
@@ -22,13 +22,15 @@ POST_TARGETDEPS += $$project_root/common/libcommon.a \
 		   $$project_root/css/libcss.a \
 		   $$project_root/gui/libgui.a
 
-LIBS +=  -lboost_filesystem \
+LIBS +=  -Wl,-Bstatic \
+         -lboost_filesystem \
          -lboost_iostreams \
          -lboost_regex \
-	 -lboost_serialization \
-         -lboost_system
+	     -lboost_serialization \
+         -lboost_system \
+         -Wl,-Bdynamic
 
-QMAKE_LFLAGS += -Wl,--no-undefined
+QMAKE_LFLAGS += -Wl,--no-undefined -Wl,--exclude-libs=ALL
 
 PLUGIN_DIR = $$PWD
 include($$(QUPZILLA_SRCDIR)/src/plugins.pri)

@@ -7,6 +7,7 @@ clang:QMAKE_CXX = clang++
 QMAKE_CXXFLAGS += -std=c++11
 QMAKE_CXXFLAGS += -Wall -Wextra
 QMAKE_CXXFLAGS += -Werror -Wfatal-errors
+QMAKE_CXXFLAGS += -fvisibility=hidden
 clang:QMAKE_CXXFLAGS += -fcolor-diagnostics
 clang:QMAKE_CXXFLAGS += -Wno-inconsistent-missing-override
 
