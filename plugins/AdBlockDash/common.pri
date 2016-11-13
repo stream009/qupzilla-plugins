@@ -9,6 +9,7 @@ PRECOMPILED_DIR = build
 clang:QMAKE_CXX = "/usr/bin/time clang"
 QMAKE_CXXFLAGS += -std=c++11 -pedantic
 QMAKE_CXXFLAGS += -Wconversion -Wold-style-cast -Werror
+QMAKE_CXXFLAGS += -fvisibility=hidden
 clang:QMAKE_CXXFLAGS += -fcolor-diagnostics -Wno-inconsistent-missing-override
 
 CONFIG += precompile_header

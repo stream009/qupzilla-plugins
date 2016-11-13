@@ -1,6 +1,7 @@
 #include <adblock/api.h>
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
+#include <boost/container/flat_map.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/path.hpp>
@@ -31,13 +32,16 @@
 #include <QtCore/QString>
 #include <QtCore/QTimer>
 #include <QtCore/QUrl>
+#include <QtGui/QPalette>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 #include <QtWebKit/QWebElement>
 #include <QtWebKitWidgets/QWebFrame>
-#include <QtWebKitWidgets/QWebView> //TODO
+#include <QtWebKitWidgets/QWebPage>
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QMenu>
 #include <queue>
 #include <string>
 #include <unordered_map>

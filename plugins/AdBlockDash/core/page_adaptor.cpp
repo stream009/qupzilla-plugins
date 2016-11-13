@@ -2,8 +2,11 @@
 
 #include "adblock_dash.hpp"
 #include "frame_adaptor.hpp"
+#include "common/logging.hpp"
 
 #include <cassert>
+
+#include <boost/make_unique.hpp>
 
 #include <QtCore/QString>
 #include <QtGui/QPalette>
@@ -23,16 +26,18 @@ RequestContext(::adblock_context const& cxt)
 {}
 
 PageAdaptor::
-PageAdaptor(QWebPage& page, AdBlockDash& adBlockDash)
+PageAdaptor(QWebPage& page, AdBlockDash& adBlockDash_)
     : m_page { page }
-    , m_adBlockDash { adBlockDash }
+    , m_adBlockDash { adBlockDash_ }
 {
+    qCDebug(adBlockDash) << __func__ << this;
+
     this->connect(
-        &page, SIGNAL(frameCreated(QWebFrame*)),
-         this,   SLOT(onFrameCreated(QWebFrame*))
+        &m_page, SIGNAL(frameCreated(QWebFrame*)),
+         this,     SLOT(onFrameCreated(QWebFrame*))
     );
 
-    auto* const mainFrame = page.mainFrame();
+    auto* const mainFrame = m_page.mainFrame();
     assert(mainFrame);
     onFrameCreated(mainFrame);
 
@@ -42,37 +47,11 @@ PageAdaptor(QWebPage& page, AdBlockDash& adBlockDash)
     );
 }
 
-static QString
-toString(RequestContext::ContentType const contentType)
+//PageAdaptor::~PageAdaptor() = default;
+PageAdaptor::
+~PageAdaptor()
 {
-    switch (contentType) {
-    case RequestContext::ContentType::TYPE_OTHER:
-        return "other";
-    case RequestContext::ContentType::TYPE_SCRIPT:
-        return "script";
-    case RequestContext::ContentType::TYPE_IMAGE:
-        return "image";
-    case RequestContext::ContentType::TYPE_STYLESHEET:
-        return "style sheet";
-    case RequestContext::ContentType::TYPE_OBJECT:
-        return "object";
-    case RequestContext::ContentType::TYPE_DOCUMENT:
-        return "document";
-    case RequestContext::ContentType::TYPE_SUBDOCUMENT:
-        return "subdocument";
-    case RequestContext::ContentType::TYPE_XMLHTTPREQUEST:
-        return "XMLHTTPRequest";
-    case RequestContext::ContentType::TYPE_OBJECT_SUBREQUEST:
-        return "object subrequest";
-    case RequestContext::ContentType::TYPE_MEDIA:
-        return "font";
-    case RequestContext::ContentType::TYPE_FONT:
-        return "media";
-    case RequestContext::ContentType::TYPE_WEBSOCKET:
-        return "websocket";
-    default:
-        assert(false && "unknown content type");
-    }
+    qCDebug(adBlockDash) << __func__ << this;
 }
 
 void PageAdaptor::
@@ -106,7 +85,28 @@ void PageAdaptor::
 onFrameCreated(QWebFrame* const frame)
 {
     assert(frame);
-    new FrameAdaptor { *frame, m_adBlockDash }; // frame will take ownership
+
+    m_frameAdaptors.emplace(
+        frame,
+        boost::make_unique<FrameAdaptor>(*frame, m_adBlockDash)
+    );
+
+    this->connect(
+        frame, &QWebFrame::destroyed,
+        this,  &PageAdaptor::onFrameDestroyed);
+}
+
+void PageAdaptor::
+onFrameDestroyed()
+{
+    qCDebug(adBlockDash) << __func__ << this;
+    // dynamic_cast will fail because QWebFrame part of object will have
+    // deleted at this point.
+    auto* const frame = reinterpret_cast<QWebFrame*>(this->sender());
+    assert(frame);
+
+    auto const count = m_frameAdaptors.erase(frame);
+    assert(count != 0); (void)count;
 }
 
 void PageAdaptor::

@@ -16,7 +16,7 @@ namespace adblock_dash {
 
 class AdBlockDash;
 
-class QUPZILLA_EXPORT SchemeHandler
+class SchemeHandler
     : public QObject, public ::SchemeHandler
 {
 public:

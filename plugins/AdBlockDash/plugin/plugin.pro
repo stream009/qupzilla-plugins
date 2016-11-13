@@ -11,7 +11,7 @@ HEADERS += plugin.hpp \
            blocked_network_reply.hpp \
            scheme_handler.hpp \
 
-QMAKE_LFLAGS += -Wl,--no-undefined
+QMAKE_LFLAGS += -Wl,--no-undefined -Wl,--exclude-libs=ALL
 
 LIBS += -L$$project_root/gui -lgui
 POST_TARGETDEPS += $$project_root/gui/libgui.a
@@ -24,7 +24,12 @@ POST_TARGETDEPS += $$project_root/common/libcommon.a
 
 LIBS += -ladblock -lstream9_qt
 
-LIBS += -lboost_filesystem -lboost_iostreams -lboost_regex -lboost_system
+LIBS += -Wl,-Bstatic \
+    -lboost_filesystem \
+    -lboost_iostreams \
+    -lboost_regex \
+    -lboost_system \
+    -Wl,-Bdynamic \
 
 PLUGIN_DIR = $$PWD
 include($$(QUPZILLA_SRCDIR)/src/plugins.pri)

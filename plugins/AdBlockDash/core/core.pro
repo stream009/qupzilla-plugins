@@ -17,6 +17,8 @@ SOURCES += \
     text_file.cpp \
     updater.cpp \
     page_adaptor.cpp \
+    request_context.cpp \
+    blocked_request.cpp \
 
 HEADERS += \
     adblock_dash.hpp \
@@ -28,3 +30,5 @@ HEADERS += \
     text_file.hpp \
     updater.hpp \
     page_adaptor.hpp \
+    request_context.hpp \
+    blocked_request.hpp \

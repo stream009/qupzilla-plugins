@@ -1,0 +1,8 @@
+#ifndef ADBLOCK_DASH_LOGGING_HPP
+#define ADBLOCK_DASH_LOGGING_HPP
+
+#include <QtCore/QLoggingCategory>
+
+Q_DECLARE_LOGGING_CATEGORY(adBlockDash)
+
+#endif // ADBLOCK_DASH_LOGGING_HPP

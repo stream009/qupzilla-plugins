@@ -8,6 +8,7 @@
 #include <QMetaType>
 #include <QtCore/QDebug>
 #include <QtCore/QHash>
+#include <QtCore/QLoggingCategory>
 #include <QtCore/QMetaType>
 #include <QtCore/QObject>
 #include <QtCore/QSettings>

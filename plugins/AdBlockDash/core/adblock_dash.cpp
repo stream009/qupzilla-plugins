@@ -2,6 +2,7 @@
 
 #include "page_adaptor.hpp"
 #include "common/utility.hpp"
+#include "common/logging.hpp"
 #include "settings.hpp"
 
 #include <cassert>
@@ -9,7 +10,6 @@
 #include <boost/optional.hpp>
 #include <boost/range/algorithm.hpp>
 
-#include <QtCore/QDebug>
 #include <QtCore/QIODevice>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QAction>
@@ -202,12 +202,13 @@ guessContentType(const QWebElement &element)
             return TYPE_IMAGE;
         }
         else {
-            qDebug() << "Unimplemented link relationship:" << rel << type;
+            qCWarning(adBlockDash)
+                << "Unimplemented link relationship:" << rel << type;
             return boost::none;
         }
     }
     else {
-        qDebug() << "Unimplemented tag:" << tag;
+        qCWarning(adBlockDash) << "Unimplemented tag:" << tag;
         return boost::none;
     }
 }
@@ -232,7 +233,8 @@ static QUrl
 normalizeUrl(const QUrl &base, const QUrl &url)
 {
     if (base.isEmpty() && url.isRelative()) {
-        qDebug() << "Empty base on relative URL:" << url.toEncoded();
+        qCWarning(adBlockDash)
+            << "Empty base on relative URL:" << url.toEncoded();
     }
     return url.isRelative() ? base.resolved(url) : url;
 }
@@ -273,6 +275,7 @@ AdBlockDash(Settings &settings, QNetworkAccessManager &manager)
 AdBlockDash::
 ~AdBlockDash()
 {
+    setEnabled(false);
     ::adblock_destroy(m_adBlock);
 }
 
@@ -280,6 +283,8 @@ AdBlockDash::
 bool AdBlockDash::
 shouldBlock(const QString &url, const QWebElement &element) const
 {
+    if (!m_enabled) return false;
+
     ::adblock_context context;
     ::memset(&context, 0, sizeof(context));
 
@@ -329,12 +334,16 @@ shouldBlock(const QString &url, const QWebElement &element) const
 bool AdBlockDash::
 shouldBlock(const QNetworkRequest &request) const
 {
+    if (!m_enabled) return false;
+
     auto* const frame =
                     dynamic_cast<QWebFrame*>(request.originatingObject());
     if (!frame) return false;
 
     const auto &url = request.url();
     assert(!url.isEmpty());
+
+    if (!url.isValid()) return false;
 
     ::adblock_context context;
     memset(&context, 0, sizeof(context));
@@ -384,6 +393,8 @@ bool AdBlockDash::
 shouldBlock(const QString &url, const QWebFrame &frame,
                              const enum ::content_type type) const
 {
+    if (!m_enabled) return false;
+
     ::adblock_context context;
     memset(&context, 0, sizeof(context));
 
@@ -441,7 +452,7 @@ elementHideCss(const QUrl &url) const
 
     const auto &freed = ::adblock_free(css);
     if (!freed) {
-        qDebug() << __PRETTY_FUNCTION__
+        qCWarning(adBlockDash) << __func__
                  << QString("fail to free memory: addr = %1, len = %2")
                         .number(reinterpret_cast<unsigned int const>(css), 16)
                         .arg(cssLen);
@@ -453,22 +464,37 @@ elementHideCss(const QUrl &url) const
 QMenu& AdBlockDash::
 pageMenu(QWebPage& page) const
 {
-    auto* const menu = new QMenu { "ADBlock Dash" };
+    auto* const menu = new QMenu { "ADBlock Dash" }; // QtWebKit will take ownership
     assert(menu);
-
-    auto* const action = new QAction { "Dump blocked request" };
-    assert(action);
 
     auto const it = m_pageAdaptors.find(&page);
     assert(it != m_pageAdaptors.end());
 
-    auto* const adaptor = it->second;
+    auto const& adaptor = it->second;
     assert(adaptor);
 
-    this->connect(action,  &QAction::triggered,
-                  adaptor, &PageAdaptor::dump);
+    {
+        auto* const action = new QAction { "Dump blocked request", menu };
+        assert(action);
+        assert(action->parent() == menu);
 
-    menu->addAction(action);
+        this->connect(action,        &QAction::triggered,
+                      adaptor.get(), &PageAdaptor::dump);
+
+        menu->addAction(action);
+    }
+    {
+        auto* const action = new QAction { "Disable", menu };
+        assert(action);
+        assert(action->parent() == menu);
+        action->setCheckable(true);
+        action->setChecked(!m_enabled);
+
+        this->connect(action, &QAction::triggered,
+                      this,   &AdBlockDash::onDisableTriggered);
+
+        menu->addAction(action);
+    }
 
     return *menu;
 }
@@ -500,7 +526,7 @@ removeFilterSet(const Path &path)
 void AdBlockDash::
 reload()
 {
-    qDebug() << "Reloading ADBlock Dash";
+    qCInfo(adBlockDash) << "Reloading ADBlock Dash";
     const auto rc = ::adblock_destroy(m_adBlock);
     assert(rc); (void)rc;
 
@@ -560,8 +586,10 @@ onWebPageCreated(WebPage* const page)
 {
     assert(page);
 
-    auto* const adaptor = new PageAdaptor { *page, *this }; // page will take ownership
-    auto const& result = m_pageAdaptors.emplace(page, adaptor);
+    auto const& result = m_pageAdaptors.emplace(
+        page,
+        boost::make_unique<PageAdaptor>(*page, *this)
+    );
     assert(result.second); (void)result;
 }
 
@@ -578,6 +606,25 @@ onSubscriptionAppended(const Subscription &subscription)
     const auto &path = subscription.path();
     ::adblock_add_filter_set(
                  m_adBlock, path.c_str(), std::strlen(path.c_str()));
+}
+
+void AdBlockDash::
+onDisableTriggered(bool const checked)
+{
+    qCDebug(adBlockDash) << __func__ << this << checked;
+
+    setEnabled(!checked);
+}
+
+void AdBlockDash::
+setEnabled(bool const enabled)
+{
+    qCDebug(adBlockDash) << __func__ << this << enabled;
+
+    if (m_enabled == enabled) return;
+
+    m_enabled = enabled;
+    Q_EMIT statusChanged(m_enabled);
 }
 
 static QString
@@ -619,8 +666,9 @@ logBlockedRequest(
     assert(page);
 
     auto const& it = m_pageAdaptors.find(page);
-    assert(it != m_pageAdaptors.end());
-    auto* const adaptor = it->second;
+    if (it == m_pageAdaptors.end()) return; // it happens.
+
+    auto const& adaptor = it->second;
     assert(adaptor);
 
     BlockedRequest req {
@@ -629,6 +677,7 @@ logBlockedRequest(
         lookupSubscriptionName(m_settings, subscription), context
     };
 
+    qCInfo(adBlockDash) << "Request has Blocked\n" << req;
     adaptor->blockedRequests().push_back(req);
 }
 
