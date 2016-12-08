@@ -33,7 +33,7 @@ testExtractOneRule()
     std::vector<DocumentRule> rules;
     DocumentRule::extract(text, std::back_inserter(rules));
 
-    QCOMPARE(rules.size(), 1u);
+    QCOMPARE(rules.size(), 1ul);
     QCOMPARE(boost::algorithm::trim_copy(rules[0].body()),
              std::string { "background: yellow" });
     QVERIFY(rules[0].match("http://www.bing.com"));
@@ -55,7 +55,7 @@ testExtractMultipleRules()
     std::vector<DocumentRule> rules;
     DocumentRule::extract(text, std::back_inserter(rules));
 
-    QCOMPARE(rules.size(), 2u);
+    QCOMPARE(rules.size(), 2ul);
     QCOMPARE(boost::algorithm::trim_copy(rules[0].body()),
              std::string { "background: yellow" });
     QCOMPARE(boost::algorithm::trim_copy(rules[1].body()),

@@ -58,7 +58,7 @@ public: // Yes, public member variable. Sue me.
     Property<bool, keyStatusBar, true> statusBar;
     Property<bool, keyMenuBar, true> menuBar;
     Property<int, keyMenuBarKey, Qt::Key_Alt> menuBarKey;
-    Property<size_t, keyWaitTimer, 1000> waitTimer;
+    Property<quint64, keyWaitTimer, static_cast<quint64>(1000)> waitTimer;
 
 private:
     QSettings m_settings;

@@ -321,8 +321,8 @@ shouldBlock(const QString &url, const QWebElement &element) const
 
     if (result) {
         logBlockedRequest(*frame, theUrl,
-                QString::fromUtf8(reasonPtr, reasonLen),
-                QString::fromUtf8(subscriptionPtr, subscriptionLen),
+                QString::fromUtf8(reasonPtr, ::toSignedInt(reasonLen)),
+                QString::fromUtf8(subscriptionPtr, ::toSignedInt(subscriptionLen)),
                 context
         );
     }
@@ -374,8 +374,8 @@ shouldBlock(const QNetworkRequest &request) const
 
     if (result) {
         logBlockedRequest(*frame, url,
-                QString::fromUtf8(reasonPtr, reasonLen),
-                QString::fromUtf8(subscriptionPtr, subscriptionLen),
+                QString::fromUtf8(reasonPtr, ::toSignedInt(reasonLen)),
+                QString::fromUtf8(subscriptionPtr, ::toSignedInt(subscriptionLen)),
                 context
         );
     }
@@ -424,8 +424,8 @@ shouldBlock(const QString &url, const QWebFrame &frame,
 
     if (result) {
         logBlockedRequest(frame, url,
-                QString::fromUtf8(reasonPtr, reasonLen),
-                QString::fromUtf8(subscriptionPtr, subscriptionLen),
+                QString::fromUtf8(reasonPtr, ::toSignedInt(reasonLen)),
+                QString::fromUtf8(subscriptionPtr, ::toSignedInt(subscriptionLen)),
                 context
         );
     }
@@ -454,7 +454,7 @@ elementHideCss(const QUrl &url) const
     if (!freed) {
         qCWarning(adBlockDash) << __func__
                  << QString("fail to free memory: addr = %1, len = %2")
-                        .number(reinterpret_cast<unsigned int const>(css), 16)
+                        .number(reinterpret_cast<size_t>(css), 16)
                         .arg(cssLen);
     }
 

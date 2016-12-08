@@ -24,7 +24,7 @@ testUrlCondition()
 
     UrlCondition::extract(text, std::back_inserter(conditions));
 
-    QCOMPARE(conditions.size(), 2u);
+    QCOMPARE(conditions.size(), 2ul);
 
     QVERIFY(std::any_of(
         conditions.begin(), conditions.end(),
@@ -59,7 +59,7 @@ testUrlPrefixCondition()
 
     UrlPrefixCondition::extract(text, std::back_inserter(conditions));
 
-    QCOMPARE(conditions.size(), 2u);
+    QCOMPARE(conditions.size(), 2ul);
 
     QVERIFY(std::any_of(
         conditions.begin(), conditions.end(),
@@ -88,7 +88,7 @@ testDomainCondition()
 
     DomainCondition::extract(text, std::back_inserter(conditions));
 
-    QCOMPARE(conditions.size(), 2u);
+    QCOMPARE(conditions.size(), 2ul);
 
     QVERIFY(std::any_of(
         conditions.begin(), conditions.end(),
@@ -117,7 +117,7 @@ testRegExCondition()
 
     RegExCondition::extract(text, std::back_inserter(conditions));
 
-    QCOMPARE(conditions.size(), 2u);
+    QCOMPARE(conditions.size(), 2ul);
 
     QVERIFY(std::any_of(
         conditions.begin(), conditions.end(),

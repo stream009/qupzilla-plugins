@@ -68,7 +68,7 @@ testConstructor() const
 
     Styles styles;
 
-    QCOMPARE(styles.size(), 1u);
+    QCOMPARE(styles.size(), 1ul);
 }
 
 template<typename Path, typename Contents>
@@ -130,7 +130,7 @@ testAddFile() const
     const auto &args = spy.takeFirst();
     QVERIFY(args.isEmpty());
 
-    QCOMPARE(styles.size(), 1u);
+    QCOMPARE(styles.size(), 1ul);
 
     // irrelevant file extension
     const char contents2[] =
@@ -142,7 +142,7 @@ testAddFile() const
     QTest::qWait(400);
     QVERIFY(spy.isEmpty());
 
-    QCOMPARE(styles.size(), 1u); // there should be no change
+    QCOMPARE(styles.size(), 1ul); // there should be no change
 
 }
 
@@ -162,7 +162,7 @@ testDeleteFile() const
 
     QSignalSpy spy { &styles, SIGNAL(changed()) };
     QVERIFY(spy.isEmpty());
-    QCOMPARE(styles.size(), 1u);
+    QCOMPARE(styles.size(), 1ul);
 
     bfs::remove(path);
     QTest::qWait(400);
@@ -190,7 +190,7 @@ testModifyFile() const
 
     QSignalSpy spy { &styles, SIGNAL(changed()) };
     QVERIFY(spy.isEmpty());
-    QCOMPARE(styles.size(), 1u);
+    QCOMPARE(styles.size(), 1ul);
 
     bfs::fstream file { path };
     const char addition[] =
@@ -204,7 +204,7 @@ testModifyFile() const
     const auto &args = spy.takeFirst();
     QVERIFY(args.isEmpty());
 
-    QCOMPARE(styles.size(), 1u);
+    QCOMPARE(styles.size(), 1ul);
 }
 
 void StylesTest::
@@ -223,7 +223,7 @@ testRenameFile() const
 
     QSignalSpy spy { &styles, SIGNAL(changed()) };
     QVERIFY(spy.isEmpty());
-    QCOMPARE(styles.size(), 1u);
+    QCOMPARE(styles.size(), 1ul);
 
     bfs::rename(path, m_directory / "renamed.css");
     QTest::qWait(400);
@@ -234,7 +234,7 @@ testRenameFile() const
     args = spy.takeFirst();
     QVERIFY(args.isEmpty());
 
-    QCOMPARE(styles.size(), 1u);
+    QCOMPARE(styles.size(), 1ul);
 }
 
 void StylesTest::
@@ -248,7 +248,7 @@ testSerialize() const
     createFile(path1, contents1);
 
     Styles styles;
-    QCOMPARE(styles.size(), 1u);
+    QCOMPARE(styles.size(), 1ul);
 
     std::stringstream ss;
     boost::archive::text_oarchive dat { ss };
@@ -263,7 +263,7 @@ testSerialize() const
     iar >> ptr;
     QVERIFY(ptr != &styles);
 
-    QCOMPARE(ptr->size(), 1u);
+    QCOMPARE(ptr->size(), 1ul);
     QCOMPARE(ptr->m_directory, m_directory);
 
     const auto &first = ptr->at(0);
@@ -282,7 +282,7 @@ testSerialize() const
     iar2 >> ptr;
     QVERIFY(ptr != &styles);
 
-    QCOMPARE(ptr->size(), 0u);
+    QCOMPARE(ptr->size(), 0ul);
     QCOMPARE(ptr->m_directory, m_directory);
 }
 
@@ -292,7 +292,7 @@ testImport() const
     namespace bfs = boost::filesystem;
 
     Styles styles;
-    QCOMPARE(styles.size(), 0u);
+    QCOMPARE(styles.size(), 0ul);
 
     const char contents1[] =
         "@-moz-document url(http://www.google.com),"
@@ -307,7 +307,7 @@ testImport() const
     styles.import(path1);
 
     QTest::qWait(400);
-    QCOMPARE(styles.size(), 1u);
+    QCOMPARE(styles.size(), 1ul);
 
     bfs::remove(path1);
 }

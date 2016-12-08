@@ -112,7 +112,7 @@ extractHeaderFields(Str &buf)
                 buf.data() + std::distance(buf.begin(), match[1].first);
         const auto size = std::distance(match[1].first, match[1].second);
 
-        m_homePage = QString::fromUtf8(c_str, size);
+        m_homePage = QString::fromUtf8(c_str, ::toSignedInt(size));
         assert(m_homePage->isValid());
     }
 
@@ -143,7 +143,7 @@ extractHeaderFields(Str &buf)
                 buf.data() + std::distance(buf.begin(), match[1].first);
         const auto size = std::distance(match[1].first, match[1].second);
 
-        m_version = QString::fromUtf8(c_str, size);
+        m_version = QString::fromUtf8(c_str, ::toSignedInt(size));
     }
 }
 

@@ -8,6 +8,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/regex.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include <QtCore/QByteArray>
 #include <QtNetwork/QNetworkAccessManager>
@@ -31,7 +32,7 @@ redirectUrl(const char* const buf, const size_t len)
     auto* const cUrl = match[1].first;
     const auto cUrlLen = std::distance(match[1].first, match[1].second);
 
-    return QString::fromUtf8(cUrl, cUrlLen);
+    return QString::fromUtf8(cUrl, boost::numeric_cast<int>(cUrlLen));
 }
 
 

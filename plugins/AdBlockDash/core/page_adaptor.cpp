@@ -7,6 +7,7 @@
 #include <cassert>
 
 #include <boost/make_unique.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include <QtCore/QString>
 #include <QtGui/QPalette>
@@ -19,8 +20,8 @@ namespace adblock_dash {
 
 RequestContext::
 RequestContext(::adblock_context const& cxt)
-    : origin { QString::fromUtf8(cxt.origin, cxt.origin_len) }
-    , siteKey { QString::fromUtf8(cxt.site_key, cxt.site_key_len) }
+    : origin { QString::fromUtf8(cxt.origin, boost::numeric_cast<int>(cxt.origin_len)) }
+    , siteKey { QString::fromUtf8(cxt.site_key, boost::numeric_cast<int>(cxt.site_key_len)) }
     , contentType { static_cast<ContentType>(cxt.content_type) }
     , isPopup { cxt.is_popup }
 {}

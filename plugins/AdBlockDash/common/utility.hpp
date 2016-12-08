@@ -58,6 +58,13 @@ toSizeT(const int si)
     return static_cast<size_t>(si);
 }
 
+inline size_t
+toSizeT(long const si)
+{
+    assert(si >= 0);
+    return static_cast<size_t>(si);
+}
+
 inline unsigned int
 toUnsignedInt(const int si)
 {
@@ -67,6 +74,20 @@ toUnsignedInt(const int si)
 
 inline int
 toSignedInt(const unsigned int ui)
+{
+    assert(ui <= INT_MAX);
+    return static_cast<int>(ui);
+}
+
+inline int
+toSignedInt(size_t const ui)
+{
+    assert(ui <= INT_MAX);
+    return static_cast<int>(ui);
+}
+
+inline int
+toSignedInt(long const ui)
 {
     assert(ui <= INT_MAX);
     return static_cast<int>(ui);

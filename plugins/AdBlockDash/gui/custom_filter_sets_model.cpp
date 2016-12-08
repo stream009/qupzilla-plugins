@@ -4,6 +4,7 @@
 #include "core/filter_set.hpp"
 
 #include <boost/filesystem.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 namespace adblock_dash { namespace setting_dialog {
 
@@ -175,8 +176,8 @@ onAppended(const FilterSet &filterSet)
     );
     assert(it != end);
 
-    const auto row = std::distance(begin, it);
-    assert(0 <= row && row < ::toSignedInt(m_filterSets.size()));
+    auto const row = boost::numeric_cast<int>(std::distance(begin, it));
+    assert(0 <= row && row < boost::numeric_cast<int>(m_filterSets.size()));
 
     this->beginInsertRows({}, row, row);
     this->endInsertRows();
