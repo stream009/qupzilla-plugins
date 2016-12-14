@@ -37,6 +37,7 @@ private:
 private Q_SLOTS:
     void validateUrl(const QString&);
     void commitChange();
+    void removeBookmark();
 
 private:
     Ui::BookmarkDialog m_ui;

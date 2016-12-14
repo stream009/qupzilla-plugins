@@ -9,6 +9,7 @@
 #include <QtCore/QUrl>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QMessageBox>
 
 namespace bookmark_dash {
 
@@ -33,6 +34,8 @@ BookmarkDialog(BookmarkItem &item, QWidget &parent)
                   this,       SLOT(validateUrl(const QString &)));
     this->connect(this, SIGNAL(accepted()),
                   this,   SLOT(commitChange()));
+    this->connect(m_ui.remove, SIGNAL(clicked()),
+                  this,          SLOT(removeBookmark()));
 }
 
 int BookmarkDialog::
@@ -107,6 +110,24 @@ commitChange()
     m_item.setUrl(url());
     m_item.setKeyword(keyword());
     m_item.setDescription(description());
+}
+
+void BookmarkDialog::
+removeBookmark()
+{
+    assert(mApp);
+    auto* const bookmarks = mApp->bookmarks();
+    assert(bookmarks);
+
+    auto const result = QMessageBox::question(
+        this,
+        "Confirm",
+        "You really want to remove this bookmark?"
+    );
+    if (result == QMessageBox::Yes) {
+        bookmarks->removeBookmark(&m_item);
+        this->close();
+    }
 }
 
 } // namespace bookmark_dash
