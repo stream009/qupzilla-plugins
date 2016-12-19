@@ -16,3 +16,4 @@ lib*.so*
 *.zip
 Thumbs.db
 .qmake.stash
+.qmake.conf
