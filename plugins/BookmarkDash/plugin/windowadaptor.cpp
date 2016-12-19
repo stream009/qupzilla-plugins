@@ -22,12 +22,21 @@ WindowAdaptor(BrowserWindow &window, Plugin &plugin)
       m_iconWatcher { window }
 {
     toolsMenu().addMenu(&m_settingsMenu);
+
+    m_remover = new QAction { "&Remove bookmark" };
+    m_remover->setShortcut(QKeySequence("Shift+Ctrl+D"));
+    this->connect(m_remover, &QAction::triggered,
+                  this,      &WindowAdaptor::onBookmarkRemoveRequested);
+    assert(m_remover);
+
+    m_window.addAction(m_remover);
 }
 
 WindowAdaptor::
 ~WindowAdaptor()
 {
     toolsMenu().removeAction(m_settingsMenu.menuAction());
+    m_window.removeAction(m_remover);
 }
 
 BrowserWindow &WindowAdaptor::
@@ -52,6 +61,22 @@ onBookmarkTriggered(BookmarkItem &item)
     }
     else {
         BookmarksTools::openBookmark(&m_window, &item);
+    }
+}
+
+void WindowAdaptor::
+onBookmarkRemoveRequested()
+{
+    auto* const view = m_window.weView();
+    assert(view);
+
+    assert(mApp);
+    auto* const bookmarks = mApp->bookmarks();
+    assert(bookmarks);
+
+    auto const& currentUrl = view->url();
+    for (auto* const item: bookmarks->searchBookmarks(currentUrl)) {
+        bookmarks->removeBookmark(item);
     }
 }
 

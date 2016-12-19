@@ -26,9 +26,15 @@ public:
 
 private Q_SLOTS:
     void onBookmarkTriggered(BookmarkItem&);
+    void onBookmarkRemoveRequested();
 
 private:
     QMenu &toolsMenu() const;
+
+    void validate()
+    {
+        assert(m_remover);
+    }
 
 private:
     BrowserWindow &m_window;
@@ -37,6 +43,7 @@ private:
     ToolBarAdaptor m_toolBar;
     SettingsMenu m_settingsMenu;
     IconChangeWatcher m_iconWatcher;
+    QAction* m_remover = nullptr;
 };
 
 } // namespace bookmark_dash
