@@ -7,6 +7,8 @@
 #include <QtCore/QString>
 #include <QtCore/QMessageLogContext>
 
+#include <iostream>
+
 namespace syslog_dash {
 
 static QtMessageHandler previousHandler = nullptr;
@@ -16,6 +18,7 @@ handleMessage(QtMsgType const type, QMessageLogContext const& cxt,
                                     QString const& msg)
 {
     QByteArray localMsg = msg.toLocal8Bit();
+    localMsg.replace('%', "%%");
 
     switch (type) {
     case QtDebugMsg:
